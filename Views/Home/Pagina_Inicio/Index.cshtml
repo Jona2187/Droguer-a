@@ -1,18 +1,99 @@
 @{
     ViewData["Title"] = "Drogueria";
     Layout = "/Views/Shared/_LayoutPublico.cshtml";
+    
 }
-<div class="container">
-    <div class="row">
-        <div class="col-12">
-            <h1>Drogueria</h1>
-            <p>Drogueria</p>
-        </div>
-        <div class="col-12">
-            <select name="" id="">
-                <option value="">Login</option>
-                <option value="">Registrarse</option>
-            </select>
+
+<link rel="stylesheet" href="~/css/carrusel.css" asp-append-version="true" />
+
+<div class="pagina-inicio">
+
+<section class="carrusel">
+
+    <div class="slide activo">
+        <img src="~/img/1.jpeg" alt="Droguería">
+        <div class="contenido-slide">
+            <h1>Bienvenido a nuestra Droguería</h1>
+            <p>
+                Encuentra medicamentos, productos de cuidado personal
+                y mucho más.
+            </p>
+            <a href="#" class="boton">Ver productos</a>
         </div>
     </div>
+
+    <div class="slide">
+        <img src="~/img/2.jpeg" alt="Productos">
+    </div>
+
+    <div class="slide">
+        <img src="~/img/3.jpeg" alt="Promociones">
+    </div>
+
+    <!-- Botones -->
+    <button class="flecha anterior" onclick="cambiarSlide(-1)">
+        &#10094;
+    </button>
+
+    <button class="flecha siguiente" onclick="cambiarSlide(1)">
+        &#10095;
+    </button>
+
+    <!-- Indicadores -->
+    <div class="indicadores">
+        <span class="punto activo" onclick="irSlide(0)"></span>
+        <span class="punto" onclick="irSlide(1)"></span>
+        <span class="punto" onclick="irSlide(2)"></span>
+    </div>
+
+</section>
+
+<script src="~/js/carrusel.js" asp-append-version="true"></script>
+
+
+<!-- INFORMACIÓN -->
+<section class="informacion">
+
+    <h2>¿Quiénes somos?</h2>
+
+    <p>
+        Somos una droguería comprometida con ofrecer productos
+        de calidad y brindar una excelente atención a nuestros clientes.
+    </p>
+
+</section>
+
 </div>
+
+
+<!-- SERVICIOS -->
+<section class="servicios">
+
+    <h2>Nuestros servicios</h2>
+
+    <div class="tarjetas">
+
+        <div class="tarjeta">
+            <h3>💊 Medicamentos</h3>
+            <p>
+                Amplia variedad de medicamentos y productos de salud.
+            </p>
+        </div>
+
+        <div class="tarjeta">
+            <h3>🩺 Atención</h3>
+            <p>
+                Atención personalizada para nuestros clientes.
+            </p>
+        </div>
+
+        <div class="tarjeta">
+            <h3>🚚 Domicilios</h3>
+            <p>
+                Recibe tus productos directamente en tu hogar.
+            </p>
+        </div>
+
+    </div>
+
+</section>

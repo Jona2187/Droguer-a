@@ -8,23 +8,23 @@
     "net10.0": []
   },
   "packageFolders": {
-    "C:\\Users\\Jonatan H\\.nuget\\packages\\": {},
+    "C:\\Users\\jesus\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Drogueria 19-09\\Drogueria\\Drogueria.csproj",
+      "projectUniqueName": "C:\\Users\\jesus\\Desktop\\d\\Droguer-a\\Drogueria.csproj",
       "projectName": "Drogueria",
-      "projectPath": "D:\\Drogueria 19-09\\Drogueria\\Drogueria.csproj",
-      "packagesPath": "C:\\Users\\Jonatan H\\.nuget\\packages\\",
-      "outputPath": "D:\\Drogueria 19-09\\Drogueria\\obj\\",
+      "projectPath": "C:\\Users\\jesus\\Desktop\\d\\Droguer-a\\Drogueria.csproj",
+      "packagesPath": "C:\\Users\\jesus\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\jesus\\Desktop\\d\\Droguer-a\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\Jonatan H\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\jesus\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -52,7 +52,7 @@
         "auditLevel": "low",
         "auditMode": "all"
       },
-      "SdkAnalysisLevel": "10.0.400"
+      "SdkAnalysisLevel": "10.0.300"
     },
     "frameworks": {
       "net10.0": {
@@ -77,7 +77,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.400/PortableRuntimeIdentifierGraph.json",
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.302/PortableRuntimeIdentifierGraph.json",
         "packagesToPrune": {
           "Microsoft.AspNetCore": "(,10.0.32767]",
           "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",
