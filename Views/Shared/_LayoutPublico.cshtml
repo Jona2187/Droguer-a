@@ -1,0 +1,304 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Drogueria — Tu aliado de salud. Productos farmaceuticos, medicamentos y mas." />
+    <title>@ViewData["Title"] - Drogueria</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap 5 CSS -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+    <!-- Site Styles -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/layout-publico.css" asp-append-version="true" />
+ 
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+<div style="display:flex; flex-direction:column; min-height:100vh;">
+
+    <!-- ====================================================
+         NAVBAR PUBLICA
+    ===================================================== -->
+    <nav class="pub-navbar" id="pubNavbar" role="navigation" aria-label="Navegacion principal">
+        <div class="pub-navbar-inner">
+
+            <!-- Marca -->
+            <a href="/" class="pub-brand" id="pubBrandLink">
+                <div class="pub-brand-logo">
+                    <img src="~/img/logodrogueria.png" alt="Drogueria Logo" class="pub-brand-img"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                    <span class="pub-brand-fallback" style="display:none;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2.2"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/>
+                            <path d="m8.5 8.5 7 7"/>
+                        </svg>
+                    </span>
+                </div>
+                <div class="pub-brand-text">
+                    <span class="pub-brand-name">Drogueria</span>
+                    <span class="pub-brand-tagline">Tu aliado de salud</span>
+                </div>
+            </a>
+
+            <!-- Links de navegacion (desktop) -->
+            <ul class="pub-nav-links" id="pubNavLinks">
+                @{
+                    var activeNav = ViewData["ActiveNav"] as string ?? "";
+                }
+                <li><a href="/" class="@(activeNav == "inicio" ? "active" : "")"><i class="bi bi-house"></i> Inicio</a></li>
+                <li><a href="#nosotros" class="@(activeNav == "nosotros" ? "active" : "")"><i class="bi bi-info-circle"></i> Nosotros</a></li>
+                <li><a href="#servicios" class="@(activeNav == "servicios" ? "active" : "")"><i class="bi bi-grid-3x3-gap"></i> Servicios</a></li>
+                <li><a href="#productos" class="@(activeNav == "productos" ? "active" : "")"><i class="bi bi-box-seam"></i> Productos</a></li>
+                <li><a href="#contacto" class="@(activeNav == "contacto" ? "active" : "")"><i class="bi bi-envelope"></i> Contacto</a></li>
+            </ul>
+
+            <!-- Acciones derechas -->
+            <div class="pub-nav-actions">
+                <!-- Toggle Tema -->
+                <button class="btn-icon" id="themeToggleBtn" title="Cambiar tema" type="button" aria-label="Cambiar tema claro/oscuro">
+                    <i class="bi bi-moon-stars" id="themeIcon"></i>
+                </button>
+
+                <!-- Dropdown Iniciar Sesion -->
+                <div class="pub-login-wrapper">
+                    <button class="pub-login-btn" id="pubLoginBtn" type="button"
+                            aria-haspopup="true" aria-expanded="false" aria-controls="pubLoginDropdown">
+                        <i class="bi bi-person-circle"></i>
+                        <span>Iniciar Sesion</span>
+                        <i class="bi bi-chevron-down" style="font-size:11px; opacity:.7;"></i>
+                    </button>
+                    <div class="pub-login-dropdown" id="pubLoginDropdown" role="menu">
+                        <div class="pub-login-dropdown-header">Acceder como</div>
+                        <a href="/Auth/LoginEmpleado" class="pub-login-option" role="menuitem" id="loginOptionEmpleado">
+                            <div class="pub-login-option-icon"><i class="bi bi-person-badge"></i></div>
+                            <div class="pub-login-option-label">
+                                <span class="pub-login-option-title">Empleado</span>
+                                <span class="pub-login-option-sub">Gestion de pedidos y ventas</span>
+                            </div>
+                        </a>
+                        <a href="/Auth/LoginAdmin" class="pub-login-option" role="menuitem" id="loginOptionAdmin">
+                            <div class="pub-login-option-icon"><i class="bi bi-shield-lock"></i></div>
+                            <div class="pub-login-option-label">
+                                <span class="pub-login-option-title">Administrador</span>
+                                <span class="pub-login-option-sub">Panel de control completo</span>
+                            </div>
+                        </a>
+                        <a href="/Auth/LoginCliente" class="pub-login-option" role="menuitem" id="loginOptionCliente">
+                            <div class="pub-login-option-icon"><i class="bi bi-bag-heart"></i></div>
+                            <div class="pub-login-option-label">
+                                <span class="pub-login-option-title">Cliente</span>
+                                <span class="pub-login-option-sub">Compras y mis pedidos</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Hamburguesa (solo movil) -->
+                <button class="pub-hamburger" id="pubHamburger" type="button" aria-label="Abrir menu" aria-expanded="false">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Menu Movil -->
+    <div class="pub-mobile-menu" id="pubMobileMenu" role="dialog" aria-label="Menu movil">
+        <a href="/" class="@(activeNav == "inicio" ? "active" : "")" id="mobileNavInicio">
+            <i class="bi bi-house-fill"></i> Inicio
+        </a>
+        <a href="#nosotros" class="@(activeNav == "nosotros" ? "active" : "")" id="mobileNavNosotros">
+            <i class="bi bi-info-circle-fill"></i> Nosotros
+        </a>
+        <a href="#servicios" class="@(activeNav == "servicios" ? "active" : "")" id="mobileNavServicios">
+            <i class="bi bi-grid-3x3-gap-fill"></i> Servicios
+        </a>
+        <a href="#productos" class="@(activeNav == "productos" ? "active" : "")" id="mobileNavProductos">
+            <i class="bi bi-box-seam-fill"></i> Productos
+        </a>
+        <a href="#contacto" class="@(activeNav == "contacto" ? "active" : "")" id="mobileNavContacto">
+            <i class="bi bi-envelope-fill"></i> Contacto
+        </a>
+        <div class="pub-mobile-divider"></div>
+        <div class="pub-mobile-section-label">Iniciar sesion como</div>
+        <a href="/Auth/LoginEmpleado" id="mobileLoginEmpleado">
+            <i class="bi bi-person-badge-fill"></i> Empleado
+        </a>
+        <a href="/Auth/LoginAdmin" id="mobileLoginAdmin">
+            <i class="bi bi-shield-lock-fill"></i> Administrador
+        </a>
+        <a href="/Auth/LoginCliente" id="mobileLoginCliente">
+            <i class="bi bi-bag-heart-fill"></i> Cliente
+        </a>
+    </div>
+
+    <!-- ====================================================
+         CONTENIDO PRINCIPAL
+    ===================================================== -->
+    <main role="main" class="pub-main-content">
+        @RenderBody()
+    </main>
+
+    <!-- ====================================================
+         FOOTER PUBLICO
+    ===================================================== -->
+    <footer class="pub-footer" role="contentinfo">
+        <div class="pub-footer-inner">
+
+            <!-- Columna 1: Marca -->
+            <div class="pub-footer-brand">
+                <a href="/" class="pub-footer-brand-logo" aria-label="Inicio Drogueria">
+                    <div class="pub-footer-logo-box">
+                        <img src="~/img/logodrogueria.png" alt="logo" style="width:100%;height:100%;object-fit:contain;"
+                             onerror="this.style.display='none';" />
+                    </div>
+                    <span class="pub-footer-brand-name">Drogueria</span>
+                </a>
+                <p class="pub-footer-desc">
+                    Tu farmacia de confianza. Ofrecemos medicamentos, productos de salud y bienestar
+                    con la mejor atencion y los precios mas competitivos del mercado.
+                </p>
+                <div class="pub-footer-socials">
+                    <a href="#" class="pub-social-btn" aria-label="Facebook" id="socialFacebook">
+                        <i class="bi bi-facebook"></i>
+                    </a>
+                    <a href="#" class="pub-social-btn" aria-label="Instagram" id="socialInstagram">
+                        <i class="bi bi-instagram"></i>
+                    </a>
+                    <a href="#" class="pub-social-btn" aria-label="WhatsApp" id="socialWhatsapp">
+                        <i class="bi bi-whatsapp"></i>
+                    </a>
+                    <a href="#" class="pub-social-btn" aria-label="Twitter" id="socialTwitter">
+                        <i class="bi bi-twitter-x"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Columna 2: Navegacion -->
+            <div>
+                <div class="pub-footer-col-title">Navegacion</div>
+                <ul class="pub-footer-links">
+                    <li><a href="/"><i class="bi bi-chevron-right"></i> Inicio</a></li>
+                    <li><a href="#nosotros"><i class="bi bi-chevron-right"></i> Nosotros</a></li>
+                    <li><a href="#servicios"><i class="bi bi-chevron-right"></i> Servicios</a></li>
+                    <li><a href="#productos"><i class="bi bi-chevron-right"></i> Productos</a></li>
+                    <li><a href="#contacto"><i class="bi bi-chevron-right"></i> Contacto</a></li>
+                </ul>
+            </div>
+
+            <!-- Columna 3: Servicios -->
+            <div>
+                <div class="pub-footer-col-title">Servicios</div>
+                <ul class="pub-footer-links">
+                    <li><a href="#"><i class="bi bi-chevron-right"></i> Venta de medicamentos</a></li>
+                    <li><a href="#"><i class="bi bi-chevron-right"></i> Asesoria farmaceutica</a></li>
+                    <li><a href="#"><i class="bi bi-chevron-right"></i> Pedidos en linea</a></li>
+                    <li><a href="#"><i class="bi bi-chevron-right"></i> Domicilios</a></li>
+                    <li><a href="#"><i class="bi bi-chevron-right"></i> Productos naturales</a></li>
+                </ul>
+            </div>
+
+            <!-- Columna 4: Contacto -->
+            <div>
+                <div class="pub-footer-col-title">Contacto</div>
+                <div class="pub-footer-contact-item">
+                    <div class="pub-footer-contact-icon"><i class="bi bi-geo-alt-fill"></i></div>
+                    <span>Calle 45 # 12-34, Bogota, Colombia</span>
+                </div>
+                <div class="pub-footer-contact-item">
+                    <div class="pub-footer-contact-icon"><i class="bi bi-telephone-fill"></i></div>
+                    <span>+57 (601) 123-4567</span>
+                </div>
+                <div class="pub-footer-contact-item">
+                    <div class="pub-footer-contact-icon"><i class="bi bi-envelope-fill"></i></div>
+                    <span>info@drogueria.com</span>
+                </div>
+                <div class="pub-footer-contact-item">
+                    <div class="pub-footer-contact-icon"><i class="bi bi-clock-fill"></i></div>
+                    <span>Lun - Sab: 7am - 9pm</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Barra inferior -->
+        <div class="pub-footer-bottom">
+            <span>&copy; @DateTime.Now.Year <strong>Drogueria</strong>. Todos los derechos reservados.</span>
+            <span class="pub-footer-bottom-badge">
+                <i class="bi bi-shield-check"></i> Sistema Gestor v1.0
+            </span>
+        </div>
+    </footer>
+
+</div><!-- /app wrapper -->
+
+<!-- Scripts -->
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+
+<script>
+
+    // Dropdown Login
+    (function () {
+        var loginBtn = document.getElementById('pubLoginBtn');
+        var dropdown = document.getElementById('pubLoginDropdown');
+
+        if (loginBtn && dropdown) {
+            loginBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                var isOpen = dropdown.classList.toggle('show');
+                loginBtn.setAttribute('aria-expanded', String(isOpen));
+            });
+            document.addEventListener('click', function () {
+                dropdown.classList.remove('show');
+                loginBtn.setAttribute('aria-expanded', 'false');
+            });
+        }
+    })();
+
+    // Hamburguesa + Menu Movil
+    (function () {
+        var hamburger = document.getElementById('pubHamburger');
+        var mobileMenu = document.getElementById('pubMobileMenu');
+
+        if (hamburger && mobileMenu) {
+            hamburger.addEventListener('click', function () {
+                var isOpen = mobileMenu.classList.toggle('show');
+                hamburger.classList.toggle('is-open', isOpen);
+                hamburger.setAttribute('aria-expanded', String(isOpen));
+            });
+            mobileMenu.querySelectorAll('a').forEach(function (link) {
+                link.addEventListener('click', function () {
+                    mobileMenu.classList.remove('show');
+                    hamburger.classList.remove('is-open');
+                    hamburger.setAttribute('aria-expanded', 'false');
+                });
+            });
+        }
+    })();
+
+    // Scroll effect navbar
+    (function () {
+        var navbar = document.getElementById('pubNavbar');
+        window.addEventListener('scroll', function () {
+            if (navbar) navbar.classList.toggle('scrolled', window.scrollY > 20);
+        }, { passive: true });
+    })();
+</script>
+
+@await RenderSectionAsync("Scripts", required: false)
+
+</body>
+</html>

@@ -1,0 +1,1020 @@
+/* ==========================================================================
+   DROGUERIA - SISTEMA GESTOR DE TICKETS
+   Design System: Tono Morado (Light & Dark Theme) + Mini Sidebar
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. VARIABLES DE TEMA CLARO (LIGHT THEME)
+   -------------------------------------------------------------------------- */
+:root,
+[data-bs-theme="light"] {
+    /* Color Palette - Tono Morado */
+    --primary: #7c3aed;                  /* Violeta Vibrante Principal */
+    --primary-hover: #6d28d9;            /* Violeta Intenso */
+    --primary-dark: #5b21b6;             /* Violeta Oscuro */
+    --primary-soft: rgba(124, 58, 237, 0.1);  /* Fondo suave translúcido */
+    --primary-subtle: rgba(124, 58, 237, 0.05);
+    --primary-light: #f5f3ff;           /* Tono muy claro violeta */
+    --primary-border: rgba(124, 58, 237, 0.22);
+    --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+    --primary-gradient-subtle: linear-gradient(135deg, rgba(124, 58, 237, 0.12) 0%, rgba(168, 85, 247, 0.06) 100%);
+    
+    /* Semantic Colors */
+    --success: #10b981;
+    --success-soft: rgba(16, 185, 129, 0.12);
+    --danger: #ef4444;
+    --danger-soft: rgba(239, 68, 68, 0.12);
+    --warning: #f59e0b;
+    --warning-soft: rgba(245, 158, 11, 0.12);
+    --info: #8b5cf6;
+    --info-soft: rgba(139, 92, 246, 0.12);
+
+    /* Neutral Colors - Modo Claro */
+    --t-base: #0f172a;
+    --t-muted: #475569;
+    --t-light: #94a3b8;
+    
+    --bg-app: #faf9fd;
+    --bg-card: #ffffff;
+    --bg-header: #ffffff;
+    --bg-sidebar: #ffffff;
+    --bg-muted: #f3f0fa;
+    --border: #e9e4f5;
+    --border-soft: #f4f0fa;
+    --tooltip-bg: #1e1b4b;
+    --tooltip-color: #ffffff;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgba(124, 58, 237, 0.04);
+    --shadow-card: 0 1px 3px 0 rgba(124, 58, 237, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 4px 6px -1px rgba(124, 58, 237, 0.08), 0 2px 4px -2px rgba(124, 58, 237, 0.04);
+    --shadow-lg: 0 10px 20px -3px rgba(124, 58, 237, 0.12), 0 4px 6px -4px rgba(124, 58, 237, 0.05);
+}
+
+/* --------------------------------------------------------------------------
+   2. VARIABLES DE TEMA OSCURO (DARK THEME)
+   -------------------------------------------------------------------------- */
+[data-bs-theme="dark"] {
+    /* Color Palette Morado para fondo oscuro */
+    --primary: #8b5cf6;                  /* Violeta luminoso */
+    --primary-hover: #a78bfa;            /* Violeta más claro al hover */
+    --primary-dark: #7c3aed;
+    --primary-soft: rgba(139, 92, 246, 0.18);
+    --primary-subtle: rgba(139, 92, 246, 0.08);
+    --primary-light: rgba(139, 92, 246, 0.15);
+    --primary-border: rgba(139, 92, 246, 0.35);
+    --primary-gradient: linear-gradient(135deg, #8b5cf6 0%, #c084fc 100%);
+    --primary-gradient-subtle: linear-gradient(135deg, rgba(139, 92, 246, 0.22) 0%, rgba(192, 132, 252, 0.1) 100%);
+
+    /* Neutral Colors - Modo Oscuro */
+    --t-base: #f8fafc;
+    --t-muted: #94a3b8;
+    --t-light: #64748b;
+
+    --bg-app: #0b0f19;                   /* Fondo general oscuro */
+    --bg-card: #131826;                  /* Superficie de tarjetas */
+    --bg-header: #111624;                /* Barra superior */
+    --bg-sidebar: #111624;               /* Barra lateral */
+    --bg-muted: #1c2234;                 /* Elementos secundarios */
+    --border: #232b40;                   /* Bordes oscuros */
+    --border-soft: #1a2030;
+    --tooltip-bg: #2e1065;
+    --tooltip-color: #f8fafc;
+
+    /* Shadows para modo oscuro */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+    --shadow-card: 0 2px 6px 0 rgba(0, 0, 0, 0.45);
+    --shadow-md: 0 6px 16px -1px rgba(0, 0, 0, 0.55);
+    --shadow-lg: 0 14px 28px -4px rgba(0, 0, 0, 0.65);
+}
+
+/* --------------------------------------------------------------------------
+   3. ESTILOS BASE Y REINICIOS
+   -------------------------------------------------------------------------- */
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: var(--t-base);
+    background-color: var(--bg-app);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: clip;
+    transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* Bootstrap Theme Overrides */
+.btn-primary {
+    background-color: var(--primary) !important;
+    border-color: var(--primary) !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 6px rgba(124, 58, 237, 0.28) !important;
+}
+
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active {
+    background-color: var(--primary-hover) !important;
+    border-color: var(--primary-hover) !important;
+    box-shadow: 0 3px 10px rgba(124, 58, 237, 0.38) !important;
+}
+
+.text-primary {
+    color: var(--primary) !important;
+}
+
+/* ==========================================================================
+   4. APP LAYOUT (Estructura Principal)
+   ========================================================================== */
+
+.app-layout {
+    display: flex;
+    min-height: 100vh;
+    min-height: 100dvh;
+    width: 100%;
+    background-color: var(--bg-app);
+    position: relative;
+}
+
+/* ==========================================================================
+   5. SIDEBAR COMPLETO Y MINI SIDEBAR (Solo Iconos al Colapsar)
+   ========================================================================== */
+
+.d-sidebar {
+    width: 260px;
+    min-width: 260px;
+    background-color: var(--bg-sidebar);
+    border-right: 1px solid var(--border);
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100vh;
+    max-height: 100dvh;
+    position: sticky;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    z-index: 1020;
+    transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1), 
+                min-width 0.28s cubic-bezier(0.4, 0, 0.2, 1), 
+                transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+                background-color 0.25s ease,
+                border-color 0.25s ease;
+}
+
+/* Header del Sidebar */
+.d-sidebar .brand-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    min-height: 64px;
+    transition: all 0.25s ease;
+}
+
+.d-sidebar .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: inherit;
+    overflow: hidden;
+}
+
+.d-sidebar .brand-logo {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: var(--primary-gradient);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 10px rgba(124, 58, 237, 0.28);
+    overflow: hidden;
+}
+
+/* Botón flotante situado sobre la línea divisoria entre sidebar y navbar */
+.sidebar-edge-toggle {
+    position: absolute;
+    right: -13px;
+    top: 19px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+    color: var(--t-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 1035;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    padding: 0;
+}
+
+.sidebar-edge-toggle:hover {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: #ffffff;
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.35);
+}
+
+.sidebar-edge-toggle i {
+    font-size: 11px;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Cuando el sidebar está colapsado, la flecha gira a la derecha */
+.app-layout.sidebar-collapsed .sidebar-edge-toggle i {
+    transform: rotate(180deg);
+}
+
+@media (max-width: 991.98px) {
+    .sidebar-edge-toggle {
+        display: none;
+    }
+}
+
+.d-sidebar .brand-fallback-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+}
+
+.d-sidebar .brand-img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.d-sidebar .brand-text {
+    display: flex;
+    flex-direction: column;
+    white-space: nowrap;
+    transition: opacity 0.2s ease, width 0.2s ease;
+}
+
+.d-sidebar .brand-name {
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--t-base);
+    letter-spacing: -0.01em;
+}
+
+.d-sidebar .brand-tag {
+    font-size: 11px;
+    color: var(--primary);
+    font-weight: 600;
+}
+
+/* Botón de acción colapsar en el sidebar */
+.sidebar-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg-muted);
+    color: var(--t-muted);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+}
+
+.sidebar-action-btn:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+    border-color: var(--primary-border);
+}
+
+/* Área con scroll del menú */
+.sidebar-scrollable {
+    flex: 1 1 0%;
+    min-height: 0;
+    max-height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-bottom: 1.5rem;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+}
+
+.sidebar-scrollable::-webkit-scrollbar {
+    width: 4px;
+}
+.sidebar-scrollable::-webkit-scrollbar-track {
+    background: transparent;
+}
+.sidebar-scrollable::-webkit-scrollbar-thumb {
+    background-color: var(--border);
+    border-radius: 10px;
+}
+
+/* Secciones de Navegación */
+.d-sidebar .nav-section {
+    padding: 12px 14px 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.d-sidebar .nav-label {
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--t-light);
+    padding: 4px 10px 8px;
+    font-family: 'JetBrains Mono', monospace;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.d-sidebar .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8.5px 12px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--t-muted);
+    text-decoration: none;
+    transition: all 0.15s ease;
+    cursor: pointer;
+    white-space: nowrap;
+    position: relative;
+}
+
+.d-sidebar .nav-link svg {
+    flex-shrink: 0;
+    stroke: currentColor;
+    transition: transform 0.15s ease;
+}
+
+.d-sidebar .nav-link span {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.d-sidebar .nav-link:hover {
+    background-color: var(--primary-light);
+    color: var(--primary);
+    transform: translateX(2px);
+}
+
+.d-sidebar .nav-link.is-active {
+    background: var(--primary-gradient-subtle);
+    color: var(--primary);
+    font-weight: 600;
+    border-left: 3px solid var(--primary);
+}
+
+.d-sidebar .nav-link .chev {
+    transition: transform 0.2s ease;
+    stroke: var(--t-light);
+    flex-shrink: 0;
+}
+
+/* Grupos y Submenús */
+.d-sidebar .nav-item-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.d-sidebar .nav-item-group .nav-submenu {
+    display: none;
+    flex-direction: column;
+    gap: 2px;
+    padding: 4px 0 4px 34px;
+}
+
+.d-sidebar .nav-item-group.is-open .nav-submenu {
+    display: flex;
+}
+
+.d-sidebar .nav-item-group.is-open > .nav-link .chev {
+    transform: rotate(90deg);
+    stroke: var(--primary);
+}
+
+.d-sidebar .nav-submenu a {
+    padding: 6px 12px;
+    font-size: 12.5px;
+    color: var(--t-muted);
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.d-sidebar .nav-submenu a:hover {
+    color: var(--primary);
+    background-color: var(--primary-light);
+}
+
+.d-sidebar .nav-submenu a.is-active {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+/* Sidebar Footer (Usuario) */
+.d-sidebar .sidebar-footer {
+    margin-top: auto;
+    padding: 12px 14px;
+    border-top: 1px solid var(--border);
+    background-color: var(--bg-sidebar);
+    flex-shrink: 0;
+    transition: all 0.25s ease;
+}
+
+.d-sidebar .dd-wrap {
+    position: relative;
+}
+
+.d-sidebar .workspace {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 9px;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+    user-select: none;
+}
+
+.d-sidebar .workspace:hover,
+.d-sidebar .workspace:focus-visible {
+    background-color: var(--primary-light);
+    outline: none;
+}
+
+.d-sidebar .workspace-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: var(--primary-gradient);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+    box-shadow: 0 3px 8px rgba(124, 58, 237, 0.25);
+}
+
+.d-sidebar .workspace-text {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.d-sidebar .workspace-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--t-base);
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.d-sidebar .workspace-role {
+    font-size: 10.5px;
+    color: var(--primary);
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+}
+
+.d-sidebar .workspace-chev {
+    stroke: var(--t-light);
+    flex-shrink: 0;
+}
+
+/* Dropdown Flotante */
+.d-sidebar .dd-menu {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 0;
+    right: 0;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow-lg);
+    padding: 6px;
+    z-index: 1050;
+}
+
+.d-sidebar .dd-menu.show {
+    display: block;
+    animation: dropdownRise 0.15s ease-out;
+}
+
+@keyframes dropdownRise {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.d-sidebar .dd-profile-head {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 4px;
+}
+
+.d-sidebar .dd-profile-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--t-base);
+}
+
+.d-sidebar .dd-profile-email {
+    font-size: 11px;
+    color: var(--t-light);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.d-sidebar .dd-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 7px 10px;
+    border-radius: 7px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--t-muted);
+    text-decoration: none;
+    transition: all 0.12s ease;
+    cursor: pointer;
+}
+
+.d-sidebar .dd-menu-item svg {
+    stroke: currentColor;
+}
+
+.d-sidebar .dd-menu-item:hover {
+    background-color: var(--primary-light);
+    color: var(--primary);
+}
+
+.d-sidebar .dd-menu-item.danger {
+    color: var(--danger);
+}
+
+.d-sidebar .dd-menu-item.danger:hover {
+    background-color: var(--danger-soft);
+    color: var(--danger);
+}
+
+.d-sidebar .dd-divider {
+    height: 1px;
+    background-color: var(--border);
+    margin: 5px 0;
+}
+
+/* --------------------------------------------------------------------------
+   ESTADO MINI SIDEBAR (SOLO ICONOS) EN ESCRITORIO
+   -------------------------------------------------------------------------- */
+@media (min-width: 992px) {
+    .app-layout.sidebar-collapsed .d-sidebar {
+        width: 66px;
+        min-width: 66px;
+    }
+
+    /* Ocultar textos del header */
+    .app-layout.sidebar-collapsed .d-sidebar .brand-text {
+        display: none !important;
+    }
+
+    .app-layout.sidebar-collapsed .d-sidebar .brand-wrapper {
+        justify-content: center;
+        padding: 11px 12px;
+    }
+
+    .app-layout.sidebar-collapsed .d-sidebar .brand {
+        padding: 0;
+        margin: 0;
+    }
+
+    .app-layout.sidebar-collapsed .d-sidebar .brand-logo {
+        width: 42px;
+        height: 42px;
+        margin: 0 auto;
+    }
+
+    /* Ajustar etiquetas y navegación */
+    .app-layout.sidebar-collapsed .d-sidebar .nav-section {
+        padding: 8px 12px 4px;
+        align-items: center;
+    }
+
+    .app-layout.sidebar-collapsed .d-sidebar .nav-label {
+        width: 24px;
+        height: 1px;
+        padding: 0;
+        margin: 6px auto;
+        background-color: var(--border);
+        color: transparent;
+        font-size: 0;
+        overflow: hidden;
+    }
+
+    /* El ancho del nav es exactamente el mismo del logo (42px) */
+    .app-layout.sidebar-collapsed .d-sidebar .nav-link {
+        justify-content: center;
+        padding: 0;
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        margin: 0 auto 4px;
+        transform: none !important;
+        border-left: none !important;
+        display: flex;
+        align-items: center;
+    }
+
+    .app-layout.sidebar-collapsed .d-sidebar .nav-link svg {
+        width: 22px;
+        height: 22px;
+    }
+
+    .app-layout.sidebar-collapsed .d-sidebar .nav-link.is-active {
+        background: var(--primary-soft);
+        color: var(--primary);
+    }
+
+    .app-layout.sidebar-collapsed .d-sidebar .nav-link span,
+    .app-layout.sidebar-collapsed .d-sidebar .nav-link .chev,
+    .app-layout.sidebar-collapsed .d-sidebar .nav-submenu {
+        display: none !important;
+    }
+
+    /* Tooltip flotante al pasar el mouse en modo mini */
+    .app-layout.sidebar-collapsed .d-sidebar .nav-link:hover::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        left: calc(100% + 14px);
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: var(--tooltip-bg);
+        color: var(--tooltip-color);
+        padding: 6px 12px;
+        border-radius: 7px;
+        font-size: 12px;
+        font-weight: 500;
+        white-space: nowrap;
+        z-index: 1060;
+        box-shadow: var(--shadow-md);
+        pointer-events: none;
+        animation: tooltipFade 0.15s ease;
+    }
+
+    @keyframes tooltipFade {
+        from { opacity: 0; transform: translateY(-50%) translateX(-4px); }
+        to   { opacity: 1; transform: translateY(-50%) translateX(0); }
+    }
+
+    /* Footer usuario en modo mini con el mismo ancho del logo (42px) */
+    .app-layout.sidebar-collapsed .d-sidebar .sidebar-footer {
+        padding: 11px 12px;
+    }
+
+    .app-layout.sidebar-collapsed .d-sidebar .workspace {
+        justify-content: center;
+        padding: 0;
+    }
+
+    .app-layout.sidebar-collapsed .d-sidebar .workspace-avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        margin: 0 auto;
+    }
+
+    .app-layout.sidebar-collapsed .d-sidebar .workspace-text,
+    .app-layout.sidebar-collapsed .d-sidebar .workspace-chev {
+        display: none !important;
+    }
+
+    .app-layout.sidebar-collapsed .d-sidebar .dd-menu {
+        left: calc(100% + 14px);
+        bottom: 8px;
+        right: auto;
+        width: 220px;
+    }
+}
+
+/* ==========================================================================
+   6. APP MAIN (Header, Content, Footer)
+   ========================================================================== */
+
+.app-main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    transition: all 0.28s ease;
+    background-color: var(--bg-app);
+}
+
+/* App Header */
+.app-header {
+    height: 64px;
+    background-color: var(--bg-header);
+    border-bottom: 1px solid var(--border);
+    padding: 0 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 1010;
+    transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sidebar-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 9px;
+    border: 1px solid var(--border);
+    background-color: var(--bg-card);
+    color: var(--t-muted);
+    cursor: pointer;
+    transition: all 0.18s ease;
+}
+
+.sidebar-toggle-btn:hover {
+    background-color: var(--primary-light);
+    color: var(--primary);
+    border-color: var(--primary-border);
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.header-search {
+    position: relative;
+    width: 260px;
+}
+
+.header-search i {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--t-light);
+    font-size: 13px;
+    pointer-events: none;
+}
+
+.header-search input {
+    padding-left: 32px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background-color: var(--bg-muted);
+    color: var(--t-base);
+    font-size: 13px;
+    transition: all 0.15s ease;
+}
+
+.header-search input:focus {
+    background-color: var(--bg-card);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-soft);
+    color: var(--t-base);
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-icon {
+    position: relative;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background-color: var(--bg-card);
+    color: var(--t-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-icon:hover {
+    background-color: var(--primary-light);
+    color: var(--primary);
+    border-color: var(--primary-border);
+}
+
+.badge-dot {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 7px;
+    height: 7px;
+    background-color: var(--primary);
+    border-radius: 50%;
+}
+
+/* App Content */
+.app-content {
+    flex: 1;
+    padding: 1.75rem;
+}
+
+/* App Footer */
+.app-footer {
+    padding: 1rem 1.75rem;
+    background-color: var(--bg-header);
+    border-top: 1px solid var(--border);
+    font-size: 12.5px;
+    color: var(--t-muted);
+    transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+/* Backdrop para Móvil */
+.sidebar-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(3px);
+    z-index: 1015;
+}
+
+/* ==========================================================================
+   7. RESPONSIVE MÓVIL (< 992px)
+   ========================================================================== */
+@media (max-width: 991.98px) {
+    .d-sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        transform: translateX(-100%);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .d-sidebar.show {
+        transform: translateX(0);
+    }
+
+    .sidebar-backdrop.show {
+        display: block;
+    }
+}
+
+/* ==========================================================================
+   8. COMPONENTES UI (Tarjetas, Métricas, Badges, Tablas)
+   ========================================================================== */
+
+.stat-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    box-shadow: var(--shadow-card);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background-color 0.25s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-border);
+}
+
+.stat-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.stat-icon.primary { background: var(--primary-soft); color: var(--primary); }
+.stat-icon.success { background: var(--success-soft); color: var(--success); }
+.stat-icon.warning { background: var(--warning-soft); color: var(--warning); }
+.stat-icon.danger  { background: var(--danger-soft); color: var(--danger); }
+
+.card-admin {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow-card);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+    transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+.card-admin-header {
+    padding: 1.1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--bg-card);
+    transition: background-color 0.25s ease;
+}
+
+.card-admin-body {
+    padding: 1.5rem;
+}
+
+/* Tabla Moderna */
+.table-modern {
+    width: 100%;
+    margin-bottom: 0;
+    vertical-align: middle;
+}
+
+.table-modern th {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--t-light);
+    background-color: var(--bg-muted);
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+.table-modern td {
+    padding: 14px 16px;
+    font-size: 13px;
+    color: var(--t-base);
+    border-bottom: 1px solid var(--border);
+    transition: background-color 0.15s ease, border-color 0.25s ease;
+}
+
+.table-modern tr:last-child td {
+    border-bottom: 0;
+}
+
+.table-modern tr:hover td {
+    background-color: var(--primary-light);
+}
+
+/* Badges */
+.badge-admin {
+    padding: 4px 9px;
+    border-radius: 6px;
+    font-size: 11.5px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.badge-admin.primary { background: var(--primary-soft); color: var(--primary); }
+.badge-admin.success { background: var(--success-soft); color: var(--success); }
+.badge-admin.warning { background: var(--warning-soft); color: var(--warning); }
+.badge-admin.danger  { background: var(--danger-soft); color: var(--danger); }
+.badge-admin.info    { background: var(--primary-soft); color: var(--primary); }

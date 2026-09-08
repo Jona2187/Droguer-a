@@ -1,0 +1,37 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\Drogueria 19-09\\Drogueria\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{2A8C08C8-5347-8FFA-B2AB-40322806BBC7}|Drogueria.csproj|d:\\drogueria 19-09\\drogueria\\views\\shared\\_layoutpublico.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{2A8C08C8-5347-8FFA-B2AB-40322806BBC7}|Drogueria.csproj|solutionrelative:views\\shared\\_layoutpublico.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "_LayoutPublico.cshtml",
+              "DocumentMoniker": "D:\\Drogueria 19-09\\Drogueria\\Views\\Shared\\_LayoutPublico.cshtml",
+              "RelativeDocumentMoniker": "Views\\Shared\\_LayoutPublico.cshtml",
+              "ToolTip": "D:\\Drogueria 19-09\\Drogueria\\Views\\Shared\\_LayoutPublico.cshtml",
+              "RelativeToolTip": "Views\\Shared\\_LayoutPublico.cshtml",
+              "ViewState": "AgIAALUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-09-08T13:26:29.083Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
