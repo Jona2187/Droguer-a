@@ -23,11 +23,8 @@ namespace Drogueria.Migrations
 
             modelBuilder.Entity("Drogueria.Models.Usuario", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+                    b.Property<string>("Uuid")
+                        .HasColumnType("varchar(36)");
 
                     b.Property<string>("Apellido")
                         .IsRequired()
@@ -48,7 +45,7 @@ namespace Drogueria.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.HasKey("Id");
+                    b.HasKey("Uuid");
 
                     b.ToTable("Usuarios");
                 });

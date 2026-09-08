@@ -1,9 +1,16 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\jesus\\Desktop\\d\\Droguer-a\\",
+  "WorkspaceRootPath": "D:\\Drogueria 19-09\\Drogueria\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{2A8C08C8-5347-8FFA-B2AB-40322806BBC7}|Drogueria.csproj|c:\\users\\jesus\\desktop\\d\\droguer-a\\views\\shared\\_layoutpublico.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\MSBuild\\Current\\Bin\\amd64\\Microsoft.Common.CurrentVersion.targets||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2A8C08C8-5347-8FFA-B2AB-40322806BBC7}|Drogueria.csproj|d:\\drogueria 19-09\\drogueria\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2A8C08C8-5347-8FFA-B2AB-40322806BBC7}|Drogueria.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2A8C08C8-5347-8FFA-B2AB-40322806BBC7}|Drogueria.csproj|d:\\drogueria 19-09\\drogueria\\views\\shared\\_layoutpublico.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{2A8C08C8-5347-8FFA-B2AB-40322806BBC7}|Drogueria.csproj|solutionrelative:views\\shared\\_layoutpublico.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     }
   ],
@@ -19,19 +26,38 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "_LayoutPublico.cshtml",
-              "DocumentMoniker": "C:\\Users\\jesus\\Desktop\\d\\Droguer-a\\Views\\Shared\\_LayoutPublico.cshtml",
-              "RelativeDocumentMoniker": "Views\\Shared\\_LayoutPublico.cshtml",
-              "ToolTip": "C:\\Users\\jesus\\Desktop\\d\\Droguer-a\\Views\\Shared\\_LayoutPublico.cshtml",
-              "RelativeToolTip": "Views\\Shared\\_LayoutPublico.cshtml",
-<<<<<<< HEAD
-              "ViewState": "AgIAAAYAAAAAAAAAAAAAAA4AAABPAAAAAAAAAA==",
-=======
-              "ViewState": "AgIAAFQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
->>>>>>> b383287e1ea9cf8f02b27e644e58a12aa26217c9
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-09-08T13:26:29.083Z",
+              "Title": "Microsoft.Common.CurrentVersion.targets",
+              "DocumentMoniker": "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\MSBuild\\Current\\Bin\\amd64\\Microsoft.Common.CurrentVersion.targets",
+              "ToolTip": "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\MSBuild\\Current\\Bin\\amd64\\Microsoft.Common.CurrentVersion.targets",
+              "ViewState": "AgIAAH0WAAAAAAAAAADwv4gWAAAEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003801|",
+              "WhenOpened": "2026-09-08T18:48:20.558Z",
               "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\Drogueria 19-09\\Drogueria\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "D:\\Drogueria 19-09\\Drogueria\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAA7AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-08T18:38:15.32Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "_LayoutPublico.cshtml",
+              "DocumentMoniker": "D:\\Drogueria 19-09\\Drogueria\\Views\\Shared\\_LayoutPublico.cshtml",
+              "RelativeDocumentMoniker": "Views\\Shared\\_LayoutPublico.cshtml",
+              "ToolTip": "D:\\Drogueria 19-09\\Drogueria\\Views\\Shared\\_LayoutPublico.cshtml",
+              "RelativeToolTip": "Views\\Shared\\_LayoutPublico.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAA7AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-09-08T18:37:26.732Z"
             }
           ]
         }

@@ -1,11 +1,5 @@
 {
   "version": 2,
-<<<<<<< HEAD
-  "dgSpecHash": "EZsprpc4/iE=",
-  "success": true,
-  "projectFilePath": "C:\\Users\\jesus\\Desktop\\d\\Droguer-a\\Drogueria.csproj",
-  "expectedPackageFiles": [],
-=======
   "dgSpecHash": "7lp+Oo5OVTA=",
   "success": true,
   "projectFilePath": "D:\\Drogueria 19-09\\Drogueria\\Drogueria.csproj",
@@ -38,6 +32,5 @@
     "C:\\Users\\Jonatan H\\.nuget\\packages\\system.composition.runtime\\7.0.0\\system.composition.runtime.7.0.0.nupkg.sha512",
     "C:\\Users\\Jonatan H\\.nuget\\packages\\system.composition.typedparts\\7.0.0\\system.composition.typedparts.7.0.0.nupkg.sha512"
   ],
->>>>>>> b383287e1ea9cf8f02b27e644e58a12aa26217c9
   "logs": []
 }

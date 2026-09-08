@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -18,7 +17,8 @@ namespace Drogueria.Migrations
                 name: "Usuarios",
                 columns: table => new
                 {
-                    Uuid = table.Column<string>(type: "varchar(36)", nullable: false),
+                    Uuid = table.Column<string>(type: "varchar(36)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     Nombre = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Apellido = table.Column<string>(type: "longtext", nullable: false)
@@ -31,7 +31,7 @@ namespace Drogueria.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Usuarios", x => x.Id);
+                    table.PrimaryKey("PK_Usuarios", x => x.Uuid);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
         }

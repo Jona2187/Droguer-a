@@ -1,8 +1,13 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace Drogueria.Models;
 
 public class Usuario
 {
-    public int Id { get; set; }
+    [Key]
+    [Column(TypeName = "varchar(36)")]
+    public string Uuid { get; set; } = Guid.NewGuid().ToString();
 
     public string Nombre { get; set; } = "";
 
