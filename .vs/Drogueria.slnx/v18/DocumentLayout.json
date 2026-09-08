@@ -24,7 +24,11 @@
               "RelativeDocumentMoniker": "Views\\Shared\\_LayoutPublico.cshtml",
               "ToolTip": "C:\\Users\\jesus\\Desktop\\d\\Droguer-a\\Views\\Shared\\_LayoutPublico.cshtml",
               "RelativeToolTip": "Views\\Shared\\_LayoutPublico.cshtml",
+<<<<<<< HEAD
               "ViewState": "AgIAAAYAAAAAAAAAAAAAAA4AAABPAAAAAAAAAA==",
+=======
+              "ViewState": "AgIAAFQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+>>>>>>> b383287e1ea9cf8f02b27e644e58a12aa26217c9
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2026-09-08T13:26:29.083Z",
               "EditorCaption": ""
