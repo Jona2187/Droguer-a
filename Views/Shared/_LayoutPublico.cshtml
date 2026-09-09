@@ -1,10 +1,18 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Drogueria — Tu aliado de salud. Productos farmaceuticos, medicamentos y mas." />
     <title>@ViewData["Title"] - Drogueria</title>
+
+    <script>
+        // Carga inmediata de tema para evitar parpadeo y mantener preferencia al recargar
+        (function () {
+            const savedTheme = localStorage.getItem('app_theme') || 'light';
+            document.documentElement.setAttribute('data-bs-theme', savedTheme);
+        })();
+    </script>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -80,21 +88,21 @@
                     </button>
                     <div class="pub-login-dropdown" id="pubLoginDropdown" role="menu">
                         <div class="pub-login-dropdown-header">Acceder como</div>
-                        <a href="/Auth/LoginEmpleado" class="pub-login-option" role="menuitem" id="loginOptionEmpleado">
+                        <a href="#" class="pub-login-option" role="menuitem" id="loginOptionEmpleado" data-bs-toggle="modal" data-bs-target="#_LoginEmpleado">
                             <div class="pub-login-option-icon"><i class="bi bi-person-badge"></i></div>
                             <div class="pub-login-option-label">
                                 <span class="pub-login-option-title">Empleado</span>
                                 <span class="pub-login-option-sub">Gestion de pedidos y ventas</span>
                             </div>
                         </a>
-                        <a href="/Auth/LoginAdmin" class="pub-login-option" role="menuitem" id="loginOptionAdmin">
+                        <a href="#" class="pub-login-option" role="menuitem" id="loginOptionAdmin" data-bs-toggle="modal" data-bs-target="#_LoginAdmin">
                             <div class="pub-login-option-icon"><i class="bi bi-shield-lock"></i></div>
                             <div class="pub-login-option-label">
                                 <span class="pub-login-option-title">Administrador</span>
                                 <span class="pub-login-option-sub">Panel de control completo</span>
                             </div>
                         </a>
-                        <a href="/Auth/LoginCliente" class="pub-login-option" role="menuitem" id="loginOptionCliente">
+                        <a href="#" class="pub-login-option" role="menuitem" id="loginOptionCliente" data-bs-toggle="modal" data-bs-target="#_LoginCliente">
                             <div class="pub-login-option-icon"><i class="bi bi-bag-heart"></i></div>
                             <div class="pub-login-option-label">
                                 <span class="pub-login-option-title">Cliente</span>

@@ -109,12 +109,7 @@ D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\rjimswa.dswa.cache.json
 D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\rjsmrazor.dswa.cache.json
 D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\rjsmcshtml.dswa.cache.json
 D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\scopedcss\bundle\Drogueria.styles.css
-D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\compressed\m6lfx84kvd-{0}-qc7lij93zm-qc7lij93zm.gz
-D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\compressed\o06jgbgt1e-{0}-vwcr3shd0m-vwcr3shd0m.gz
-D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\compressed\b1lgrntdql-{0}-t8klp2i3gy-t8klp2i3gy.gz
 D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\compressed\i4ky0vfvt2-{0}-61n19gt1b8-61n19gt1b8.gz
-D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\compressed\pku99580xw-{0}-8p22153hjd-8p22153hjd.gz
-D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\compressed\jye7jjmaf6-{0}-ael97iez05-ael97iez05.gz
 D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\compressed\qitglnop4l-{0}-t1cqhe9u97-t1cqhe9u97.gz
 D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\compressed\q2fzkl7s52-{0}-c2jlpeoesf-c2jlpeoesf.gz
 D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\compressed\n3h6esq8mn-{0}-sejl45xvog-sejl45xvog.gz
@@ -185,3 +180,9 @@ D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\refint\Drogueria.dll
 D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\Drogueria.pdb
 D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\Drogueria.genruntimeconfig.cache
 D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\ref\Drogueria.dll
+D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\compressed\o06jgbgt1e-{0}-1o6ao0m696-1o6ao0m696.gz
+D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\compressed\jye7jjmaf6-{0}-ct0k5mo1m0-ct0k5mo1m0.gz
+D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\compressed\ezcgvd667l-{0}-6w92pincaa-6w92pincaa.gz
+D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\compressed\wldxpjaezf-{0}-qc7lij93zm-qc7lij93zm.gz
+D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\compressed\b1lgrntdql-{0}-gndqkyq61w-gndqkyq61w.gz
+D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt

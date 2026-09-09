@@ -1,0 +1,411 @@
+@model IEnumerable<Drogueria.Models.Usuario>
+
+@{
+    ViewData["Title"] = "Usuarios";
+    ViewData["ActiveNav"] = "usuarios";
+    Layout = "~/Views/Shared/_Topbar.cshtml";
+
+    var lista = Model ?? Enumerable.Empty<Drogueria.Models.Usuario>();
+    var total = lista.Count();
+    var activos = lista.Count(u => u.Estado);
+    var admins = lista.Count(u => string.Equals(u.Rol, "Administrador", StringComparison.OrdinalIgnoreCase));
+    var empleados = lista.Count(u => string.Equals(u.Rol, "Empleado", StringComparison.OrdinalIgnoreCase));
+    var clientes = lista.Count(u => string.Equals(u.Rol, "Cliente", StringComparison.OrdinalIgnoreCase));
+}
+
+@* ================= ALERTA DE MENSAJES ================= *@
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" role="alert" style="background: var(--success-soft); color: var(--success); border-radius: 12px;">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        <strong>¡Éxito!</strong> @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4" role="alert" style="background: var(--danger-soft); color: var(--danger); border-radius: 12px;">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        <strong>Atención:</strong> @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@* ================= SECCIÓN HERO ================= *@
+<section class="hero">
+    <div class="hero-text">
+        <span class="eyebrow" id="heroDate">
+            <i class="bi bi-calendar3"></i> Panel de Usuarios
+        </span>
+        <h1 class="hero-title">Gestión de <span class="accent">Usuarios</span></h1>
+        <p class="hero-sub">
+            Crea y administra cuentas con roles de <strong>Administrador</strong>, <strong>Empleado</strong> y <strong>Cliente</strong>.
+            Actualmente hay <strong>@activos cuentas activas</strong> en el sistema.
+        </p>
+    </div>
+    <div class="hero-action">
+        <button class="btn btn--primary" data-bs-toggle="modal" data-bs-target="#modalCrear">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 5v14M5 12h14" />
+            </svg>
+            Nuevo usuario
+        </button>
+    </div>
+</section>
+
+@* ================= TARJETAS KPI ================= *@
+<section class="kpi-grid">
+    <div class="kpi-card">
+        <div class="kpi-icon k-purple">
+            <i class="bi bi-people-fill"></i>
+        </div>
+        <div class="kpi-data">
+            <span class="kpi-val">@total</span>
+            <span class="kpi-lbl">Total (@activos Activos)</span>
+        </div>
+    </div>
+
+    <div class="kpi-card">
+        <div class="kpi-icon k-info">
+            <i class="bi bi-shield-lock-fill"></i>
+        </div>
+        <div class="kpi-data">
+            <span class="kpi-val">@admins</span>
+            <span class="kpi-lbl">Administradores</span>
+        </div>
+    </div>
+
+    <div class="kpi-card">
+        <div class="kpi-icon k-success">
+            <i class="bi bi-person-badge-fill"></i>
+        </div>
+        <div class="kpi-data">
+            <span class="kpi-val">@empleados</span>
+            <span class="kpi-lbl">Empleados</span>
+        </div>
+    </div>
+
+    <div class="kpi-card">
+        <div class="kpi-icon k-orange">
+            <i class="bi bi-bag-heart-fill"></i>
+        </div>
+        <div class="kpi-data">
+            <span class="kpi-val">@clientes</span>
+            <span class="kpi-lbl">Clientes</span>
+        </div>
+    </div>
+</section>
+
+@* ================= TABLA PRINCIPAL DE USUARIOS ================= *@
+<div class="card">
+    <div class="card-head">
+        <div class="card-title-wrap">
+            <span class="eyebrow">Directorio</span>
+            <h2 class="card-title">Listado de Usuarios Registrados</h2>
+        </div>
+
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <!-- Buscador en tiempo real -->
+            <div class="ui-search">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.3-4.3" />
+                </svg>
+                <input type="text" id="filtroUsuarios" placeholder="Buscar por nombre, correo o rol..." autocomplete="off" />
+            </div>
+
+            <!-- Filtro por Rol -->
+            <select id="filtroRol" class="ui-select">
+                <option value="">Todos los roles</option>
+                <option value="administrador">Administrador</option>
+                <option value="empleado">Empleado</option>
+                <option value="cliente">Cliente</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="table-scroll">
+        <table class="table table-adminator" id="tablaUsuarios">
+            <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th>Rol en Sistema</th>
+                    <th>Estado</th>
+                    <th style="text-align: right;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (lista.Any())
+                {
+                    @foreach (var user in lista)
+                    {
+                        var iniciales = "US";
+                        if (!string.IsNullOrWhiteSpace(user.Nombre))
+                        {
+                            iniciales = user.Nombre.Substring(0, 1).ToUpper();
+                            if (!string.IsNullOrWhiteSpace(user.Apellido))
+                            {
+                                iniciales += user.Apellido.Substring(0, 1).ToUpper();
+                            }
+                        }
+
+                        var avatarColor = "u-primary";
+                        var rolLower = user.Rol?.ToLower() ?? "";
+                        if (rolLower.Contains("admin")) { avatarColor = "u-purple"; }
+                        else if (rolLower.Contains("empleado")) { avatarColor = "u-info"; }
+                        else if (rolLower.Contains("cliente")) { avatarColor = "u-orange"; }
+
+                        <tr class="fila-usuario" data-rol="@rolLower">
+                            <!-- Nombre y Correo -->
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="cell-user-avatar @avatarColor">
+                                        @iniciales
+                                    </div>
+                                    <div>
+                                        <div class="cell-name">@user.Nombre @user.Apellido</div>
+                                        <div class="cell-email">
+                                            <i class="bi bi-envelope me-1"></i>@user.Email
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- Rol -->
+                            <td>
+                                @if (rolLower.Contains("admin"))
+                                {
+                                    <span class="tag t-new">
+                                        <i class="bi bi-shield-check"></i> @(string.IsNullOrEmpty(user.Rol) ? "Administrador" : user.Rol)
+                                    </span>
+                                }
+                                else if (rolLower.Contains("empleado") || rolLower.Contains("farmac"))
+                                {
+                                    <span class="tag t-info">
+                                        <i class="bi bi-person-badge"></i> @user.Rol
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="tag t-used">
+                                        <i class="bi bi-person"></i> @(string.IsNullOrEmpty(user.Rol) ? "Usuario" : user.Rol)
+                                    </span>
+                                }
+                            </td>
+
+                            <!-- Estado -->
+                            <td>
+                                <form method="post" asp-controller="Usuario" asp-action="ToggleEstado" asp-route-id="@user.Uuid" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    @if (user.Estado)
+                                    {
+                                        <button type="submit" class="tag t-active border-0" title="Click para desactivar">
+                                            <span class="tag-dot"></span> Activo
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button type="submit" class="tag t-unavail border-0" title="Click para activar">
+                                            <span class="tag-dot"></span> Inactivo
+                                        </button>
+                                    }
+                                </form>
+                            </td>
+
+                            <!-- Acciones -->
+                            <td style="text-align: right;">
+                                <div class="d-inline-flex align-items-center gap-1">
+                                    
+                                     <!-- Botón Editar -->
+                                    <button class="btn-action-icon edit" data-bs-toggle="modal" data-bs-target="#modalEditar"
+                                        data-uuid="@user.Uuid"
+                                        data-nombre="@user.Nombre"
+                                        data-apellido="@user.Apellido"
+                                        data-email="@user.Email"
+                                        data-rol="@user.Rol.ToLower()">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+
+                                    <!-- Botón Eliminar con confirmación -->
+                                    <form method="post" asp-controller="Usuario" asp-action="Delete" asp-route-id="@user.Uuid" onsubmit="return confirm('¿Estás seguro de eliminar al usuario @user.Nombre?');" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn-action-icon danger" title="Eliminar Usuario">
+                                            <i class="bi bi-trash3"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5" class="text-center py-5">
+                            <div class="d-flex flex-column align-items-center justify-content-center text-muted">
+                                <i class="bi bi-people" style="font-size: 42px; opacity: 0.4; margin-bottom: 12px;"></i>
+                                <span class="fw-semibold">No se encontraron usuarios en la base de datos</span>
+                                <small class="text-muted mb-3">Comienza agregando el primer usuario de tu droguería.</small>
+                                <button class="btn btn--primary" data-bs-toggle="modal" data-bs-target="#modalCrear">
+                                    <i class="bi bi-plus-lg me-1"></i> Registrar Primer Usuario
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@* ================= MODAL DE CREACIÓN (GLASSMORPHISM) ================= *@
+<div class="modal fade" id="modalCrear" tabindex="-1" aria-labelledby="modalCrearLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-glass">
+            <div class="modal-header">
+                <div>
+                    <span class="eyebrow" style="font-size: 10px;">Nuevo Registro</span>
+                    <h5 class="modal-title" id="modalCrearLabel">Crear Nuevo Usuario</h5>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <form method="post" asp-controller="Usuario" asp-action="Create">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <label class="form-label" for="nombreUsuario">Nombre</label>
+                            <input type="text" class="form-control" id="nombreUsuario" name="Nombre" placeholder="Ej. Juan" required />
+                        </div>
+
+                        <div class="col-sm-6">
+                            <label class="form-label" for="apellidoUsuario">Apellido</label>
+                            <input type="text" class="form-control" id="apellidoUsuario" name="Apellido" placeholder="Ej. Pérez" required />
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label" for="emailUsuario">Correo Electrónico</label>
+                            <input type="email" class="form-control" id="emailUsuario" name="Email" placeholder="juan.perez@drogueria.com" required />
+                        </div>
+
+                        <div class="col-sm-6">
+                            <label class="form-label" for="rolUsuario">Rol del Sistema</label>
+                            <select class="form-select" id="rolUsuario" name="Rol" required>
+                                <option value="Empleado" selected>Empleado (Ventas y Gestión)</option>
+                                <option value="Administrador">Administrador (Control Total)</option>
+                                <option value="Cliente">Cliente (Compras y Pedidos)</option>
+                            </select>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <label class="form-label" for="passwordUsuario">Contraseña</label>
+                            <div class="position-relative">
+                                <input type="password" class="form-control pe-5" id="passwordUsuario" name="Password" placeholder="••••••••" required autocomplete="new-password" />
+                                <button type="button" class="btn btn-sm position-absolute top-50 end-0 translate-middle-y me-2 border-0 bg-transparent text-muted" onclick="togglePass('passwordUsuario', this)" title="Ver contraseña">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form-check form-switch mt-2">
+                                <input class="form-check-input" type="checkbox" id="estadoUsuario" name="Estado" value="true" checked />
+                                <label class="form-check-label small fw-semibold" for="estadoUsuario" style="color: var(--t-base);">
+                                    Usuario Activo (Permite el inicio de sesión)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn--ghost" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn--primary">
+                        <i class="bi bi-person-plus-fill me-1"></i> Guardar Usuario
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@*===============Modal de Edicion=======================================*@
+
+
+@section Scripts {
+    <script>
+        // Alternar visibilidad de contraseña
+        function togglePass(inputId, btn) {
+            const input = document.getElementById(inputId);
+            const icon = btn.querySelector("i");
+            if (input && icon) {
+                if (input.type === "password") {
+                    input.type = "text";
+                    icon.classList.remove("bi-eye");
+                    icon.classList.add("bi-eye-slash");
+                } else {
+                    input.type = "password";
+                    icon.classList.remove("bi-eye-slash");
+                    icon.classList.add("bi-eye");
+                }
+            }
+        }
+
+        // Fecha dinámica en el eyebrow
+        document.addEventListener("DOMContentLoaded", function() {
+            const fechaEl = document.getElementById("heroDate");
+            if (fechaEl) {
+                const hoy = new Date();
+                const opciones = { day: 'numeric', month: 'long', year: 'numeric' };
+                fechaEl.innerHTML = `<i class="bi bi-calendar3 me-1"></i> ` + hoy.toLocaleDateString('es-ES', opciones);
+            }
+
+            // Filtro en tiempo real por texto y rol
+            const inputFiltro = document.getElementById("filtroUsuarios");
+            const selectRol = document.getElementById("filtroRol");
+            const filas = document.querySelectorAll(".fila-usuario");
+
+            function filtrar() {
+                const texto = (inputFiltro ? inputFiltro.value : "").toLowerCase().trim();
+                const rol = (selectRol ? selectRol.value : "").toLowerCase().trim();
+
+                filas.forEach(function(fila) {
+                    const contenido = fila.textContent.toLowerCase();
+                    const filaRol = (fila.getAttribute("data-rol") || "").toLowerCase();
+
+                    const coincideTexto = !texto || contenido.includes(texto);
+                    const coincideRol = !rol || filaRol === rol || filaRol.includes(rol);
+
+                    if (coincideTexto && coincideRol) {
+                        fila.style.display = "";
+                    } else {
+                        fila.style.display = "none";
+                    }
+                });
+            }
+
+            if (inputFiltro) inputFiltro.addEventListener("input", filtrar);
+            if (selectRol) selectRol.addEventListener("change", filtrar);
+        });
+
+        // Copiar UUID
+        function copiarUuid(uuid, btn) {
+            navigator.clipboard.writeText(uuid).then(function() {
+                const icon = btn.querySelector("i");
+                if (icon) {
+                    icon.classList.remove("bi-clipboard");
+                    icon.classList.add("bi-check2");
+                    setTimeout(function() {
+                        icon.classList.remove("bi-check2");
+                        icon.classList.add("bi-clipboard");
+                    }, 1500);
+                }
+            });
+        }
+    </script>
+}

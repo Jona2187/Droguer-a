@@ -29,9 +29,9 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Inicializar icono según el tema actual ya aplicado en el <head>
-    const currentTheme = document.documentElement.getAttribute('data-bs-theme') || 'light';
-    applyTheme(currentTheme);
+    // Inicializar icono según el tema actual guardado en localStorage o aplicado en <head>
+    const savedTheme = localStorage.getItem('app_theme') || document.documentElement.getAttribute('data-bs-theme') || 'light';
+    applyTheme(savedTheme);
 
     if (themeToggleBtn) {
         themeToggleBtn.addEventListener('click', function () {

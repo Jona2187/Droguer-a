@@ -44,31 +44,39 @@
                         <i class="bi bi-list fs-5"></i>
                     </button>
                     <div class="header-breadcrumb d-none d-md-flex align-items-center gap-2">
-                        <span class="text-muted small">Droguería</span>
-                        <span class="text-muted small">/</span>
-                        <span class="fw-semibold small">@(ViewData["Title"] ?? "Dashboard")</span>
+                        <a asp-controller="Home" asp-action="Index" class="text-muted small text-decoration-none d-flex align-items-center gap-1 hover-primary">
+                            <i class="bi bi-house-door" style="font-size: 13px;"></i>
+                            <span>Droguería</span>
+                        </a>
+                        <i class="bi bi-chevron-right text-muted" style="font-size: 10px; opacity: 0.6;"></i>
+                        <span class="fw-semibold small px-2 py-0-5 rounded-pill" style="background: var(--primary-soft); color: var(--primary);">
+                            @(ViewData["Title"] ?? "Dashboard")
+                        </span>
                     </div>
                 </div>
 
                 <div class="header-right">
-                    <div class="header-search d-none d-sm-flex">
-                        <i class="bi bi-search"></i>
-                        <input type="text" placeholder="Buscar..." class="form-control form-control-sm" />
+                    <div class="header-search d-none d-sm-flex align-items-center position-relative">
+                        <i class="bi bi-search position-absolute text-muted" style="left: 12px; font-size: 13px;"></i>
+                        <input type="text" placeholder="Buscar en el sistema..." class="form-control form-control-sm ps-5 pe-4" style="border-radius: 999px; background: var(--bg-muted); border: 1px solid var(--border);" />
+                        <kbd class="position-absolute end-0 me-2 small text-muted px-1 rounded border d-none d-md-inline-block" style="font-size: 10px; background: var(--bg-card); font-family: 'JetBrains Mono', monospace;">Ctrl K</kbd>
                     </div>
 
-                    <div class="header-actions">
+                    <div class="header-actions d-flex align-items-center gap-2">
                         <!-- Dark / Light Theme Toggle Button -->
                         <button class="btn-icon" id="themeToggleBtn" title="Cambiar tema oscuro / claro" type="button" aria-label="Cambiar tema">
                             <i class="bi bi-moon-stars" id="themeIcon"></i>
                         </button>
 
-                        <button class="btn-icon" title="Notificaciones" type="button">
-                            <i class="bi bi-bell"></i>
-                            <span class="badge-dot"></span>
-                        </button>
-                        <button class="btn-icon" title="Mensajes" type="button">
-                            <i class="bi bi-chat-dots"></i>
-                        </button>
+                        <div class="d-none d-md-flex align-items-center gap-2 ps-2 ms-1 border-start" style="border-color: var(--border) !important;">
+                            <div class="cell-user-avatar u-primary" style="width: 32px; height: 32px; font-size: 11px; border-radius: 8px;">
+                                AD
+                            </div>
+                            <div class="d-flex flex-column" style="line-height: 1.2;">
+                                <span class="fw-semibold small" style="color: var(--t-base);">Admin</span>
+                                <span class="text-muted" style="font-size: 10.5px;">En línea</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </header>

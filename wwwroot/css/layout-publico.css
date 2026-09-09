@@ -640,3 +640,174 @@
 [data-bs-theme="dark"] .pub-navbar.scrolled {
     box-shadow: 0 4px 32px rgba(0, 0, 0, 0.5);
 }
+
+/* ──────────────────────────────────────────────
+   6. MODAL ELEGANTE - LOGIN
+   ────────────────────────────────────────────── */
+.modal-login .modal-content {
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    background: var(--bg-card);
+    box-shadow: 0 24px 48px -12px rgba(124, 58, 237, 0.25), 0 8px 16px -8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-bs-theme="dark"] .modal-login .modal-content {
+    box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.7), 0 0 25px rgba(139, 92, 246, 0.2);
+}
+
+.modal-login-banner {
+    position: relative;
+    padding: 2.25rem 2rem 1.5rem;
+    background: var(--primary-gradient-subtle);
+    border-bottom: 1px solid var(--border-soft);
+    text-align: center;
+}
+
+.modal-login-icon-box {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 1rem;
+    border-radius: 20px;
+    background: var(--primary-gradient);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 28px;
+    box-shadow: 0 10px 24px rgba(124, 58, 237, 0.35);
+}
+
+.modal-login-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--t-base);
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+}
+
+.modal-login-subtitle {
+    font-size: 0.85rem;
+    color: var(--t-muted);
+    margin: 0;
+}
+
+.modal-login .btn-close {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    border-radius: 50%;
+    padding: 0.6rem;
+    background-color: var(--primary-soft);
+    opacity: 0.8;
+    transition: all 0.2s ease;
+}
+
+.modal-login .btn-close:hover {
+    opacity: 1;
+    transform: rotate(90deg);
+    background-color: var(--danger-soft);
+}
+
+.modal-login-body {
+    padding: 2rem;
+}
+
+.modal-login-form .form-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--t-base);
+    margin-bottom: 0.4rem;
+}
+
+.input-group-custom {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-group-custom .input-icon {
+    position: absolute;
+    left: 16px;
+    color: var(--primary);
+    font-size: 1.15rem;
+    z-index: 5;
+    pointer-events: none;
+    transition: color 0.2s ease;
+}
+
+.input-group-custom .form-control {
+    padding-left: 48px;
+    padding-right: 48px;
+    height: 50px;
+    border-radius: 14px;
+    border: 1.5px solid var(--border);
+    background-color: var(--bg-app);
+    color: var(--t-base);
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.25s ease;
+}
+
+.input-group-custom .form-control:focus {
+    border-color: var(--primary);
+    background-color: var(--bg-card);
+    box-shadow: 0 0 0 4px var(--primary-soft);
+}
+
+.input-group-custom .btn-toggle-password {
+    position: absolute;
+    right: 12px;
+    background: transparent;
+    border: none;
+    color: var(--t-light);
+    font-size: 1.15rem;
+    cursor: pointer;
+    z-index: 5;
+    padding: 4px 8px;
+    border-radius: 8px;
+    transition: color 0.2s ease;
+}
+
+.input-group-custom .btn-toggle-password:hover {
+    color: var(--primary);
+}
+
+.btn-login-submit {
+    height: 52px;
+    border-radius: 14px;
+    background: var(--primary-gradient);
+    border: none;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: 0.02em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 8px 22px rgba(124, 58, 237, 0.35);
+    transition: all 0.25s ease;
+    width: 100%;
+}
+
+.btn-login-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(124, 58, 237, 0.48);
+    color: #ffffff;
+}
+
+.btn-login-submit:active {
+    transform: translateY(0);
+}
+
+.modal-login-footer {
+    border-top: 1px solid var(--border-soft);
+    padding: 1.1rem 2rem 1.25rem;
+    background-color: var(--primary-subtle);
+    text-align: center;
+    font-size: 0.82rem;
+    color: var(--t-muted);
+}
+

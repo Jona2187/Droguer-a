@@ -1,10 +1,10 @@
 @{
     var brandInitial = "DR";
     var brandName = "Droguería";
-    var activeNav = ViewData["ActiveNav"]?.ToString() ?? "dashboard";
-    var userName = User.Identity?.IsAuthenticated == true ? User.Identity.Name : brandName;
-    var userEmail = "[EMAIL_ADDRESS]";
-    var userRole = "admin";
+    var activeNav = (ViewData["ActiveNav"]?.ToString() ?? "dashboard").ToLower();
+    var userName = User.Identity?.IsAuthenticated == true ? User.Identity.Name : "Administrador";
+    var userEmail = "admin@drogueria.com";
+    var userRole = "Admin General";
     var initials = !string.IsNullOrEmpty(userName) && userName.Length >= 2 
         ? userName.Substring(0, 2).ToUpper() 
         : brandInitial;
@@ -23,7 +23,7 @@
       <div class="brand-logo">
         <img src="~/img/logodrogueria.png" alt="logo" class="brand-img" onerror="this.style.display='none'; var f=this.nextElementSibling; if(f) f.style.display='flex';" />
         <div class="brand-fallback-logo">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z" />
             <path d="m8.5 8.5 7 7" />
           </svg>
@@ -31,62 +31,53 @@
       </div>
       <div class="brand-text">
         <div class="brand-name">@brandName</div>
-        <div class="brand-tag">Sistema Gestor De Droguería</div>
+        <div class="brand-tag">Sistema Gestor</div>
       </div>
     </a>
-
-    
   </div>
 
   <!-- Scrollable Navigations -->
   <div class="sidebar-scrollable">
-    @* ================= WORKSPACE ================= *@
+    @* ================= GESTIÓN PRINCIPAL ================= *@
     <nav class="nav-section">
-      <div class="nav-label">Workspace</div>
+      <div class="nav-label">Panel Principal</div>
 
-      <a class="nav-link @(activeNav == "usuarios" ? "is-active" : "")" asp-controller="Home" asp-action="Productos" data-tooltip="Usuarios" title="Usuarios">
-        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-user-plus">
-          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-          <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" />
-          <path d="M16 19h6" />
-          <path d="M19 16v6" />
-          <path d="M6 21v-2a4 4 0 0 1 4 -4h4" />
+      
+      <a class="nav-link @(activeNav == "productos" ? "is-active" : "")" asp-controller="Home" asp-action="Productos" data-tooltip="Productos" title="Productos">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z" />
+          <path d="m8.5 8.5 7 7" />
         </svg>
         <span>Productos</span>
       </a>
 
-    @* ================= COMPONENTES ================= *@
-    <nav class="nav-section">
-      <div class="nav-label">Componentes</div>
-
-      <a class="nav-link @(activeNav == "ui" ? "is-active" : "")" href="#ui-elements" data-tooltip="Elementos UI" title="Elementos UI">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75">
-          <circle cx="12" cy="12" r="9" />
-          <path d="M8 12h8M12 8v8" />
+      <a class="nav-link @(activeNav == "usuarios" ? "is-active" : "")" asp-controller="Usuario" asp-action="Index" data-tooltip="Usuarios" title="Usuarios">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
         </svg>
-        <span>Elementos UI</span>
+        <span>Usuarios</span>
       </a>
+    </nav>
 
-      <div class="nav-item-group @(activeNav == "pages" ? "is-open" : "")" data-nav-group>
-        <a class="nav-link" href="javascript:void(0)" data-nav-toggle data-tooltip="Páginas" title="Páginas">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-            <path d="M14 2v6h6" />
-          </svg>
-          <span>Páginas</span>
-          <svg class="chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8">
-            <path d="m9 18 6-6-6-6" />
-          </svg>
-        </a>
-        <div class="nav-submenu">
-          <a href="/Account/Login" class="@(activeNav == "login" ? "is-active" : "")">Iniciar sesión</a>
-          <a href="/Home/Privacy">Privacidad</a>
-          <a href="/Error/404">Error 404</a>
-        </div>
-      </div>
+    @* ================= ACCESOS RÁPIDOS ================= *@
+    <nav class="nav-section">
+      <div class="nav-label">Accesos</div>
+
+      <a class="nav-link" href="/" target="_blank" data-tooltip="Ver Tienda Pública" title="Ver Tienda Pública">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+          <path d="M2 12h20" />
+        </svg>
+        <span>Tienda Pública</span>
+        <i class="bi bi-box-arrow-up-right small text-muted ms-auto"></i>
+      </a>
     </nav>
   </div>
-
+    
   @* ================= FOOTER / PROFILE ================= *@
   <div class="sidebar-footer">
     <div class="dd-wrap">

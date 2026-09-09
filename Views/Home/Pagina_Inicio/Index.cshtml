@@ -1,10 +1,10 @@
 @{
     ViewData["Title"] = "Drogueria";
     Layout = "/Views/Shared/_LayoutPublico.cshtml";
-    
 }
 
-<link rel="stylesheet" href="~/css/carrusel.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/landingPages.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 
 <div class="pagina-inicio">
 
@@ -48,7 +48,6 @@
 
 </section>
 
-<script src="~/js/carrusel.js" asp-append-version="true"></script>
 
 
 <!-- INFORMACIÓN -->
@@ -97,3 +96,225 @@
     </div>
 
 </section>
+
+<!-- Modal Empleado -->
+<div class="modal fade modal-login" id="_LoginEmpleado" tabindex="-1" aria-labelledby="_LoginEmpleadoLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-login-banner">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        <div class="modal-login-icon-box">
+          <i class="bi bi-person-badge"></i>
+        </div>
+        <h4 class="modal-login-title" id="_LoginEmpleadoLabel">Acceso Empleados</h4>
+        <p class="modal-login-subtitle">Gestión de inventarios, pedidos y punto de venta</p>
+      </div>
+      <div class="modal-login-body">
+        <form class="modal-login-form">
+          <div class="mb-3">
+            <label for="emp-user" class="form-label">Usuario o Correo</label>
+            <div class="input-group-custom">
+              <i class="bi bi-person input-icon"></i>
+              <input type="text" class="form-control" id="emp-user" placeholder="ej. empleado@drogueria.com" required autocomplete="username">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="emp-pass" class="form-label">Contraseña</label>
+            <div class="input-group-custom">
+              <i class="bi bi-lock input-icon"></i>
+              <input type="password" class="form-control" id="emp-pass" placeholder="••••••••" required autocomplete="current-password">
+              <button type="button" class="btn-toggle-password" onclick="togglePasswordVisibility('emp-pass', this)" title="Ver contraseña">
+                <i class="bi bi-eye"></i>
+              </button>
+            </div>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="rememberEmp">
+              <label class="form-check-label small text-muted" for="rememberEmp">Recordar sesión</label>
+            </div>
+            <a href="#" class="text-decoration-none small fw-semibold text-primary">¿Olvidaste tu clave?</a>
+          </div>
+          <button type="submit" class="btn btn-login-submit">
+            <span>Iniciar Sesión</span>
+            <i class="bi bi-arrow-right-short fs-4"></i>
+          </button>
+        </form>
+      </div>
+      <div class="modal-login-footer">
+        <i class="bi bi-lock-fill me-1 text-primary"></i> Área restringida únicamente a personal autorizado
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Administrador -->
+<div class="modal fade modal-login" id="_LoginAdmin" tabindex="-1" aria-labelledby="_LoginAdminLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-login-banner">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        <div class="modal-login-icon-box">
+          <i class="bi bi-shield-lock"></i>
+        </div>
+        <h4 class="modal-login-title" id="_LoginAdminLabel">Acceso Administrador</h4>
+        <p class="modal-login-subtitle">Panel de control completo y configuración del sistema</p>
+      </div>
+      <div class="modal-login-body">
+        <form class="modal-login-form">
+          <div class="mb-3">
+            <label for="admin-user" class="form-label">Usuario Administrador</label>
+            <div class="input-group-custom">
+              <i class="bi bi-shield-person input-icon"></i>
+              <input type="text" class="form-control" id="admin-user" placeholder="admin@drogueria.com" required autocomplete="username">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="admin-pass" class="form-label">Contraseña</label>
+            <div class="input-group-custom">
+              <i class="bi bi-key input-icon"></i>
+              <input type="password" class="form-control" id="admin-pass" placeholder="••••••••" required autocomplete="current-password">
+              <button type="button" class="btn-toggle-password" onclick="togglePasswordVisibility('admin-pass', this)" title="Ver contraseña">
+                <i class="bi bi-eye"></i>
+              </button>
+            </div>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="rememberAdmin">
+              <label class="form-check-label small text-muted" for="rememberAdmin">Mantener sesión activa</label>
+            </div>
+            <a href="#" class="text-decoration-none small fw-semibold text-primary">¿Problemas para ingresar?</a>
+          </div>
+          <button type="submit" class="btn btn-login-submit">
+            <span>Ingresar al Panel</span>
+            <i class="bi bi-arrow-right-short fs-4"></i>
+          </button>
+        </form>
+      </div>
+      <div class="modal-login-footer">
+        <i class="bi bi-lock-fill me-1 text-primary"></i> Área restringida únicamente a personal autorizado
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Cliente Iniciar sesión -->
+<div class="modal fade modal-login" id="_LoginCliente" tabindex="-1" aria-labelledby="_LoginClienteLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-login-banner">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        <div class="modal-login-icon-box">
+          <i class="bi bi-bag-heart"></i>
+        </div>
+        <h4 class="modal-login-title" id="_LoginClienteLabel">¡Hola de nuevo!</h4>
+        <p class="modal-login-subtitle">Ingresa para realizar tus compras y ver tus domicilios</p>
+      </div>
+      <div class="modal-login-body">
+        <form class="modal-login-form">
+          <div class="mb-3">
+            <label for="client-user" class="form-label">Correo Electrónico</label>
+            <div class="input-group-custom">
+              <i class="bi bi-envelope input-icon"></i>
+              <input type="email" class="form-control" id="client-user" placeholder="tu-correo@ejemplo.com" required autocomplete="email">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="client-pass" class="form-label">Contraseña</label>
+            <div class="input-group-custom">
+              <i class="bi bi-lock input-icon"></i>
+              <input type="password" class="form-control" id="client-pass" placeholder="••••••••" required autocomplete="current-password">
+              <button type="button" class="btn-toggle-password" onclick="togglePasswordVisibility('client-pass', this)" title="Ver contraseña">
+                <i class="bi bi-eye"></i>
+              </button>
+            </div>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="rememberClient">
+              <label class="form-check-label small text-muted" for="rememberClient">Recordarme</label>
+            </div>
+            <a href="#" class="text-decoration-none small fw-semibold text-primary">¿Olvidaste tu clave?</a>
+          </div>
+          <button type="submit" class="btn btn-login-submit">
+            <span>Ingresar</span>
+            <i class="bi bi-arrow-right-short fs-4"></i>
+          </button>
+        </form>
+      </div>
+      <div class="modal-login-footer">
+        ¿Aún no tienes cuenta? <a href="#" class="fw-bold text-primary text-decoration-none ms-1" data-bs-toggle="modal" data-bs-target="#_RegistroCliente">Regístrate aquí</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Cliente Registro -->
+<div class="modal fade modal-login" id="_RegistroCliente" tabindex="-1" aria-labelledby="_RegistroClienteLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-login-banner">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        <div class="modal-login-icon-box">
+          <i class="bi bi-person-plus"></i>
+        </div>
+        <h4 class="modal-login-title" id="_RegistroClienteLabel">Crear Cuenta</h4>
+        <p class="modal-login-subtitle">Regístrate para realizar tus compras y domicilios</p>
+      </div>
+      <div class="modal-login-body">
+        <form class="modal-login-form">
+          <div class="mb-3">
+            <label for="reg-name" class="form-label">Nombre Completo</label>
+            <div class="input-group-custom">
+              <i class="bi bi-person input-icon"></i>
+              <input type="text" class="form-control" id="reg-name" placeholder="Juan Pérez" required autocomplete="name">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="reg-email" class="form-label">Correo Electrónico</label>
+            <div class="input-group-custom">
+              <i class="bi bi-envelope input-icon"></i>
+              <input type="email" class="form-control" id="reg-email" placeholder="tu-correo@ejemplo.com" required autocomplete="email">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="reg-phone" class="form-label">Teléfono / Celular</label>
+            <div class="input-group-custom">
+              <i class="bi bi-telephone input-icon"></i>
+              <input type="tel" class="form-control" id="reg-phone" placeholder="300 123 4567" required autocomplete="tel">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="reg-pass" class="form-label">Contraseña</label>
+            <div class="input-group-custom">
+              <i class="bi bi-lock input-icon"></i>
+              <input type="password" class="form-control" id="reg-pass" placeholder="••••••••" required autocomplete="new-password">
+              <button type="button" class="btn-toggle-password" onclick="togglePasswordVisibility('reg-pass', this)" title="Ver contraseña">
+                <i class="bi bi-eye"></i>
+              </button>
+            </div>
+          </div>
+          <div class="mb-4">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="acceptTerms" required>
+              <label class="form-check-label small text-muted" for="acceptTerms">
+                Acepto los <a href="#" class="text-primary text-decoration-none fw-semibold">términos y políticas de privacidad</a>
+              </label>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-login-submit">
+            <span>Crear Mi Cuenta</span>
+            <i class="bi bi-arrow-right-short fs-4"></i>
+          </button>
+        </form>
+      </div>
+      <div class="modal-login-footer">
+        ¿Ya tienes cuenta? <a href="#" class="fw-bold text-primary text-decoration-none ms-1" data-bs-toggle="modal" data-bs-target="#_LoginCliente">Inicia sesión aquí</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script src="~/js/landingPages.js" asp-append-version="true"></script>

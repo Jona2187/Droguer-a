@@ -1,9 +1,17 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Drogueria.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Home/Pagina_Inicio";
+        options.AccessDeniedPath = "/Home/Pagina_Inicio";
+    });
 
 builder.Services.AddDbContext<AppDbContex>(options =>
     options.UseMySql(
