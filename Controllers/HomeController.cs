@@ -16,6 +16,11 @@ namespace Drogueria.Controllers
             return View("~/Views/Home/pages/_Productos.cshtml");
         }
 
+        public IActionResult Nosotros()
+        {
+            return View("~/Views/Home/pages/_Nosotros.cshtml");
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

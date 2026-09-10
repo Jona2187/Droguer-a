@@ -1,0 +1,48 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Drogueria.Data;
+
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllersWithViews();
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Home/Pagina_Inicio";
+        options.AccessDeniedPath = "/Home/Pagina_Inicio";
+    });
+
+builder.Services.AddDbContext<AppDbContex>(options =>
+    options.UseMySql(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        ServerVersion.AutoDetect(
+            builder.Configuration.GetConnectionString("DefaultConnection")
+        )
+    )
+);
+
+var app = builder.Build();
+
+// Aplicar migraciones al arrancar (crea la BD si falta)
+using (var scope = app.Services.CreateScope())
+{
+    // Usamos el DbContext definido en Data\AppDbContex.cs
+    var db = scope.ServiceProvider.GetRequiredService<Data.AppDbContex>();
+    db.Database.Migrate();
+}
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+
+app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}"
+);
+
+app.Run();

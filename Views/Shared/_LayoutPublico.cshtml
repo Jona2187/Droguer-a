@@ -6,29 +6,106 @@
     <meta name="description" content="Drogueria — Tu aliado de salud. Productos farmaceuticos, medicamentos y mas." />
     <title>@ViewData["Title"] - Drogueria</title>
 
-    <script>
-        // Carga inmediata de tema para evitar parpadeo y mantener preferencia al recargar
-        (function () {
-            const savedTheme = localStorage.getItem('app_theme') || 'light';
-            document.documentElement.setAttribute('data-bs-theme', savedTheme);
-        })();
-    </script>
+<script>
+    // Carga inmediata de tema para evitar parpadeo y mantener preferencia al recargar
+    (function () {
+        const savedTheme = localStorage.getItem('app_theme') || 'light';
+        document.documentElement.setAttribute('data-bs-theme', savedTheme);
+    })();
+</script>
 
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- Bootstrap 5 CSS -->
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+<!-- Animación suave para la navegación -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
 
-    <!-- Site Styles -->
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/layout-publico.css" asp-append-version="true" />
- 
-    @await RenderSectionAsync("Styles", required: false)
+        document.addEventListener('click', function (e) {
+
+            const enlace = e.target.closest('a[href^="#"]');
+
+            if (!enlace) {
+                return;
+            }
+
+            const destinoId = enlace.getAttribute('href');
+
+            // Ignorar enlaces que solamente tienen #
+            if (!destinoId || destinoId === '#') {
+                return;
+            }
+
+            const destino = document.querySelector(destinoId);
+
+            if (!destino) {
+                return;
+            }
+
+            e.preventDefault();
+
+            const inicio = window.scrollY;
+            const destinoY = destino.getBoundingClientRect().top + window.scrollY;
+
+            const distancia = destinoY - inicio;
+
+            // Más distancia = un poco más de duración
+            const duracion = Math.min(
+                1200,
+                Math.max(600, Math.abs(distancia) * 0.8)
+            );
+
+            let tiempoInicio = null;
+
+            function animar(tiempoActual) {
+
+                if (tiempoInicio === null) {
+                    tiempoInicio = tiempoActual;
+                }
+
+                const progreso = Math.min(
+                    (tiempoActual - tiempoInicio) / duracion,
+                    1
+                );
+
+                // Suavizado: acelera al principio y desacelera al final
+                const suavizado =
+                    progreso < 0.5
+                        ? 2 * progreso * progreso
+                        : 1 - Math.pow(-2 * progreso + 2, 2) / 2;
+
+                window.scrollTo(
+                    0,
+                    inicio + distancia * suavizado
+                );
+
+                if (progreso < 1) {
+                    requestAnimationFrame(animar);
+                }
+            }
+
+            requestAnimationFrame(animar);
+        });
+
+    });
+</script>
+
+
+
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<!-- Bootstrap 5 CSS -->
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+<!-- Site Styles -->
+<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/layout-publico.css" asp-append-version="true" />
+
+@await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
 <div style="display:flex; flex-direction:column; min-height:100vh;">
@@ -64,10 +141,10 @@
                 @{
                     var activeNav = ViewData["ActiveNav"] as string ?? "";
                 }
-                <li><a href="/" class="@(activeNav == "inicio" ? "active" : "")"><i class="bi bi-house"></i> Inicio</a></li>
-                <li><a href="#nosotros" class="@(activeNav == "nosotros" ? "active" : "")"><i class="bi bi-info-circle"></i> Nosotros</a></li>
+                <li><a href="#inicio" class="@(activeNav == "inicio" ? "active" : "")"><i class="bi bi-house"></i> Inicio</a></li>
                 <li><a href="#servicios" class="@(activeNav == "servicios" ? "active" : "")"><i class="bi bi-grid-3x3-gap"></i> Servicios</a></li>
                 <li><a href="#productos" class="@(activeNav == "productos" ? "active" : "")"><i class="bi bi-box-seam"></i> Productos</a></li>
+                <li><a href="#nosotros" class="@(activeNav == "nosotros" ? "active" : "")"><i class="bi bi-info-circle"></i> Nosotros</a></li>
                 <li><a href="#contacto" class="@(activeNav == "contacto" ? "active" : "")"><i class="bi bi-envelope"></i> Contacto</a></li>
             </ul>
 
@@ -117,17 +194,17 @@
 
     <!-- Menu Movil -->
     <div class="pub-mobile-menu" id="pubMobileMenu" role="dialog" aria-label="Menu movil">
-        <a href="/" class="@(activeNav == "inicio" ? "active" : "")" id="mobileNavInicio">
+        <a href="#inicio" class="@(activeNav == "inicio" ? "active" : "")" id="mobileNavInicio">
             <i class="bi bi-house-fill"></i> Inicio
-        </a>
-        <a href="#nosotros" class="@(activeNav == "nosotros" ? "active" : "")" id="mobileNavNosotros">
-            <i class="bi bi-info-circle-fill"></i> Nosotros
         </a>
         <a href="#servicios" class="@(activeNav == "servicios" ? "active" : "")" id="mobileNavServicios">
             <i class="bi bi-grid-3x3-gap-fill"></i> Servicios
         </a>
         <a href="#productos" class="@(activeNav == "productos" ? "active" : "")" id="mobileNavProductos">
             <i class="bi bi-box-seam-fill"></i> Productos
+        </a>
+        <a href="#nosotros" class="@(activeNav == "nosotros" ? "active" : "")" id="mobileNavNosotros">
+            <i class="bi bi-info-circle-fill"></i> Nosotros
         </a>
         <a href="#contacto" class="@(activeNav == "contacto" ? "active" : "")" id="mobileNavContacto">
             <i class="bi bi-envelope-fill"></i> Contacto
@@ -155,7 +232,7 @@
     <!-- ====================================================
          FOOTER PUBLICO
     ===================================================== -->
-    <footer class="pub-footer" role="contentinfo">
+<footer class="pub-footer" id="contacto" role="contentinfo">
         <div class="pub-footer-inner">
 
             <!-- Columna 1: Marca -->
@@ -191,7 +268,7 @@
             <div>
                 <div class="pub-footer-col-title">Navegacion</div>
                 <ul class="pub-footer-links">
-                    <li><a href="/"><i class="bi bi-chevron-right"></i> Inicio</a></li>
+                    <li><a href="#inicio"><i class="bi bi-chevron-right"></i> Inicio</a></li>
                     <li><a href="#nosotros"><i class="bi bi-chevron-right"></i> Nosotros</a></li>
                     <li><a href="#servicios"><i class="bi bi-chevron-right"></i> Servicios</a></li>
                     <li><a href="#productos"><i class="bi bi-chevron-right"></i> Productos</a></li>
@@ -199,39 +276,65 @@
                 </ul>
             </div>
 
-            <!-- Columna 3: Servicios -->
-            <div>
-                <div class="pub-footer-col-title">Servicios</div>
-                <ul class="pub-footer-links">
-                    <li><a href="#"><i class="bi bi-chevron-right"></i> Venta de medicamentos</a></li>
-                    <li><a href="#"><i class="bi bi-chevron-right"></i> Asesoria farmaceutica</a></li>
-                    <li><a href="#"><i class="bi bi-chevron-right"></i> Pedidos en linea</a></li>
-                    <li><a href="#"><i class="bi bi-chevron-right"></i> Domicilios</a></li>
-                    <li><a href="#"><i class="bi bi-chevron-right"></i> Productos naturales</a></li>
-                </ul>
+            <!-- Columna 4: Contacto -->
+
+            <div style="grid-column: span 2;">
+                <div class="pub-footer-col-title">Contacto</div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px 30px;">
+
+                    <!-- Columna 1 -->
+                    <div>
+                        <div class="pub-footer-contact-item">
+                            <div class="pub-footer-contact-icon">
+                                <i class="bi bi-geo-alt-fill"></i>
+                            </div>
+                            <span>Calle 45 # 12-34, Bogota, Colombia</span>
+                        </div>
+
+                        <div class="pub-footer-contact-item">
+                            <div class="pub-footer-contact-icon">
+                                <i class="bi bi-telephone-fill"></i>
+                            </div>
+                            <span>+57 (601) 123-4567</span>
+                        </div>
+
+                        <div class="pub-footer-contact-item">
+                            <div class="pub-footer-contact-icon">
+                                <i class="bi bi-envelope-fill"></i>
+                            </div>
+                            <span>info@drogueria.com</span>
+                        </div>
+                    </div>
+
+                    <!-- Columna 2 -->
+                    <div>
+                        <div class="pub-footer-contact-item">
+                            <div class="pub-footer-contact-icon">
+                                <i class="bi bi-whatsapp"></i>
+                            </div>
+                            <span>WhatsApp: +57 300 123 4567</span>
+                        </div>
+
+                        <div class="pub-footer-contact-item">
+                            <div class="pub-footer-contact-icon">
+                                <i class="bi bi-clock-fill"></i>
+                            </div>
+                            <span>Lun - Sab: 7:00 AM - 9:00 PM</span>
+                        </div>
+
+                        <div class="pub-footer-contact-item">
+                            <div class="pub-footer-contact-icon">
+                                <i class="bi bi-truck"></i>
+                            </div>
+                            <span>Domicilios: 8:00 AM - 8:00 PM</span>
+                        </div>
+                    </div>
+
+                </div>
             </div>
 
-            <!-- Columna 4: Contacto -->
-            <div>
-                <div class="pub-footer-col-title">Contacto</div>
-                <div class="pub-footer-contact-item">
-                    <div class="pub-footer-contact-icon"><i class="bi bi-geo-alt-fill"></i></div>
-                    <span>Calle 45 # 12-34, Bogota, Colombia</span>
-                </div>
-                <div class="pub-footer-contact-item">
-                    <div class="pub-footer-contact-icon"><i class="bi bi-telephone-fill"></i></div>
-                    <span>+57 (601) 123-4567</span>
-                </div>
-                <div class="pub-footer-contact-item">
-                    <div class="pub-footer-contact-icon"><i class="bi bi-envelope-fill"></i></div>
-                    <span>info@drogueria.com</span>
-                </div>
-                <div class="pub-footer-contact-item">
-                    <div class="pub-footer-contact-icon"><i class="bi bi-clock-fill"></i></div>
-                    <span>Lun - Sab: 7am - 9pm</span>
-                </div>
-            </div>
-        </div>
+
 
         <!-- Barra inferior -->
         <div class="pub-footer-bottom">
