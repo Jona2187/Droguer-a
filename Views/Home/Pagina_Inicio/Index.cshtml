@@ -8,6 +8,22 @@
 
 <div class="pagina-inicio">
 
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show m-3" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>@TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show m-3" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+}
+
 <section class="carrusel">
 
     <div class="slide activo">
@@ -110,19 +126,21 @@
         <p class="modal-login-subtitle">Gestión de inventarios, pedidos y punto de venta</p>
       </div>
       <div class="modal-login-body">
-        <form class="modal-login-form">
+        <form class="modal-login-form" method="post" asp-controller="Account" asp-action="Login">
+          @Html.AntiForgeryToken()
+          <input type="hidden" name="rolEsperado" value="Empleado" />
           <div class="mb-3">
             <label for="emp-user" class="form-label">Usuario o Correo</label>
             <div class="input-group-custom">
               <i class="bi bi-person input-icon"></i>
-              <input type="text" class="form-control" id="emp-user" placeholder="ej. empleado@drogueria.com" required autocomplete="username">
+              <input type="text" class="form-control" id="emp-user" name="email" placeholder="ej. empleado@drogueria.com" required autocomplete="username">
             </div>
           </div>
           <div class="mb-3">
             <label for="emp-pass" class="form-label">Contraseña</label>
             <div class="input-group-custom">
               <i class="bi bi-lock input-icon"></i>
-              <input type="password" class="form-control" id="emp-pass" placeholder="••••••••" required autocomplete="current-password">
+              <input type="password" class="form-control" id="emp-pass" name="password" placeholder="••••••••" required autocomplete="current-password">
               <button type="button" class="btn-toggle-password" onclick="togglePasswordVisibility('emp-pass', this)" title="Ver contraseña">
                 <i class="bi bi-eye"></i>
               </button>
@@ -161,19 +179,21 @@
         <p class="modal-login-subtitle">Panel de control completo y configuración del sistema</p>
       </div>
       <div class="modal-login-body">
-        <form class="modal-login-form">
+        <form class="modal-login-form" method="post" asp-controller="Account" asp-action="Login">
+          @Html.AntiForgeryToken()
+          <input type="hidden" name="rolEsperado" value="Administrador" />
           <div class="mb-3">
             <label for="admin-user" class="form-label">Usuario Administrador</label>
             <div class="input-group-custom">
               <i class="bi bi-shield-person input-icon"></i>
-              <input type="text" class="form-control" id="admin-user" placeholder="admin@drogueria.com" required autocomplete="username">
+              <input type="text" class="form-control" id="admin-user" name="email" placeholder="admin@drogueria.com" required autocomplete="username">
             </div>
           </div>
           <div class="mb-3">
             <label for="admin-pass" class="form-label">Contraseña</label>
             <div class="input-group-custom">
               <i class="bi bi-key input-icon"></i>
-              <input type="password" class="form-control" id="admin-pass" placeholder="••••••••" required autocomplete="current-password">
+              <input type="password" class="form-control" id="admin-pass" name="password" placeholder="••••••••" required autocomplete="current-password">
               <button type="button" class="btn-toggle-password" onclick="togglePasswordVisibility('admin-pass', this)" title="Ver contraseña">
                 <i class="bi bi-eye"></i>
               </button>
@@ -212,19 +232,21 @@
         <p class="modal-login-subtitle">Ingresa para realizar tus compras y ver tus domicilios</p>
       </div>
       <div class="modal-login-body">
-        <form class="modal-login-form">
+        <form class="modal-login-form" method="post" asp-controller="Account" asp-action="Login">
+          @Html.AntiForgeryToken()
+          <input type="hidden" name="rolEsperado" value="Cliente" />
           <div class="mb-3">
             <label for="client-user" class="form-label">Correo Electrónico</label>
             <div class="input-group-custom">
               <i class="bi bi-envelope input-icon"></i>
-              <input type="email" class="form-control" id="client-user" placeholder="tu-correo@ejemplo.com" required autocomplete="email">
+              <input type="email" class="form-control" id="client-user" name="email" placeholder="tu-correo@ejemplo.com" required autocomplete="email">
             </div>
           </div>
           <div class="mb-3">
             <label for="client-pass" class="form-label">Contraseña</label>
             <div class="input-group-custom">
               <i class="bi bi-lock input-icon"></i>
-              <input type="password" class="form-control" id="client-pass" placeholder="••••••••" required autocomplete="current-password">
+              <input type="password" class="form-control" id="client-pass" name="password" placeholder="••••••••" required autocomplete="current-password">
               <button type="button" class="btn-toggle-password" onclick="togglePasswordVisibility('client-pass', this)" title="Ver contraseña">
                 <i class="bi bi-eye"></i>
               </button>
@@ -263,33 +285,34 @@
         <p class="modal-login-subtitle">Regístrate para realizar tus compras y domicilios</p>
       </div>
       <div class="modal-login-body">
-        <form class="modal-login-form">
+        <form class="modal-login-form" method="post" asp-controller="Account" asp-action="Register">
+          @Html.AntiForgeryToken()
           <div class="mb-3">
-            <label for="reg-name" class="form-label">Nombre Completo</label>
+            <label for="reg-name" class="form-label">Nombre</label>
             <div class="input-group-custom">
               <i class="bi bi-person input-icon"></i>
-              <input type="text" class="form-control" id="reg-name" placeholder="Juan Pérez" required autocomplete="name">
+              <input type="text" class="form-control" id="reg-name" name="nombre" placeholder="Juan" required autocomplete="given-name">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="reg-apellido" class="form-label">Apellido</label>
+            <div class="input-group-custom">
+              <i class="bi bi-person input-icon"></i>
+              <input type="text" class="form-control" id="reg-apellido" name="apellido" placeholder="Perez" required autocomplete="family-name">
             </div>
           </div>
           <div class="mb-3">
             <label for="reg-email" class="form-label">Correo Electrónico</label>
             <div class="input-group-custom">
               <i class="bi bi-envelope input-icon"></i>
-              <input type="email" class="form-control" id="reg-email" placeholder="tu-correo@ejemplo.com" required autocomplete="email">
-            </div>
-          </div>
-          <div class="mb-3">
-            <label for="reg-phone" class="form-label">Teléfono / Celular</label>
-            <div class="input-group-custom">
-              <i class="bi bi-telephone input-icon"></i>
-              <input type="tel" class="form-control" id="reg-phone" placeholder="300 123 4567" required autocomplete="tel">
+              <input type="email" class="form-control" id="reg-email" name="email" placeholder="tu-correo@ejemplo.com" required autocomplete="email">
             </div>
           </div>
           <div class="mb-3">
             <label for="reg-pass" class="form-label">Contraseña</label>
             <div class="input-group-custom">
               <i class="bi bi-lock input-icon"></i>
-              <input type="password" class="form-control" id="reg-pass" placeholder="••••••••" required autocomplete="new-password">
+              <input type="password" class="form-control" id="reg-pass" name="password" placeholder="••••••••" required autocomplete="new-password">
               <button type="button" class="btn-toggle-password" onclick="togglePasswordVisibility('reg-pass', this)" title="Ver contraseña">
                 <i class="bi bi-eye"></i>
               </button>
@@ -318,3 +341,26 @@
 
 
 <script src="~/js/landingPages.js" asp-append-version="true"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".alert-dismissible").forEach(function (alertEl) {
+            setTimeout(function () {
+                const instancia = bootstrap.Alert.getOrCreateInstance(alertEl);
+                instancia.close();
+            }, 4000);
+        });
+    });
+</script>
+
+@if (TempData["AbrirModal"] != null)
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const modalEl = document.getElementById("@TempData["AbrirModal"]");
+            if (modalEl) {
+                new bootstrap.Modal(modalEl).show();
+            }
+        });
+    </script>
+}

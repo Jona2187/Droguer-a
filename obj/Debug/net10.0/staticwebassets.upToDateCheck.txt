@@ -1,13 +1,13 @@
 wwwroot\css\landingPages.css
 wwwroot\css\layout-publico.css
-wwwroot\css\site.css
+wwwroot\js\site.js
 wwwroot\favicon.ico
 wwwroot\img\1.jpeg
 wwwroot\img\2.jpeg
 wwwroot\img\3.jpeg
 wwwroot\img\logodrogueria.png
 wwwroot\js\landingPages.js
-wwwroot\js\site.js
+wwwroot\css\site.css
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css

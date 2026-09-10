@@ -197,7 +197,7 @@
 
                             <!-- Estado -->
                             <td>
-                                <form method="post" asp-controller="Usuario" asp-action="ToggleEstado" asp-route-id="@user.Uuid" class="d-inline">
+                                <form method="post" asp-controller="Usuario" asp-action="ToggleEstado" asp-route-id="@user.Uuid" class="d-inline toggle-estado-form" data-usuario-id="@user.Uuid" data-estado="@user.Estado.ToString().ToLowerInvariant()">
                                     @Html.AntiForgeryToken()
                                     @if (user.Estado)
                                     {
@@ -224,15 +224,18 @@
                                         data-nombre="@user.Nombre"
                                         data-apellido="@user.Apellido"
                                         data-email="@user.Email"
-                                        data-rol="@user.Rol.ToLower()">
+                                        data-rol="@user.Rol.ToLower()"
+                                        data-estado="@user.Estado.ToString().ToLowerInvariant()">
                                         <i class="bi bi-pencil-square"></i>
                                     </button>
 
-                                    <!-- Botón Eliminar con confirmación -->
-                                    <form method="post" asp-controller="Usuario" asp-action="Delete" asp-route-id="@user.Uuid" onsubmit="return confirm('¿Estás seguro de eliminar al usuario @user.Nombre?');" class="d-inline">
+                                    <!-- Botón Desactivar (antes "Eliminar") -->
+                                    <form method="post" asp-controller="Usuario" asp-action="Delete" asp-route-id="@user.Uuid" class="d-inline desactivar-form" data-usuario-id="@user.Uuid">
                                         @Html.AntiForgeryToken()
-                                        <button type="submit" class="btn-action-icon danger" title="Eliminar Usuario">
-                                            <i class="bi bi-trash3"></i>
+                                        <button type="button" class="btn-action-icon danger" title="Desactivar Usuario"
+                                            data-bs-toggle="modal" data-bs-target="#glassConfirmModal"
+                                            data-uuid="@user.Uuid" data-nombre="@user.Nombre">
+                                            <i class="bi bi-person-x-fill"></i>
                                         </button>
                                     </form>
                                 </div>
@@ -294,9 +297,9 @@
                         <div class="col-sm-6">
                             <label class="form-label" for="rolUsuario">Rol del Sistema</label>
                             <select class="form-select" id="rolUsuario" name="Rol" required>
-                                <option value="Empleado" selected>Empleado (Ventas y Gestión)</option>
-                                <option value="Administrador">Administrador (Control Total)</option>
-                                <option value="Cliente">Cliente (Compras y Pedidos)</option>
+                                <option value="Cliente" selected>Cliente</option>
+                                <option value="Empleado">Empleado</option>
+                                <option value="Administrador">Administrador</option>
                             </select>
                         </div>
 
@@ -335,77 +338,368 @@
 </div>
 
 @*===============Modal de Edicion=======================================*@
+<div class="modal fade" id="modalEditar" tabindex="-1" aria-labelledby="modalEditarLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-glass">
+            <div class="modal-header">
+                <div>
+                    <span class="eyebrow" style="font-size: 10px;">Editar Registro</span>
+                    <h5 class="modal-title" id="modalEditarLabel">Editar Usuario</h5>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
 
+            <form method="post" asp-controller="Usuario" asp-action="Update">
+                @Html.AntiForgeryToken()
+                <input type="hidden" id="uuidEditar" name="Uuid" value="" />
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <label class="form-label" for="nombreUsuario">Nombre</label>
+                            <input type="text" class="form-control" id="nombreEditar" name="Nombre" placeholder="Ej. Juan" required />
+                        </div>
+
+                        <div class="col-sm-6">
+                            <label class="form-label" for="apellidoUsuario">Apellido</label>
+                            <input type="text" class="form-control" id="apellidoEditar" name="Apellido" placeholder="Ej. Pérez" required />
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label" for="emailEditar">Correo Electrónico</label>
+                            <input type="email" class="form-control" id="emailEditar" name="Email" placeholder="juan.perez@drogueria.com" required />
+                        </div>
+
+                        <div class="col-sm-6">
+                            <label class="form-label" for="rolEditar">Rol del Sistema</label>
+                            <select class="form-select" id="rolEditar" name="Rol" required>
+                                <option value="Cliente" selected>Cliente</option>
+                                <option value="Empleado">Empleado</option>
+                                <option value="Administrador">Administrador</option>
+                            </select>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <label class="form-label" for="passwordEditar">Contraseña</label>
+                            <div class="position-relative">
+                                <input type="password" class="form-control pe-5" id="passwordEditar" name="Password" placeholder="Dejar en blanco para no cambiarla" autocomplete="new-password" />
+                                <button type="button" class="btn btn-sm position-absolute top-50 end-0 translate-middle-y me-2 border-0 bg-transparent text-muted" onclick="togglePass('passwordEditar', this)" title="Ver contraseña">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                            <small class="text-muted">Déjala vacía si no quieres cambiar la contraseña actual.</small>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form-check form-switch mt-2">
+                                <input class="form-check-input" type="checkbox" id="estadoEditar" name="Estado" value="true" checked />
+                                <label class="form-check-label small fw-semibold" for="estadoEditar" style="color: var(--t-base);">
+                                    Usuario Activo (Permite el inicio de sesión)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn--ghost" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn--primary">
+                        <i class="bi bi-person-plus-fill me-1"></i> Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@* ================= MODAL DE CONFIRMACIÓN (GLASSMORPHISM) ================= *@
+<div class="modal fade" id="glassConfirmModal" tabindex="-1" aria-labelledby="glassConfirmLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+      <div class="modal-content modal-glass">
+
+        <div class="modal-header">
+          <h5 class="modal-title" id="glassConfirmLabel">¿Desactivar usuario?</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <p style="color: var(--t-muted); font-size: 13px; margin: 0;" id="glassConfirmTexto">
+            Esta acción desactivará al usuario seleccionado. Podrás reactivarlo cuando quieras desde el listado.
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn--ghost" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" id="btnConfirmarEliminar" class="btn btn--ghost"
+            style="color: var(--danger); border-color: var(--danger);" onclick="confirmarDesactivarUsuario()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+            </svg>
+            Desactivar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
 @section Scripts {
     <script>
-        // Alternar visibilidad de contraseña
-        function togglePass(inputId, btn) {
-            const input = document.getElementById(inputId);
-            const icon = btn.querySelector("i");
-            if (input && icon) {
-                if (input.type === "password") {
-                    input.type = "text";
-                    icon.classList.remove("bi-eye");
-                    icon.classList.add("bi-eye-slash");
-                } else {
-                    input.type = "password";
-                    icon.classList.remove("bi-eye-slash");
-                    icon.classList.add("bi-eye");
-                }
+    function validarFormulario(form) {
+        if (!form) return false;
+
+        const requiredFields = form.querySelectorAll("input[required], select[required]");
+        let valido = true;
+
+        requiredFields.forEach(function (campo) {
+            if (!campo.value.trim()) {
+                campo.classList.add("is-invalid");
+                valido = false;
+            } else {
+                campo.classList.remove("is-invalid");
             }
-        }
-
-        // Fecha dinámica en el eyebrow
-        document.addEventListener("DOMContentLoaded", function() {
-            const fechaEl = document.getElementById("heroDate");
-            if (fechaEl) {
-                const hoy = new Date();
-                const opciones = { day: 'numeric', month: 'long', year: 'numeric' };
-                fechaEl.innerHTML = `<i class="bi bi-calendar3 me-1"></i> ` + hoy.toLocaleDateString('es-ES', opciones);
-            }
-
-            // Filtro en tiempo real por texto y rol
-            const inputFiltro = document.getElementById("filtroUsuarios");
-            const selectRol = document.getElementById("filtroRol");
-            const filas = document.querySelectorAll(".fila-usuario");
-
-            function filtrar() {
-                const texto = (inputFiltro ? inputFiltro.value : "").toLowerCase().trim();
-                const rol = (selectRol ? selectRol.value : "").toLowerCase().trim();
-
-                filas.forEach(function(fila) {
-                    const contenido = fila.textContent.toLowerCase();
-                    const filaRol = (fila.getAttribute("data-rol") || "").toLowerCase();
-
-                    const coincideTexto = !texto || contenido.includes(texto);
-                    const coincideRol = !rol || filaRol === rol || filaRol.includes(rol);
-
-                    if (coincideTexto && coincideRol) {
-                        fila.style.display = "";
-                    } else {
-                        fila.style.display = "none";
-                    }
-                });
-            }
-
-            if (inputFiltro) inputFiltro.addEventListener("input", filtrar);
-            if (selectRol) selectRol.addEventListener("change", filtrar);
         });
 
-        // Copiar UUID
-        function copiarUuid(uuid, btn) {
-            navigator.clipboard.writeText(uuid).then(function() {
-                const icon = btn.querySelector("i");
-                if (icon) {
-                    icon.classList.remove("bi-clipboard");
-                    icon.classList.add("bi-check2");
-                    setTimeout(function() {
-                        icon.classList.remove("bi-check2");
-                        icon.classList.add("bi-clipboard");
-                    }, 1500);
+        if (!valido) {
+            form.reportValidity();
+        }
+
+        return valido;
+    }
+
+    function showUsuario(uuid) {
+        const fila = document.querySelector(`.fila-usuario[data-uuid="${uuid}"]`);
+        if (!fila) return;
+
+        document.querySelectorAll(".fila-usuario").forEach(function (row) {
+            row.classList.remove("table-active");
+        });
+
+        fila.classList.add("table-active");
+        fila.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    function createUsuario() {
+        const form = document.querySelector("#modalCrear form");
+        if (!form) return;
+
+        if (!validarFormulario(form)) return;
+
+        form.submit();
+    }
+
+    function editUsuario(event) {
+        const button = event?.relatedTarget || document.querySelector(".btn-action-icon.edit.active");
+
+        if (!button) return;
+
+        const uuid = button.getAttribute("data-uuid");
+        const nombre = button.getAttribute("data-nombre");
+        const apellido = button.getAttribute("data-apellido");
+        const email = button.getAttribute("data-email");
+        const rol = button.getAttribute("data-rol");
+        const estado = button.getAttribute("data-estado");
+
+        const uuidInput = document.getElementById("uuidEditar");
+        const nombreInput = document.getElementById("nombreEditar");
+        const apellidoInput = document.getElementById("apellidoEditar");
+        const emailInput = document.getElementById("emailEditar");
+        const passwordInput = document.getElementById("passwordEditar");
+        const estadoInput = document.getElementById("estadoEditar");
+        const rolSelect = document.getElementById("rolEditar");
+
+        if (uuidInput) uuidInput.value = uuid || "";
+        if (nombreInput) nombreInput.value = nombre || "";
+        if (apellidoInput) apellidoInput.value = apellido || "";
+        if (emailInput) emailInput.value = email || "";
+        if (passwordInput) passwordInput.value = "";
+        if (estadoInput) estadoInput.checked = String(estado).toLowerCase() === "true";
+        if (rolSelect) {
+            const valorRol = (rol || "cliente").toLowerCase();
+            const rolesValidos = ["cliente", "empleado", "administrador"];
+            rolSelect.value = rolesValidos.includes(valorRol) ? valorRol.charAt(0).toUpperCase() + valorRol.slice(1) : "Cliente";
+        }
+    }
+
+    function updateUsuario(uuid) {
+        const form = document.querySelector("#modalEditar form");
+        if (!form) return;
+
+        if (uuid && form.querySelector("#uuidEditar")) {
+            form.querySelector("#uuidEditar").value = uuid;
+        }
+
+        if (!validarFormulario(form)) return;
+
+        form.submit();
+    }
+
+    function activarUsuario(uuid) {
+        const form = document.querySelector(`form.toggle-estado-form[data-usuario-id="${uuid}"]`);
+        if (!form) return;
+
+        const activo = form.dataset.estado === "true";
+        if (activo) {
+            if (!confirm("Este usuario ya está activo. ¿Deseas cambiar su estado?")) return;
+        }
+
+        form.submit();
+    }
+
+    function desactivarUsuario(uuid) {
+        const form = document.querySelector(`form.toggle-estado-form[data-usuario-id="${uuid}"]`);
+        if (!form) return;
+
+        const activo = form.dataset.estado === "true";
+        if (!activo) {
+            if (!confirm("Este usuario ya está inactivo. ¿Deseas cambiar su estado?")) return;
+        }
+
+        form.submit();
+    }
+
+    function togglePass(inputId, btn) {
+        const input = document.getElementById(inputId);
+        const icon = btn.querySelector("i");
+
+        if (!input || !icon) return;
+
+        if (input.type === "password") {
+            input.type = "text";
+            icon.classList.remove("bi-eye");
+            icon.classList.add("bi-eye-slash");
+        } else {
+            input.type = "password";
+            icon.classList.remove("bi-eye-slash");
+            icon.classList.add("bi-eye");
+        }
+    }
+
+    function copiarUuid(uuid, btn) {
+        if (!uuid || !navigator.clipboard) return;
+
+        navigator.clipboard.writeText(uuid).then(function () {
+            const icon = btn.querySelector("i");
+            if (!icon) return;
+
+            icon.classList.remove("bi-clipboard");
+            icon.classList.add("bi-check2");
+
+            setTimeout(function () {
+                icon.classList.remove("bi-check2");
+                icon.classList.add("bi-clipboard");
+            }, 1500);
+        });
+    }
+
+    function filtrarUsuarios() {
+        const inputFiltro = document.getElementById("filtroUsuarios");
+        const selectRol = document.getElementById("filtroRol");
+        const filas = document.querySelectorAll(".fila-usuario");
+
+        const texto = inputFiltro?.value.toLowerCase().trim() || "";
+        const rol = selectRol?.value.toLowerCase().trim() || "";
+
+        filas.forEach(function (fila) {
+            const contenido = fila.textContent.toLowerCase();
+            const filaRol = fila.getAttribute("data-rol")?.toLowerCase() || "";
+
+            const coincideTexto = !texto || contenido.includes(texto);
+            const coincideRol = !rol || filaRol === rol || filaRol.includes(rol);
+
+            fila.style.display = coincideTexto && coincideRol ? "" : "none";
+        });
+    }
+
+    function cargarFecha() {
+        const fechaEl = document.getElementById("heroDate");
+        if (!fechaEl) return;
+
+        const hoy = new Date();
+        const opciones = { day: "numeric", month: "long", year: "numeric" };
+        fechaEl.innerHTML = `<i class="bi bi-calendar3 me-1"></i> ` + hoy.toLocaleDateString("es-ES", opciones);
+    }
+
+    function autoOcultarAlertas() {
+        document.querySelectorAll(".alert-dismissible").forEach(function (alertEl) {
+            setTimeout(function () {
+                const instancia = bootstrap.Alert.getOrCreateInstance(alertEl);
+                instancia.close();
+            }, 4000);
+        });
+    }
+
+    let uuidADesactivar = null;
+
+    function confirmarDesactivarUsuario() {
+        if (!uuidADesactivar) return;
+
+        const form = document.querySelector(`.desactivar-form[data-usuario-id="${uuidADesactivar}"]`);
+        if (form) form.submit();
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        cargarFecha();
+        autoOcultarAlertas();
+
+        document.getElementById("filtroUsuarios")?.addEventListener("input", filtrarUsuarios);
+        document.getElementById("filtroRol")?.addEventListener("change", filtrarUsuarios);
+
+        const editModal = document.getElementById("modalEditar");
+        if (editModal) {
+            editModal.addEventListener("show.bs.modal", editUsuario);
+        }
+
+        const confirmModal = document.getElementById("glassConfirmModal");
+        if (confirmModal) {
+            confirmModal.addEventListener("show.bs.modal", function (event) {
+                const boton = event.relatedTarget;
+                uuidADesactivar = boton?.getAttribute("data-uuid") || null;
+                const nombre = boton?.getAttribute("data-nombre") || "este usuario";
+
+                const texto = document.getElementById("glassConfirmTexto");
+                if (texto) {
+                    texto.textContent = `Esta acción desactivará a ${nombre}. Podrás reactivarlo cuando quieras desde el listado.`;
                 }
             });
         }
+
+        const formCrear = document.querySelector("#modalCrear form");
+        if (formCrear) {
+            formCrear.addEventListener("submit", function (event) {
+                if (!validarFormulario(formCrear)) {
+                    event.preventDefault();
+                }
+            });
+        }
+
+        const formEditar = document.querySelector("#modalEditar form");
+        if (formEditar) {
+            formEditar.addEventListener("submit", function (event) {
+                if (!validarFormulario(formEditar)) {
+                    event.preventDefault();
+                }
+            });
+        }
+
+        document.querySelectorAll(".btn-action-icon.edit").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+                document.querySelectorAll(".btn-action-icon.edit").forEach(function (item) {
+                    item.classList.remove("active");
+                });
+                btn.classList.add("active");
+            });
+        });
+
+        document.querySelectorAll(".toggle-estado-form").forEach(function (form) {
+            form.addEventListener("submit", function (event) {
+                const estadoActual = this.dataset.estado === "true";
+                const accion = estadoActual ? "desactivar" : "activar";
+                const nombre = this.closest("tr")?.querySelector(".cell-name")?.textContent?.trim() || "este usuario";
+
+                if (!confirm(`¿Seguro que quieres ${accion} a ${nombre}?`)) {
+                    event.preventDefault();
+                }
+            });
+        });
+    });
     </script>
 }

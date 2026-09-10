@@ -32,5 +32,5 @@ public class Usuario
 
     [Required(ErrorMessage = "El rol es obligatorio")]
     [StringLength(50)]
-    public string Rol { get; set; } = "Empleado"; // Administrador, Empleado, Cliente
+    public string Rol { get; set; } = "Cliente"; // Administrador, Empleado, Cliente
 }

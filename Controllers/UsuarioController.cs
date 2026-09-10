@@ -54,10 +54,11 @@ namespace Drogueria.Controllers
                 usuario.Nombre = usuario.Nombre?.Trim() ?? "";
                 usuario.Apellido = usuario.Apellido?.Trim() ?? "";
                 usuario.Email = usuario.Email?.Trim().ToLower() ?? "";
+                usuario.Password = BCrypt.Net.BCrypt.HashPassword(usuario.Password?.Trim() ?? "");
 
                 _context.Usuarios.Add(usuario);
                 await _context.SaveChangesAsync();
-                TempData["Success"] = $"Usuario {usuario.Nombre} ({usuario.Rol}) creado con éxito.";
+                TempData["Success"] = $"Usuario ({usuario.Rol}) {usuario.Nombre} creado con éxito.";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -75,13 +76,17 @@ namespace Drogueria.Controllers
             {
                 usuario.Estado = !usuario.Estado;
                 await _context.SaveChangesAsync();
-                TempData["Success"] = $"Estado de {usuario.Nombre} actualizado.";
+                TempData["Success"] = $"Estado de {usuario.Nombre} actualizado correctamente.";
+            }
+            else
+            {
+                TempData["Error"] = "Usuario no encontrado.";
             }
 
             return RedirectToAction(nameof(Index));
         }
 
-        // Eliminar usuario
+        // "Eliminar" usuario -> en realidad solo se desactiva (borrado lógico)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(string id)
@@ -89,12 +94,82 @@ namespace Drogueria.Controllers
             var usuario = await _context.Usuarios.FindAsync(id);
             if (usuario != null)
             {
-                _context.Usuarios.Remove(usuario);
+                usuario.Estado = false;
                 await _context.SaveChangesAsync();
-                TempData["Success"] = "Usuario eliminado correctamente.";
+                TempData["Success"] = $"Usuario {usuario.Nombre} desactivado correctamente.";
+            }
+            else
+            {
+                TempData["Error"] = "Usuario no encontrado.";
             }
 
             return RedirectToAction(nameof(Index));
         }
+
+        // POST: /Usuario/Update
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Update(Usuario usuario)
+        {
+            // Si el usuario no escribió una contraseña nueva, no la exigimos ni la tocamos
+            var nuevaPassword = usuario.Password?.Trim();
+            if (string.IsNullOrWhiteSpace(nuevaPassword))
+            {
+                ModelState.Remove(nameof(Usuario.Password));
+            }
+
+            if (!ModelState.IsValid)
+            {
+                TempData["Error"] = "Verifica los campos obligatorios.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var existente = await _context.Usuarios.FindAsync(usuario.Uuid);
+            if (existente == null)
+            {
+                TempData["Error"] = "Usuario no encontrado.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Validar correo duplicado (excluyendo al propio usuario que se está editando)
+            if (!string.IsNullOrWhiteSpace(usuario.Email))
+            {
+                var emailExiste = await _context.Usuarios
+                    .AnyAsync(u => u.Uuid != usuario.Uuid && u.Email.ToLower() == usuario.Email.Trim().ToLower());
+
+                if (emailExiste)
+                {
+                    TempData["Error"] = $"El correo '{usuario.Email}' ya está registrado con otro usuario.";
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+
+            // Normalizar y asignar los datos
+            existente.Nombre   = usuario.Nombre?.Trim() ?? "";
+            existente.Apellido = usuario.Apellido?.Trim() ?? "";
+            existente.Email    = usuario.Email?.Trim().ToLower() ?? "";
+            existente.Estado   = usuario.Estado;
+
+            // Solo actualizamos la contraseña si el usuario escribió una nueva
+            if (!string.IsNullOrWhiteSpace(nuevaPassword))
+            {
+                existente.Password = BCrypt.Net.BCrypt.HashPassword(nuevaPassword);
+            }
+
+            // Normalizar rol (igual que en Create)
+            var rol = usuario.Rol?.Trim();
+            if (string.Equals(rol, "Administrador", StringComparison.OrdinalIgnoreCase))
+                existente.Rol = "Administrador";
+            else if (string.Equals(rol, "Cliente", StringComparison.OrdinalIgnoreCase))
+                existente.Rol = "Cliente";
+            else
+                existente.Rol = "Empleado";
+
+            // Guardar cambios
+            await _context.SaveChangesAsync();
+            TempData["Success"] = $"Usuario {existente.Nombre} actualizado con éxito.";
+            return RedirectToAction(nameof(Index));
+        }
+
     }
 }

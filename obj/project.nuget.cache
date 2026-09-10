@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "7lp+Oo5OVTA=",
+  "dgSpecHash": "hEFHThNCpZ8=",
   "success": true,
   "projectFilePath": "D:\\Drogueria 19-09\\Drogueria\\Drogueria.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\Jonatan H\\.nuget\\packages\\bcrypt.net-next\\4.2.0\\bcrypt.net-next.4.2.0.nupkg.sha512",
     "C:\\Users\\Jonatan H\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\Jonatan H\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\7.0.0\\microsoft.bcl.asyncinterfaces.7.0.0.nupkg.sha512",
     "C:\\Users\\Jonatan H\\.nuget\\packages\\microsoft.build.framework\\17.8.3\\microsoft.build.framework.17.8.3.nupkg.sha512",
