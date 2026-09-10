@@ -1,0 +1,88 @@
+@{
+    ViewData["Title"] = "Categorias";
+    ViewData["ActiveNav"] = "categorias";
+    Layout = "~/Views/Shared/_Topbar.cshtml";
+}
+
+
+<section class="hero">
+    <div class="hero-text">
+        <span class="eyebrow" id="heroDate">
+            <i class="bi bi-calendar3"></i> Panel de Categorías
+        </span>
+        <h1 class="hero-title">Gestión de <span class="accent">Categorías</span></h1>
+        <p class="hero-sub">
+           Crear y administrar categorías para la gestión de productos. Actualmente hay <strong>activas categorías activas</strong> en el sistema.
+        </p>
+    </div>
+    <div class="hero-action">
+        <button class="btn btn--primary" data-bs-toggle="modal" data-bs-target="#modalCrear">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 5v14M5 12h14" />
+            </svg>
+            Nueva categoría
+        </button>
+    </div>
+</section>
+
+<div class="card">
+    <div class="card-head">
+        <div class="card-title-wrap">
+            <span class="eyebrow">Directorio</span>
+            <h2 class="card-title">Listado de Categorías Registradas</h2>
+        </div>
+
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <!-- Buscador en tiempo real -->
+            <div class="ui-search">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.3-4.3" />
+                </svg>
+                <input type="text" id="filtroCategorias" placeholder="Buscar por nombre..." autocomplete="off" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Registro Categoría -->
+<div class="modal fade" id="modalCrear" tabindex="-1" aria-labelledby="modalCrearLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-glass">
+            <div class="modal-header">
+                <div>
+                    <span class="eyebrow" style="font-size: 10px;">Nuevo Registro</span>
+                    <h5 class="modal-title" id="modalCrearLabel">Crear Nueva Categoría</h5>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <form method="post" asp-controller="Usuario" asp-action="Create">
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <label class="form-label" for="nombreCategoria">Nombre</label>
+                            <input type="text" class="form-control" id="nombreCategoria" name="Nombre" placeholder="Ej. Analgésicos" required />
+                        </div>
+                    </div>
+                </div> 
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn--ghost" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn--primary">
+                        <i class="bi bi-tags-fill me-1"></i> Guardar Categoría
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="~/js/landingPages.js" asp-append-version="true"></script>
+
+<script>
+    
+</script>
+

@@ -20,45 +20,49 @@ build_property.TargetFrameworkVersion = v10.0
 build_property.EntryPointFilePath = 
 build_property.RootNamespace = Drogueria
 build_property.RootNamespace = Drogueria
-build_property.ProjectDir = D:\Drogueria 19-09\Drogueria\
+build_property.ProjectDir = C:\Users\yazza\OneDrive\Desktop\Drogueria\Droguer-a\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 10.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = D:\Drogueria 19-09\Drogueria
+build_property.MSBuildProjectDirectory = C:\Users\yazza\OneDrive\Desktop\Drogueria\Droguer-a
 build_property._RazorSourceGeneratorDebug = 
 build_property.EffectiveAnalysisLevelStyle = 10.0
 build_property.EnableCodeStyleSeverity = 
 
-[D:/Drogueria 19-09/Drogueria/Views/Home/pages/_Productos.cshtml]
+[C:/Users/yazza/OneDrive/Desktop/Drogueria/Droguer-a/Views/Home/pages/_Categorias.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxwYWdlc1xfQ2F0ZWdvcmlhcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/yazza/OneDrive/Desktop/Drogueria/Droguer-a/Views/Home/pages/_Productos.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxwYWdlc1xfUHJvZHVjdG9zLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Drogueria 19-09/Drogueria/Views/Home/pages/_Usuarios.cshtml]
+[C:/Users/yazza/OneDrive/Desktop/Drogueria/Droguer-a/Views/Home/pages/_Usuarios.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxwYWdlc1xfVXN1YXJpb3MuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Drogueria 19-09/Drogueria/Views/Home/Pagina_Inicio/Index.cshtml]
+[C:/Users/yazza/OneDrive/Desktop/Drogueria/Droguer-a/Views/Home/Pagina_Inicio/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQYWdpbmFfSW5pY2lvXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Drogueria 19-09/Drogueria/Views/Shared/_LayoutPublico.cshtml]
+[C:/Users/yazza/OneDrive/Desktop/Drogueria/Droguer-a/Views/Shared/_LayoutPublico.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXRQdWJsaWNvLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Drogueria 19-09/Drogueria/Views/Shared/_Sidebar.cshtml]
+[C:/Users/yazza/OneDrive/Desktop/Drogueria/Droguer-a/Views/Shared/_Sidebar.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9TaWRlYmFyLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Drogueria 19-09/Drogueria/Views/Shared/_Topbar.cshtml]
+[C:/Users/yazza/OneDrive/Desktop/Drogueria/Droguer-a/Views/Shared/_Topbar.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9Ub3BiYXIuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Drogueria 19-09/Drogueria/Views/_ViewImports.cshtml]
+[C:/Users/yazza/OneDrive/Desktop/Drogueria/Droguer-a/Views/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Drogueria 19-09/Drogueria/Views/_ViewStart.cshtml]
+[C:/Users/yazza/OneDrive/Desktop/Drogueria/Droguer-a/Views/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 

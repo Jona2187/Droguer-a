@@ -1,13 +1,17 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "D:\\Drogueria 19-09\\Drogueria\\",
+  "WorkspaceRootPath": "C:\\Users\\yazza\\OneDrive\\Desktop\\Drogueria\\Droguer-a\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{2A8C08C8-5347-8FFA-B2AB-40322806BBC7}|Drogueria.csproj|d:\\drogueria 19-09\\drogueria\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{2A8C08C8-5347-8FFA-B2AB-40322806BBC7}|Drogueria.csproj|c:\\users\\yazza\\onedrive\\desktop\\drogueria\\droguer-a\\controllers\\usuariocontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2A8C08C8-5347-8FFA-B2AB-40322806BBC7}|Drogueria.csproj|solutionrelative:controllers\\usuariocontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2A8C08C8-5347-8FFA-B2AB-40322806BBC7}|Drogueria.csproj|c:\\users\\yazza\\onedrive\\desktop\\drogueria\\droguer-a\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{2A8C08C8-5347-8FFA-B2AB-40322806BBC7}|Drogueria.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2A8C08C8-5347-8FFA-B2AB-40322806BBC7}|Drogueria.csproj|d:\\drogueria 19-09\\drogueria\\views\\shared\\_layoutpublico.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "AbsoluteMoniker": "D:0:0:{2A8C08C8-5347-8FFA-B2AB-40322806BBC7}|Drogueria.csproj|c:\\users\\yazza\\onedrive\\desktop\\drogueria\\droguer-a\\views\\shared\\_layoutpublico.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{2A8C08C8-5347-8FFA-B2AB-40322806BBC7}|Drogueria.csproj|solutionrelative:views\\shared\\_layoutpublico.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     }
   ],
@@ -23,23 +27,36 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "UsuarioController.cs",
+              "DocumentMoniker": "C:\\Users\\yazza\\OneDrive\\Desktop\\Drogueria\\Droguer-a\\Controllers\\UsuarioController.cs",
+              "RelativeDocumentMoniker": "Controllers\\UsuarioController.cs",
+              "ToolTip": "C:\\Users\\yazza\\OneDrive\\Desktop\\Drogueria\\Droguer-a\\Controllers\\UsuarioController.cs",
+              "RelativeToolTip": "Controllers\\UsuarioController.cs",
+              "ViewState": "AgIAABgAAAAAAAAAAAAYwCEAAAAoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-10T17:17:51.995Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "Program.cs",
-              "DocumentMoniker": "D:\\Drogueria 19-09\\Drogueria\\Program.cs",
+              "DocumentMoniker": "C:\\Users\\yazza\\OneDrive\\Desktop\\Drogueria\\Droguer-a\\Program.cs",
               "RelativeDocumentMoniker": "Program.cs",
-              "ToolTip": "D:\\Drogueria 19-09\\Drogueria\\Program.cs",
+              "ToolTip": "C:\\Users\\yazza\\OneDrive\\Desktop\\Drogueria\\Droguer-a\\Program.cs",
               "RelativeToolTip": "Program.cs",
-              "ViewState": "AgIAAAoAAAAAAAAAAAAAAAoAAAAFAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-09-08T18:38:15.32Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "_LayoutPublico.cshtml",
-              "DocumentMoniker": "D:\\Drogueria 19-09\\Drogueria\\Views\\Shared\\_LayoutPublico.cshtml",
+              "DocumentMoniker": "C:\\Users\\yazza\\OneDrive\\Desktop\\Drogueria\\Droguer-a\\Views\\Shared\\_LayoutPublico.cshtml",
               "RelativeDocumentMoniker": "Views\\Shared\\_LayoutPublico.cshtml",
-              "ToolTip": "D:\\Drogueria 19-09\\Drogueria\\Views\\Shared\\_LayoutPublico.cshtml",
+              "ToolTip": "C:\\Users\\yazza\\OneDrive\\Desktop\\Drogueria\\Droguer-a\\Views\\Shared\\_LayoutPublico.cshtml",
               "RelativeToolTip": "Views\\Shared\\_LayoutPublico.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAA7AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",

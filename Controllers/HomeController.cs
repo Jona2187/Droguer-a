@@ -11,9 +11,9 @@ namespace Drogueria.Controllers
             return View("~/Views/Home/Pagina_Inicio/Index.cshtml");
         }
 
-        public IActionResult Productos()
+        public IActionResult Categorias()
         {
-            return View("~/Views/Home/pages/_Productos.cshtml");
+            return View("~/Views/Home/Pages/Categorias.cshtml");
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
