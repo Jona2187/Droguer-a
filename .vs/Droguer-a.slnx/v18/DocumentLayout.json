@@ -1,11 +1,16 @@
 {
   "Version": 1,
+<<<<<<< HEAD
   "WorkspaceRootPath": "C:\\Users\\jesus\\Desktop\\dddd\\Droguer-a\\",
+=======
+  "WorkspaceRootPath": "C:\\Users\\yazza\\OneDrive\\Desktop\\Drogueria\\Droguer-a\\",
+>>>>>>> 24fffc863a3bcb4bdafdd80e552a6225d1c37b95
   "Documents": [],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
       "VerticalTabListWidth": 256,
+<<<<<<< HEAD
       "DocumentGroups": [
         {
           "DockedWidth": 200,
@@ -18,6 +23,9 @@
           ]
         }
       ]
+=======
+      "DocumentGroups": []
+>>>>>>> 24fffc863a3bcb4bdafdd80e552a6225d1c37b95
     }
   ]
 }
