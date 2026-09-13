@@ -1,39 +1,24 @@
 {
   "format": 1,
   "restore": {
-<<<<<<< HEAD
-    "C:\\Users\\jesus\\Desktop\\dddd\\Droguer-a\\Drogueria.csproj": {}
+    "D:\\Drogueria 19-09\\Drogueria\\Drogueria.csproj": {}
   },
   "projects": {
-    "C:\\Users\\jesus\\Desktop\\dddd\\Droguer-a\\Drogueria.csproj": {
+    "D:\\Drogueria 19-09\\Drogueria\\Drogueria.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\jesus\\Desktop\\dddd\\Droguer-a\\Drogueria.csproj",
+        "projectUniqueName": "D:\\Drogueria 19-09\\Drogueria\\Drogueria.csproj",
         "projectName": "Drogueria",
-        "projectPath": "C:\\Users\\jesus\\Desktop\\dddd\\Droguer-a\\Drogueria.csproj",
-        "packagesPath": "C:\\Users\\jesus\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\jesus\\Desktop\\dddd\\Droguer-a\\obj\\",
-=======
-    "C:\\Users\\yazza\\OneDrive\\Desktop\\Drogueria\\Droguer-a\\Drogueria.csproj": {}
-  },
-  "projects": {
-    "C:\\Users\\yazza\\OneDrive\\Desktop\\Drogueria\\Droguer-a\\Drogueria.csproj": {
-      "version": "1.0.0",
-      "restore": {
-        "projectUniqueName": "C:\\Users\\yazza\\OneDrive\\Desktop\\Drogueria\\Droguer-a\\Drogueria.csproj",
-        "projectName": "Drogueria",
-        "projectPath": "C:\\Users\\yazza\\OneDrive\\Desktop\\Drogueria\\Droguer-a\\Drogueria.csproj",
-        "packagesPath": "C:\\Users\\yazza\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\yazza\\OneDrive\\Desktop\\Drogueria\\Droguer-a\\obj\\",
->>>>>>> 24fffc863a3bcb4bdafdd80e552a6225d1c37b95
+        "projectPath": "D:\\Drogueria 19-09\\Drogueria\\Drogueria.csproj",
+        "packagesPath": "C:\\Users\\Jonatan H\\.nuget\\packages\\",
+        "outputPath": "D:\\Drogueria 19-09\\Drogueria\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-<<<<<<< HEAD
-          "C:\\Users\\jesus\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Jonatan H\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-=======
-          "C:\\Users\\yazza\\AppData\\Roaming\\NuGet\\NuGet.Config",
->>>>>>> 24fffc863a3bcb4bdafdd80e552a6225d1c37b95
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -60,7 +45,7 @@
           "auditLevel": "low",
           "auditMode": "all"
         },
-        "SdkAnalysisLevel": "10.0.300"
+        "SdkAnalysisLevel": "10.0.400"
       },
       "frameworks": {
         "net10.0": {
@@ -107,11 +92,7 @@
               "privateAssets": "all"
             }
           },
-<<<<<<< HEAD
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.302/PortableRuntimeIdentifierGraph.json",
-=======
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.401/PortableRuntimeIdentifierGraph.json",
->>>>>>> 24fffc863a3bcb4bdafdd80e552a6225d1c37b95
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.400/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.AspNetCore": "(,10.0.32767]",
             "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",

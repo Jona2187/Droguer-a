@@ -10,1090 +10,570 @@
 
     <!-- CARRUSEL -->
     <section class="carrusel" id="carrusel">
-
         <div class="slide activo">
-
             <img src="~/img/1.jpeg" alt="Droguería">
-
             <div class="contenido-slide">
-
-                <span class="etiqueta-slide">
-                    TU SALUD ES NUESTRA PRIORIDAD
-                </span>
-
+                <span class="etiqueta-slide">TU SALUD ES NUESTRA PRIORIDAD</span>
                 <h1>Bienvenido a nuestra Droguería</h1>
-
                 <p>
                     Encuentra medicamentos, productos de cuidado personal
                     y mucho más para cuidar de ti y de tu familia.
                 </p>
-
-                <a href="#productos" class="boton">
-                    Ver productos
-                </a>
-
+                <a href="#productos" class="boton">Ver productos</a>
             </div>
-
         </div>
-
 
         <div class="slide">
             <img src="~/img/2.jpeg" alt="Productos de droguería">
         </div>
 
-
         <div class="slide">
             <img src="~/img/3.jpeg" alt="Promociones">
         </div>
 
-
-        <button class="flecha anterior"
-                type="button"
-                onclick="cambiarSlide(-1)"
-                aria-label="Anterior">
+        <button class="flecha anterior" type="button" onclick="cambiarSlide(-1)" aria-label="Anterior">
             &#10094;
         </button>
 
-
-        <button class="flecha siguiente"
-                type="button"
-                onclick="cambiarSlide(1)"
-                aria-label="Siguiente">
+        <button class="flecha siguiente" type="button" onclick="cambiarSlide(1)" aria-label="Siguiente">
             &#10095;
         </button>
 
-
         <div class="indicadores">
-
-            <button class="punto activo"
-                    type="button"
-                    onclick="irSlide(0)"
-                    aria-label="Ir a la diapositiva 1">
-            </button>
-
-            <button class="punto"
-                    type="button"
-                    onclick="irSlide(1)"
-                    aria-label="Ir a la diapositiva 2">
-            </button>
-
-            <button class="punto"
-                    type="button"
-                    onclick="irSlide(2)"
-                    aria-label="Ir a la diapositiva 3">
-            </button>
-
+            <button class="punto activo" type="button" onclick="irSlide(0)" aria-label="Ir a la diapositiva 1"></button>
+            <button class="punto" type="button" onclick="irSlide(1)" aria-label="Ir a la diapositiva 2"></button>
+            <button class="punto" type="button" onclick="irSlide(2)" aria-label="Ir a la diapositiva 3"></button>
         </div>
-
     </section>
 
     <!-- SERVICIOS -->
     <section class="servicios" id="servicios">
-
-        <span class="etiqueta">
-            LO QUE OFRECEMOS
-        </span>
-
+        <span class="etiqueta">LO QUE OFRECEMOS</span>
         <h2>Nuestros servicios</h2>
-
         <p class="texto-seccion">
             Encuentra soluciones para cuidar tu salud de forma rápida,
             sencilla y segura.
         </p>
 
-
         <div class="tarjetas">
-
             <!-- MEDICAMENTOS -->
             <div class="tarjeta">
-
                 <div class="icono-servicio icono-svg">
-
                     <svg viewBox="0 0 24 24" aria-hidden="true">
-
-                        <path d="M7 17l10-10a4.24 4.24 0 0 1 6 6L13 23a4.24 4.24 0 0 1-6-6z"
-                              fill="none"
-                              stroke="currentColor"
-                              stroke-width="2" />
-
-                        <path d="M9 15l6-6"
-                              stroke="currentColor"
-                              stroke-width="2" />
-
+                        <path d="M7 17l10-10a4.24 4.24 0 0 1 6 6L13 23a4.24 4.24 0 0 1-6-6z" fill="none" stroke="currentColor" stroke-width="2" />
+                        <path d="M9 15l6-6" stroke="currentColor" stroke-width="2" />
                     </svg>
-
                 </div>
-
                 <h3>Medicamentos</h3>
-
-                <p>
-                    Amplia variedad de medicamentos y productos de salud.
-                </p>
-
-                <a asp-controller="Home"
-                   asp-action="Productos">
-                    Ver más →
-                </a>
-
+                <p>Amplia variedad de medicamentos y productos de salud.</p>
             </div>
-
 
             <!-- ATENCIÓN FARMACÉUTICA -->
             <div class="tarjeta">
-
                 <div class="icono-servicio icono-svg">
-
                     <svg viewBox="0 0 24 24" aria-hidden="true">
-
-                        <path d="M12 21s-7-4-9-9a6 6 0 0 1 9-6 6 6 0 0 1 9 6c-2 5-9 9-9 9z"
-                              fill="none"
-                              stroke="currentColor"
-                              stroke-width="2" />
-
-                        <path d="M12 8v6M9 11h6"
-                              stroke="currentColor"
-                              stroke-width="2"
-                              stroke-linecap="round" />
-
+                        <path d="M12 21s-7-4-9-9a6 6 0 0 1 9-6 6 6 0 0 1 9 6c-2 5-9 9-9 9z" fill="none" stroke="currentColor" stroke-width="2" />
+                        <path d="M12 8v6M9 11h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
                     </svg>
-
                 </div>
-
                 <h3>Atención farmacéutica</h3>
-
-                <p>
-                    Orientación y atención personalizada para nuestros clientes.
-                </p>
-
-                <a asp-controller="Home"
-                   asp-action="Contacto">
-                    Ver más →
-                </a>
-
+                <p>Orientación y atención personalizada para nuestros clientes.</p>
             </div>
-
 
             <!-- DOMICILIOS -->
             <div class="tarjeta">
-
                 <div class="icono-servicio icono-svg">
-
                     <svg viewBox="0 0 24 24" aria-hidden="true">
-
-                        <path d="M3 6h11v11H3z"
-                              fill="none"
-                              stroke="currentColor"
-                              stroke-width="2" />
-
-                        <path d="M14 10h4l3 3v4h-7z"
-                              fill="none"
-                              stroke="currentColor"
-                              stroke-width="2" />
-
-                        <circle cx="7"
-                                cy="19"
-                                r="2"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2" />
-
-                        <circle cx="18"
-                                cy="19"
-                                r="2"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2" />
-
+                        <path d="M3 6h11v11H3z" fill="none" stroke="currentColor" stroke-width="2" />
+                        <path d="M14 10h4l3 3v4h-7z" fill="none" stroke="currentColor" stroke-width="2" />
+                        <circle cx="7" cy="19" r="2" fill="none" stroke="currentColor" stroke-width="2" />
+                        <circle cx="18" cy="19" r="2" fill="none" stroke="currentColor" stroke-width="2" />
                     </svg>
-
                 </div>
-
                 <h3>Domicilios</h3>
-
-                <p>
-                    Recibe tus productos directamente en la comodidad de tu hogar.
-                </p>
-
-                <a asp-controller="Home"
-                   asp-action="Contacto">
-                    Ver más →
-                </a>
-
+                <p>Recibe tus productos directamente en la comodidad de tu hogar.</p>
             </div>
-
 
             <!-- PRODUCTOS NATURALES -->
             <div class="tarjeta">
-
                 <div class="icono-servicio icono-svg">
-
                     <svg viewBox="0 0 24 24" aria-hidden="true">
-
-                        <path d="M20 4C10 4 5 8 5 14c0 3 2 6 6 6 6 0 9-6 9-16z"
-                              fill="none"
-                              stroke="currentColor"
-                              stroke-width="2" />
-
-                        <path d="M4 21c3-6 7-9 13-13"
-                              fill="none"
-                              stroke="currentColor"
-                              stroke-width="2"
-                              stroke-linecap="round" />
-
+                        <path d="M20 4C10 4 5 8 5 14c0 3 2 6 6 6 6 0 9-6 9-16z" fill="none" stroke="currentColor" stroke-width="2" />
+                        <path d="M4 21c3-6 7-9 13-13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
                     </svg>
-
                 </div>
-
                 <h3>Productos naturales</h3>
-
-                <p>
-                    Vitaminas, suplementos y productos naturales para tu bienestar.
-                </p>
-
-                <a asp-controller="Home"
-                   asp-action="Productos">
-                    Ver más →
-                </a>
-
+                <p>Vitaminas, suplementos y productos naturales para tu bienestar.</p>
             </div>
-
 
             <!-- CUIDADO PERSONAL -->
             <div class="tarjeta">
-
                 <div class="icono-servicio icono-svg">
-
                     <svg viewBox="0 0 24 24" aria-hidden="true">
-
-                        <path d="M9 4h6v3H9z"
-                              fill="none"
-                              stroke="currentColor"
-                              stroke-width="2" />
-
-                        <path d="M8 7h8l1 14H7z"
-                              fill="none"
-                              stroke="currentColor"
-                              stroke-width="2" />
-
-                        <path d="M10 11h4M10 15h4"
-                              stroke="currentColor"
-                              stroke-width="2"
-                              stroke-linecap="round" />
-
+                        <path d="M9 4h6v3H9z" fill="none" stroke="currentColor" stroke-width="2" />
+                        <path d="M8 7h8l1 14H7z" fill="none" stroke="currentColor" stroke-width="2" />
+                        <path d="M10 11h4M10 15h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
                     </svg>
-
                 </div>
-
                 <h3>Cuidado personal</h3>
-
-                <p>
-                    Productos para higiene, belleza y cuidado diario.
-                </p>
-
-                <a asp-controller="Home"
-                   asp-action="Productos">
-                    Ver más →
-                </a>
-
+                <p>Productos para higiene, belleza y cuidado diario.</p>
             </div>
-
 
             <!-- PEDIDOS EN LÍNEA -->
             <div class="tarjeta">
-
                 <div class="icono-servicio icono-svg">
-
                     <svg viewBox="0 0 24 24" aria-hidden="true">
-
-                        <path d="M3 4h2l2.5 12h10L21 8H6"
-                              fill="none"
-                              stroke="currentColor"
-                              stroke-width="2"
-                              stroke-linecap="round"
-                              stroke-linejoin="round" />
-
-                        <circle cx="10"
-                                cy="20"
-                                r="1.5"
-                                fill="currentColor" />
-
-                        <circle cx="18"
-                                cy="20"
-                                r="1.5"
-                                fill="currentColor" />
-
+                        <path d="M3 4h2l2.5 12h10L21 8H6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        <circle cx="10" cy="20" r="1.5" fill="currentColor" />
+                        <circle cx="18" cy="20" r="1.5" fill="currentColor" />
                     </svg>
-
                 </div>
-
                 <h3>Pedidos en línea</h3>
-
-                <p>
-                    Realiza tus pedidos de manera rápida y sencilla.
-                </p>
-
-                <a asp-controller="Home"
-                   asp-action="Productos">
-                    Ver más →
-                </a>
-
+                <p>Realiza tus pedidos de manera rápida y sencilla.</p>
             </div>
-
         </div>
-
     </section>
 
     <!-- CONSEJOS -->
     <section class="consejos">
-
-        <span class="etiqueta">
-            BIENESTAR
-        </span>
-
+        <span class="etiqueta">BIENESTAR</span>
         <h2>Consejos para cuidar tu salud</h2>
 
-
         <div class="consejos-tarjetas">
-
             <!-- HIDRATACIÓN -->
             <article class="consejo">
-
                 <span class="icono-svg">
-
                     <svg viewBox="0 0 24 24" aria-hidden="true">
-
-                        <path d="M12 2s-7 8-7 13a7 7 0 0 0 14 0c0-5-7-13-7-13z"
-                            fill="currentColor" />
-
+                        <path d="M12 2s-7 8-7 13a7 7 0 0 0 14 0c0-5-7-13-7-13z" fill="currentColor" />
                     </svg>
-
                 </span>
-
                 <h3>Hidratación</h3>
-
-                <p>
-                    Mantener una buena hidratación es importante
-                    para el bienestar diario.
-                </p>
-
-                <a href="#">
-                    Leer más →
-                </a>
-
+                <p>Mantener una buena hidratación es importante para el bienestar diario.</p>
             </article>
-
 
             <!-- ALIMENTACIÓN -->
             <article class="consejo">
-
                 <span class="icono-svg">
-
                     <svg viewBox="0 0 24 24" aria-hidden="true">
-
-                        <path d="M12 21C7 21 4 17 4 12c0-4 3-7 8-9 5 2 8 5 8 9 0 5-3 9-8 9z"
-                              fill="none"
-                              stroke="currentColor"
-                              stroke-width="2" />
-
-                        <path d="M8 14c3-4 6-6 10-7"
-                              fill="none"
-                              stroke="currentColor"
-                              stroke-width="2" />
-
+                        <path d="M12 21C7 21 4 17 4 12c0-4 3-7 8-9 5 2 8 5 8 9 0 5-3 9-8 9z" fill="none" stroke="currentColor" stroke-width="2" />
+                        <path d="M8 14c3-4 6-6 10-7" fill="none" stroke="currentColor" stroke-width="2" />
                     </svg>
-
                 </span>
-
                 <h3>Alimentación saludable</h3>
-
-                <p>
-                    Una alimentación equilibrada ayuda a mantener
-                    buenos hábitos de salud.
-                </p>
-
-                <a href="#">
-                    Leer más →
-                </a>
-
+                <p>Una alimentación equilibrada ayuda a mantener buenos hábitos de salud.</p>
             </article>
-
 
             <!-- ACTIVIDAD FÍSICA -->
             <article class="consejo">
-
                 <span class="icono-svg">
-
                     <svg viewBox="0 0 24 24" aria-hidden="true">
-
-                        <circle cx="14"
-                                cy="5"
-                                r="2"
-                                fill="currentColor" />
-
-                        <path d="M12 8l-3 5 4 2 2 6M9 13l-4 2M13 15l5-3 2 3"
-                              fill="none"
-                              stroke="currentColor"
-                              stroke-width="2"
-                              stroke-linecap="round"
-                              stroke-linejoin="round" />
-
+                        <circle cx="14" cy="5" r="2" fill="currentColor" />
+                        <path d="M12 8l-3 5 4 2 2 6M9 13l-4 2M13 15l5-3 2 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
-
                 </span>
-
                 <h3>Actividad física</h3>
-
-                <p>
-                    Mantenerse activo contribuye al bienestar
-                    físico y mental.
-                </p>
-
-                <a href="#">
-                    Leer más →
-                </a>
-
+                <p>Mantenerse activo contribuye al bienestar físico y mental.</p>
             </article>
-
         </div>
-
     </section>
 
-
-    <!-- ================================================ -->
     <!-- CARRUSEL DE PASTILLAS -->
-    <!-- ================================================ -->
-
     <section class="carrusel-pastillas" id="productos">
-
-        <span class="etiqueta">
-            NUESTROS PRODUCTOS
-        </span>
-
+        <span class="etiqueta">NUESTROS PRODUCTOS</span>
         <h2>Pastillas y medicamentos</h2>
-
-        <p class="texto-seccion">
-            Encuentra productos para el cuidado de tu salud.
-        </p>
-
+        <p class="texto-seccion">Encuentra productos para el cuidado de tu salud.</p>
 
         <div class="pastillas-slider">
-
-
             <!-- BOTÓN ANTERIOR -->
-            <button class="flecha-pastilla anterior-pastilla"
-                    type="button"
-                    onclick="cambiarPastilla(-1)"
-                    aria-label="Producto anterior">
-
+            <button class="flecha-pastilla anterior-pastilla" type="button" onclick="cambiarPastilla(-1)" aria-label="Producto anterior">
                 &#10094;
-
             </button>
-
 
             <!-- PRODUCTO 1 -->
             <div class="pastilla-slide activo">
-
-                <img src="~/img/pastilla1.jpeg"
-                     alt="Pastillas">
-
+                <img src="~/img/pastilla1.jpeg" alt="Pastillas">
                 <div class="pastilla-info">
-
                     <h3>Medicamentos</h3>
-
-                    <p>
-                        Encuentra medicamentos para diferentes necesidades
-                        y el cuidado de tu salud.
-                    </p>
-
-                    <a asp-controller="Home"
-                       asp-action="Productos"
-                       class="boton-secundario">
-
-                        Ver productos →
-
-                    </a>
-
+                    <p>Encuentra medicamentos para diferentes necesidades y el cuidado de tu salud.</p>
                 </div>
-
             </div>
-
 
             <!-- PRODUCTO 2 -->
             <div class="pastilla-slide">
-
-                <img src="~/img/pastilla2.jpeg"
-                     alt="Medicamentos">
-
+                <img src="~/img/pastilla2.jpeg" alt="Medicamentos">
                 <div class="pastilla-info">
-
                     <h3>Pastillas para el cuidado de tu salud</h3>
-
-                    <p>
-                        Productos de calidad para ayudarte a cuidar
-                        de ti y de tu familia.
-                    </p>
-
-                    <a asp-controller="Home"
-                       asp-action="Productos"
-                       class="boton-secundario">
-
-                        Ver productos →
-
-                    </a>
-
+                    <p>Productos de calidad para ayudarte a cuidar de ti y de tu familia.</p>
                 </div>
-
             </div>
-
 
             <!-- PRODUCTO 3 -->
             <div class="pastilla-slide">
-
-                <img src="~/img/pastilla3.jpeg"
-                     alt="Productos de salud">
-
+                <img src="~/img/pastilla3.jpeg" alt="Productos de salud">
                 <div class="pastilla-info">
-
                     <h3>Productos de salud</h3>
-
-                    <p>
-                        Conoce nuestra variedad de productos disponibles
-                        en nuestra droguería.
-                    </p>
-
-                    <a asp-controller="Home"
-                       asp-action="Productos"
-                       class="boton-secundario">
-
-                        Ver productos →
-
-                    </a>
-
+                    <p>Conoce nuestra variedad de productos disponibles en nuestra droguería.</p>
                 </div>
-
             </div>
 
-
             <!-- BOTÓN SIGUIENTE -->
-            <button class="flecha-pastilla siguiente-pastilla"
-                    type="button"
-                    onclick="cambiarPastilla(1)"
-                    aria-label="Siguiente producto">
-
+            <button class="flecha-pastilla siguiente-pastilla" type="button" onclick="cambiarPastilla(1)" aria-label="Siguiente producto">
                 &#10095;
-
             </button>
-
         </div>
-
 
         <!-- INDICADORES -->
         <div class="indicadores-pastillas">
-
-            <button class="punto-pastilla activo"
-                    type="button"
-                    onclick="irPastilla(0)"
-                    aria-label="Producto 1">
-            </button>
-
-            <button class="punto-pastilla"
-                    type="button"
-                    onclick="irPastilla(1)"
-                    aria-label="Producto 2">
-            </button>
-
-            <button class="punto-pastilla"
-                    type="button"
-                    onclick="irPastilla(2)"
-                    aria-label="Producto 3">
-            </button>
-
+            <button class="punto-pastilla activo" type="button" onclick="irPastilla(0)" aria-label="Producto 1"></button>
+            <button class="punto-pastilla" type="button" onclick="irPastilla(1)" aria-label="Producto 2"></button>
+            <button class="punto-pastilla" type="button" onclick="irPastilla(2)" aria-label="Producto 3"></button>
         </div>
-
     </section>
 
-        <!-- QUIÉNES SOMOS -->
+    <!-- QUIÉNES SOMOS -->
     <section class="informacion" id="nosotros">
-
         <div class="informacion-contenido">
-
             <div class="informacion-texto">
-
-                <span class="etiqueta">
-                    CONÓCENOS
-                </span>
-
+                <span class="etiqueta">CONÓCENOS</span>
                 <h2>¿Quiénes somos?</h2>
-
                 <p>
                     Somos una droguería comprometida con ofrecer productos
                     de calidad y brindar una excelente atención a nuestros clientes.
                 </p>
-
                 <p>
                     Nuestro objetivo es ayudarte a cuidar tu salud, ofreciéndote
                     productos confiables y una atención cercana para ti y tu familia.
                 </p>
-
-                <a asp-controller="Home"
-                   asp-action="Nosotros"
-                   class="boton-secundario">
-                    Conoce más
-                </a>
-
+                <a asp-controller="Home" asp-action="Nosotros" class="boton-secundario">Conoce más</a>
             </div>
 
-
             <div class="informacion-beneficios">
-
                 <!-- CALIDAD -->
                 <div class="beneficio">
-
                     <span class="icono-svg">
                         <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M12 21s-7-4.35-9.5-8.5C.5 8.5 3 4 7 4c2.2 0 4 1.4 5 3 1-1.6 2.8-3 5-3 4 0 6.5 4.5 4.5 8.5C19 16.65 12 21 12 21z"
-                                  fill="currentColor" />
+                            <path d="M12 21s-7-4.35-9.5-8.5C.5 8.5 3 4 7 4c2.2 0 4 1.4 5 3 1-1.6 2.8-3 5-3 4 0 6.5 4.5 4.5 8.5C19 16.65 12 21 12 21z" fill="currentColor" />
                         </svg>
                     </span>
-
                     <div>
-
                         <h3>Calidad</h3>
-
-                        <p>
-                            Productos seleccionados para nuestros clientes.
-                        </p>
-
+                        <p>Productos seleccionados para nuestros clientes.</p>
                     </div>
-
                 </div>
-
 
                 <!-- ATENCIÓN PERSONALIZADA -->
                 <div class="beneficio">
-
                     <span class="icono-svg">
                         <svg viewBox="0 0 24 24" aria-hidden="true">
-
-                            <circle cx="12"
-                                    cy="7"
-                                    r="4"
-                                    fill="currentColor" />
-
-                            <path d="M4 21a8 8 0 0 1 16 0"
-                                  fill="currentColor" />
-
-                            <path d="M19 5v6M16 8h6"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  stroke-width="2"
-                                  stroke-linecap="round" />
-
+                            <circle cx="12" cy="7" r="4" fill="currentColor" />
+                            <path d="M4 21a8 8 0 0 1 16 0" fill="currentColor" />
+                            <path d="M19 5v6M16 8h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
                         </svg>
                     </span>
-
                     <div>
-
                         <h3>Atención personalizada</h3>
-
-                        <p>
-                            Estamos disponibles para ayudarte.
-                        </p>
-
+                        <p>Estamos disponibles para ayudarte.</p>
                     </div>
-
                 </div>
-
 
                 <!-- CONFIANZA -->
                 <div class="beneficio">
-
                     <span class="icono-svg">
                         <svg viewBox="0 0 24 24" aria-hidden="true">
-
-                            <path d="M8 12l2.5 2.5L16 9"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  stroke-width="2"
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round" />
-
-                            <path d="M3 7h5l3 3-2 2-2-2"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  stroke-width="2"
-                                  stroke-linejoin="round" />
-
-                            <path d="M21 7h-5l-3 3 2 2 2-2"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  stroke-width="2"
-                                  stroke-linejoin="round" />
-
-                            <path d="M8 17l2 2 2-2 2 2 2-2"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  stroke-width="2"
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round" />
-
+                            <path d="M8 12l2.5 2.5L16 9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M3 7h5l3 3-2 2-2-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+                            <path d="M21 7h-5l-3 3 2 2 2-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+                            <path d="M8 17l2 2 2-2 2 2 2-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
                     </span>
-
                     <div>
-
                         <h3>Confianza</h3>
-
-                        <p>
-                            Tu bienestar es nuestra prioridad.
-                        </p>
-
+                        <p>Tu bienestar es nuestra prioridad.</p>
                     </div>
-
                 </div>
-
             </div>
-
         </div>
-
     </section>
-
 
     <!-- CONTACTO -->
     <section class="contacto-inicio">
-
         <div>
-
-            <span class="etiqueta">
-                ESTAMOS PARA AYUDARTE
-            </span>
-
+            <span class="etiqueta">ESTAMOS PARA AYUDARTE</span>
             <h2>¿Necesitas ayuda?</h2>
-
-            <p>
-                Comunícate con nosotros y recibe atención personalizada.
-            </p>
-
+            <p>Comunícate con nosotros y recibe atención personalizada.</p>
         </div>
-
-
-        <a asp-controller="Home"
-           asp-action="Contacto"
-           class="boton-contacto">
-
-            Contáctanos →
-
-        </a>
-
+        <a href="#contacto" class="boton-contacto">Contáctanos →</a>
     </section>
-
 </div>
 
-
-<!-- ================================================ -->
-<!-- JAVASCRIPT DEL CARRUSEL DE PASTILLAS -->
-<!-- ================================================ -->
-
+<!-- CARRUSEL SCRIPT -->
 <script>
-
     let pastillaActual = 0;
 
-
     function mostrarPastilla(indice) {
-
         const slides = document.querySelectorAll(".pastilla-slide");
         const puntos = document.querySelectorAll(".punto-pastilla");
 
-
-        if (slides.length === 0) {
-            return;
-        }
-
+        if (slides.length === 0) return;
 
         if (indice >= slides.length) {
-
             pastillaActual = 0;
-
-        }
-        else if (indice < 0) {
-
+        } else if (indice < 0) {
             pastillaActual = slides.length - 1;
-
-        }
-        else {
-
+        } else {
             pastillaActual = indice;
-
         }
-
 
         slides.forEach(function (slide) {
-
             slide.classList.remove("activo");
-
         });
-
 
         puntos.forEach(function (punto) {
-
             punto.classList.remove("activo");
-
         });
 
-
         slides[pastillaActual].classList.add("activo");
-
-
         if (puntos[pastillaActual]) {
-
             puntos[pastillaActual].classList.add("activo");
-
         }
-
     }
-
 
     function cambiarPastilla(direccion) {
-
         mostrarPastilla(pastillaActual + direccion);
-
     }
-
 
     function irPastilla(indice) {
-
         mostrarPastilla(indice);
-
     }
-
 </script>
 
 <!-- Modal Empleado -->
 <div class="modal fade modal-login" id="_LoginEmpleado" tabindex="-1" aria-labelledby="_LoginEmpleadoLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-login-banner">
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-        <div class="modal-login-icon-box">
-          <i class="bi bi-person-badge"></i>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-login-banner">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                <div class="modal-login-icon-box">
+                    <i class="bi bi-person-badge"></i>
+                </div>
+                <h4 class="modal-login-title" id="_LoginEmpleadoLabel">Acceso Empleados</h4>
+                <p class="modal-login-subtitle">Gestión de inventarios, pedidos y punto de venta</p>
+            </div>
+            <div class="modal-login-body">
+                <form class="modal-login-form" method="post" asp-controller="Account" asp-action="Login">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="rolEsperado" value="Empleado" />
+                    <div class="mb-3">
+                        <label for="emp-user" class="form-label">Usuario o Correo</label>
+                        <div class="input-group-custom">
+                            <i class="bi bi-person input-icon"></i>
+                            <input type="text" class="form-control" id="emp-user" name="email" placeholder="ej. empleado@drogueria.com" required autocomplete="username">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="emp-pass" class="form-label">Contraseña</label>
+                        <div class="input-group-custom">
+                            <i class="bi bi-lock input-icon"></i>
+                            <input type="password" class="form-control" id="emp-pass" name="password" placeholder="••••••••" required autocomplete="current-password">
+                            <button type="button" class="btn-toggle-password" onclick="togglePasswordVisibility('emp-pass', this)" title="Ver contraseña">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="rememberEmp">
+                            <label class="form-check-label small text-muted" for="rememberEmp">Recordar sesión</label>
+                        </div>
+                        <a href="#" class="text-decoration-none small fw-semibold text-primary">¿Olvidaste tu clave?</a>
+                    </div>
+                    <button type="submit" class="btn btn-login-submit">
+                        <span>Iniciar Sesión</span>
+                        <i class="bi bi-arrow-right-short fs-4"></i>
+                    </button>
+                </form>
+            </div>
+            <div class="modal-login-footer">
+                <i class="bi bi-lock-fill me-1 text-primary"></i> Área restringida únicamente a personal autorizado
+            </div>
         </div>
-        <h4 class="modal-login-title" id="_LoginEmpleadoLabel">Acceso Empleados</h4>
-        <p class="modal-login-subtitle">Gestión de inventarios, pedidos y punto de venta</p>
-      </div>
-      <div class="modal-login-body">
-        <form class="modal-login-form" method="post" asp-controller="Account" asp-action="Login">
-          @Html.AntiForgeryToken()
-          <input type="hidden" name="rolEsperado" value="Empleado" />
-          <div class="mb-3">
-            <label for="emp-user" class="form-label">Usuario o Correo</label>
-            <div class="input-group-custom">
-              <i class="bi bi-person input-icon"></i>
-              <input type="text" class="form-control" id="emp-user" name="email" placeholder="ej. empleado@drogueria.com" required autocomplete="username">
-            </div>
-          </div>
-          <div class="mb-3">
-            <label for="emp-pass" class="form-label">Contraseña</label>
-            <div class="input-group-custom">
-              <i class="bi bi-lock input-icon"></i>
-              <input type="password" class="form-control" id="emp-pass" name="password" placeholder="••••••••" required autocomplete="current-password">
-              <button type="button" class="btn-toggle-password" onclick="togglePasswordVisibility('emp-pass', this)" title="Ver contraseña">
-                <i class="bi bi-eye"></i>
-              </button>
-            </div>
-          </div>
-          <div class="d-flex justify-content-between align-items-center mb-4">
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="rememberEmp">
-              <label class="form-check-label small text-muted" for="rememberEmp">Recordar sesión</label>
-            </div>
-            <a href="#" class="text-decoration-none small fw-semibold text-primary">¿Olvidaste tu clave?</a>
-          </div>
-          <button type="submit" class="btn btn-login-submit">
-            <span>Iniciar Sesión</span>
-            <i class="bi bi-arrow-right-short fs-4"></i>
-          </button>
-        </form>
-      </div>
-      <div class="modal-login-footer">
-        <i class="bi bi-lock-fill me-1 text-primary"></i> Área restringida únicamente a personal autorizado
-      </div>
     </div>
-  </div>
 </div>
 
 <!-- Modal Administrador -->
 <div class="modal fade modal-login" id="_LoginAdmin" tabindex="-1" aria-labelledby="_LoginAdminLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-login-banner">
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-        <div class="modal-login-icon-box">
-          <i class="bi bi-shield-lock"></i>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-login-banner">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                <div class="modal-login-icon-box">
+                    <i class="bi bi-shield-lock"></i>
+                </div>
+                <h4 class="modal-login-title" id="_LoginAdminLabel">Acceso Administrador</h4>
+                <p class="modal-login-subtitle">Panel de control completo y configuración del sistema</p>
+            </div>
+            <div class="modal-login-body">
+                <form class="modal-login-form" method="post" asp-controller="Account" asp-action="Login">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="rolEsperado" value="Administrador" />
+                    <div class="mb-3">
+                        <label for="admin-user" class="form-label">Usuario Administrador</label>
+                        <div class="input-group-custom">
+                            <i class="bi bi-shield-person input-icon"></i>
+                            <input type="text" class="form-control" id="admin-user" name="email" placeholder="admin@drogueria.com" required autocomplete="username">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="admin-pass" class="form-label">Contraseña</label>
+                        <div class="input-group-custom">
+                            <i class="bi bi-key input-icon"></i>
+                            <input type="password" class="form-control" id="admin-pass" name="password" placeholder="••••••••" required autocomplete="current-password">
+                            <button type="button" class="btn-toggle-password" onclick="togglePasswordVisibility('admin-pass', this)" title="Ver contraseña">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="rememberAdmin">
+                            <label class="form-check-label small text-muted" for="rememberAdmin">Mantener sesión activa</label>
+                        </div>
+                        <a href="#" class="text-decoration-none small fw-semibold text-primary">¿Problemas para ingresar?</a>
+                    </div>
+                    <button type="submit" class="btn btn-login-submit">
+                        <span>Ingresar al Panel</span>
+                        <i class="bi bi-arrow-right-short fs-4"></i>
+                    </button>
+                </form>
+            </div>
+            <div class="modal-login-footer">
+                <i class="bi bi-lock-fill me-1 text-primary"></i> Área restringida únicamente a personal autorizado
+            </div>
         </div>
-        <h4 class="modal-login-title" id="_LoginAdminLabel">Acceso Administrador</h4>
-        <p class="modal-login-subtitle">Panel de control completo y configuración del sistema</p>
-      </div>
-      <div class="modal-login-body">
-        <form class="modal-login-form" method="post" asp-controller="Account" asp-action="Login">
-          @Html.AntiForgeryToken()
-          <input type="hidden" name="rolEsperado" value="Administrador" />
-          <div class="mb-3">
-            <label for="admin-user" class="form-label">Usuario Administrador</label>
-            <div class="input-group-custom">
-              <i class="bi bi-shield-person input-icon"></i>
-              <input type="text" class="form-control" id="admin-user" name="email" placeholder="admin@drogueria.com" required autocomplete="username">
-            </div>
-          </div>
-          <div class="mb-3">
-            <label for="admin-pass" class="form-label">Contraseña</label>
-            <div class="input-group-custom">
-              <i class="bi bi-key input-icon"></i>
-              <input type="password" class="form-control" id="admin-pass" name="password" placeholder="••••••••" required autocomplete="current-password">
-              <button type="button" class="btn-toggle-password" onclick="togglePasswordVisibility('admin-pass', this)" title="Ver contraseña">
-                <i class="bi bi-eye"></i>
-              </button>
-            </div>
-          </div>
-          <div class="d-flex justify-content-between align-items-center mb-4">
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="rememberAdmin">
-              <label class="form-check-label small text-muted" for="rememberAdmin">Mantener sesión activa</label>
-            </div>
-            <a href="#" class="text-decoration-none small fw-semibold text-primary">¿Problemas para ingresar?</a>
-          </div>
-          <button type="submit" class="btn btn-login-submit">
-            <span>Ingresar al Panel</span>
-            <i class="bi bi-arrow-right-short fs-4"></i>
-          </button>
-        </form>
-      </div>
-      <div class="modal-login-footer">
-        <i class="bi bi-lock-fill me-1 text-primary"></i> Área restringida únicamente a personal autorizado
-      </div>
     </div>
-  </div>
 </div>
 
 <!-- Modal Cliente Iniciar sesión -->
 <div class="modal fade modal-login" id="_LoginCliente" tabindex="-1" aria-labelledby="_LoginClienteLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-login-banner">
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-        <div class="modal-login-icon-box">
-          <i class="bi bi-bag-heart"></i>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-login-banner">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                <div class="modal-login-icon-box">
+                    <i class="bi bi-bag-heart"></i>
+                </div>
+                <h4 class="modal-login-title" id="_LoginClienteLabel">¡Hola de nuevo!</h4>
+                <p class="modal-login-subtitle">Ingresa para realizar tus compras y ver tus domicilios</p>
+            </div>
+            <div class="modal-login-body">
+                <form class="modal-login-form" method="post" asp-controller="Account" asp-action="Login">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="rolEsperado" value="Cliente" />
+                    <div class="mb-3">
+                        <label for="client-user" class="form-label">Correo Electrónico</label>
+                        <div class="input-group-custom">
+                            <i class="bi bi-envelope input-icon"></i>
+                            <input type="email" class="form-control" id="client-user" name="email" placeholder="tu-correo@ejemplo.com" required autocomplete="email">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="client-pass" class="form-label">Contraseña</label>
+                        <div class="input-group-custom">
+                            <i class="bi bi-lock input-icon"></i>
+                            <input type="password" class="form-control" id="client-pass" name="password" placeholder="••••••••" required autocomplete="current-password">
+                            <button type="button" class="btn-toggle-password" onclick="togglePasswordVisibility('client-pass', this)" title="Ver contraseña">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="rememberClient">
+                            <label class="form-check-label small text-muted" for="rememberClient">Recordarme</label>
+                        </div>
+                        <a href="#" class="text-decoration-none small fw-semibold text-primary">¿Olvidaste tu clave?</a>
+                    </div>
+                    <button type="submit" class="btn btn-login-submit">
+                        <span>Ingresar</span>
+                        <i class="bi bi-arrow-right-short fs-4"></i>
+                    </button>
+                </form>
+            </div>
+            <div class="modal-login-footer">
+                ¿Aún no tienes cuenta? <a href="#" class="fw-bold text-primary text-decoration-none ms-1" data-bs-toggle="modal" data-bs-target="#_RegistroCliente">Regístrate aquí</a>
+            </div>
         </div>
-        <h4 class="modal-login-title" id="_LoginClienteLabel">¡Hola de nuevo!</h4>
-        <p class="modal-login-subtitle">Ingresa para realizar tus compras y ver tus domicilios</p>
-      </div>
-      <div class="modal-login-body">
-        <form class="modal-login-form" method="post" asp-controller="Account" asp-action="Login">
-          @Html.AntiForgeryToken()
-          <input type="hidden" name="rolEsperado" value="Cliente" />
-          <div class="mb-3">
-            <label for="client-user" class="form-label">Correo Electrónico</label>
-            <div class="input-group-custom">
-              <i class="bi bi-envelope input-icon"></i>
-              <input type="email" class="form-control" id="client-user" name="email" placeholder="tu-correo@ejemplo.com" required autocomplete="email">
-            </div>
-          </div>
-          <div class="mb-3">
-            <label for="client-pass" class="form-label">Contraseña</label>
-            <div class="input-group-custom">
-              <i class="bi bi-lock input-icon"></i>
-              <input type="password" class="form-control" id="client-pass" name="password" placeholder="••••••••" required autocomplete="current-password">
-              <button type="button" class="btn-toggle-password" onclick="togglePasswordVisibility('client-pass', this)" title="Ver contraseña">
-                <i class="bi bi-eye"></i>
-              </button>
-            </div>
-          </div>
-          <div class="d-flex justify-content-between align-items-center mb-4">
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="rememberClient">
-              <label class="form-check-label small text-muted" for="rememberClient">Recordarme</label>
-            </div>
-            <a href="#" class="text-decoration-none small fw-semibold text-primary">¿Olvidaste tu clave?</a>
-          </div>
-          <button type="submit" class="btn btn-login-submit">
-            <span>Ingresar</span>
-            <i class="bi bi-arrow-right-short fs-4"></i>
-          </button>
-        </form>
-      </div>
-      <div class="modal-login-footer">
-        ¿Aún no tienes cuenta? <a href="#" class="fw-bold text-primary text-decoration-none ms-1" data-bs-toggle="modal" data-bs-target="#_RegistroCliente">Regístrate aquí</a>
-      </div>
     </div>
-  </div>
 </div>
 
 <!-- Modal Cliente Registro -->
 <div class="modal fade modal-login" id="_RegistroCliente" tabindex="-1" aria-labelledby="_RegistroClienteLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-login-banner">
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-        <div class="modal-login-icon-box">
-          <i class="bi bi-person-plus"></i>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-login-banner">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                <div class="modal-login-icon-box">
+                    <i class="bi bi-person-plus"></i>
+                </div>
+                <h4 class="modal-login-title" id="_RegistroClienteLabel">Crear Cuenta</h4>
+                <p class="modal-login-subtitle">Regístrate para realizar tus compras y domicilios</p>
+            </div>
+            <div class="modal-login-body">
+                <form class="modal-login-form" method="post" asp-controller="Account" asp-action="Register">
+                    @Html.AntiForgeryToken()
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label for="reg-name" class="form-label">Nombre</label>
+                            <div class="input-group-custom">
+                                <i class="bi bi-person input-icon"></i>
+                                <input type="text" class="form-control" id="reg-name" name="nombre" placeholder="Juan" required autocomplete="given-name">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <label for="reg-apellido" class="form-label">Apellido</label>
+                            <div class="input-group-custom">
+                                <i class="bi bi-person input-icon"></i>
+                                <input type="text" class="form-control" id="reg-apellido" name="apellido" placeholder="Perez" required autocomplete="family-name">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="reg-email" class="form-label">Correo Electrónico</label>
+                        <div class="input-group-custom">
+                            <i class="bi bi-envelope input-icon"></i>
+                            <input type="email" class="form-control" id="reg-email" name="email" placeholder="tu-correo@ejemplo.com" required autocomplete="email">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="reg-pass" class="form-label">Contraseña</label>
+                        <div class="input-group-custom">
+                            <i class="bi bi-lock input-icon"></i>
+                            <input type="password" class="form-control" id="reg-pass" name="password" placeholder="••••••••" required autocomplete="new-password">
+                            <button type="button" class="btn-toggle-password" onclick="togglePasswordVisibility('reg-pass', this)" title="Ver contraseña">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="acceptTerms" required>
+                            <label class="form-check-label small text-muted" for="acceptTerms">
+                                Acepto los <a href="#" class="text-primary text-decoration-none fw-semibold">términos y políticas de privacidad</a>
+                            </label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-login-submit">
+                        <span>Crear Mi Cuenta</span>
+                        <i class="bi bi-arrow-right-short fs-4"></i>
+                    </button>
+                </form>
+            </div>
+            <div class="modal-login-footer">
+                ¿Ya tienes cuenta? <a href="#" class="fw-bold text-primary text-decoration-none ms-1" data-bs-toggle="modal" data-bs-target="#_LoginCliente">Inicia sesión aquí</a>
+            </div>
         </div>
-        <h4 class="modal-login-title" id="_RegistroClienteLabel">Crear Cuenta</h4>
-        <p class="modal-login-subtitle">Regístrate para realizar tus compras y domicilios</p>
-      </div>
-      <div class="modal-login-body">
-        <form class="modal-login-form" method="post" asp-controller="Account" asp-action="Register">
-          @Html.AntiForgeryToken()
-          <div class="mb-3">
-            <label for="reg-name" class="form-label">Nombre</label>
-            <div class="input-group-custom">
-              <i class="bi bi-person input-icon"></i>
-              <input type="text" class="form-control" id="reg-name" name="nombre" placeholder="Juan" required autocomplete="given-name">
-            </div>
-          </div>
-          <div class="mb-3">
-            <label for="reg-apellido" class="form-label">Apellido</label>
-            <div class="input-group-custom">
-              <i class="bi bi-person input-icon"></i>
-              <input type="text" class="form-control" id="reg-apellido" name="apellido" placeholder="Perez" required autocomplete="family-name">
-            </div>
-          </div>
-          <div class="mb-3">
-            <label for="reg-email" class="form-label">Correo Electrónico</label>
-            <div class="input-group-custom">
-              <i class="bi bi-envelope input-icon"></i>
-              <input type="email" class="form-control" id="reg-email" name="email" placeholder="tu-correo@ejemplo.com" required autocomplete="email">
-            </div>
-          </div>
-          <div class="mb-3">
-            <label for="reg-pass" class="form-label">Contraseña</label>
-            <div class="input-group-custom">
-              <i class="bi bi-lock input-icon"></i>
-              <input type="password" class="form-control" id="reg-pass" name="password" placeholder="••••••••" required autocomplete="new-password">
-              <button type="button" class="btn-toggle-password" onclick="togglePasswordVisibility('reg-pass', this)" title="Ver contraseña">
-                <i class="bi bi-eye"></i>
-              </button>
-            </div>
-          </div>
-          <div class="mb-4">
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="acceptTerms" required>
-              <label class="form-check-label small text-muted" for="acceptTerms">
-                Acepto los <a href="#" class="text-primary text-decoration-none fw-semibold">términos y políticas de privacidad</a>
-              </label>
-            </div>
-          </div>
-          <button type="submit" class="btn btn-login-submit">
-            <span>Crear Mi Cuenta</span>
-            <i class="bi bi-arrow-right-short fs-4"></i>
-          </button>
-        </form>
-      </div>
-      <div class="modal-login-footer">
-        ¿Ya tienes cuenta? <a href="#" class="fw-bold text-primary text-decoration-none ms-1" data-bs-toggle="modal" data-bs-target="#_LoginCliente">Inicia sesión aquí</a>
-      </div>
     </div>
-  </div>
 </div>
-
 
 <script src="~/js/landingPages.js" asp-append-version="true"></script>
 

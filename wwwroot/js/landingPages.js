@@ -29,7 +29,7 @@ mostrarSlide(slideActual);
 
 setInterval(function() {
     cambiarSlide(1);
-}, 3000);
+}, 5000);
 
 //-- Visibilidad de la contraseña --//
 function togglePasswordVisibility(inputId, btn) {
