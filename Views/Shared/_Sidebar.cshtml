@@ -1,13 +1,20 @@
+@using System.Security.Claims
 @{
     var brandInitial = "DR";
     var brandName = "Droguería";
     var activeNav = (ViewData["ActiveNav"]?.ToString() ?? "dashboard").ToLower();
-    var userName = User.Identity?.IsAuthenticated == true ? User.Identity.Name : "Administrador";
-    var userEmail = "admin@drogueria.com";
-    var userRole = "Admin General";
+    var userName = User.Identity?.IsAuthenticated == true ? User.Identity.Name : "Usuario";
+    var userRole = User.FindFirst(ClaimTypes.Role)?.Value ?? "Cliente";
+    var userEmail = User.FindFirst(ClaimTypes.Email)?.Value ?? "";
+    var isCliente = string.Equals(userRole, "Cliente", StringComparison.OrdinalIgnoreCase);
+    var isAdmin = string.Equals(userRole, "Administrador", StringComparison.OrdinalIgnoreCase);
+    var isEmpleado = string.Equals(userRole, "Empleado", StringComparison.OrdinalIgnoreCase);
     var initials = !string.IsNullOrEmpty(userName) && userName.Length >= 2 
         ? userName.Substring(0, 2).ToUpper() 
         : brandInitial;
+        
+    var roleTagText = isAdmin ? "Panel Administrador" : (isEmpleado ? "Panel Empleado" : "Tienda Online");
+    var homeUrl = isCliente ? "/Tienda/Catalogo" : (isEmpleado ? "/Empleado/Productos" : "/Usuario");
 }
 
 <aside class="d-sidebar" id="appSidebar">
@@ -19,7 +26,7 @@
 
   <!-- Header & Brand -->
   <div class="brand-wrapper">
-    <a asp-controller="Home" asp-action="Index" class="brand" title="@brandName">
+    <a href="@homeUrl" class="brand" title="@brandName">
       <div class="brand-logo">
         <img src="~/img/logodrogueria.png" alt="logo" class="brand-img" onerror="this.style.display='none'; var f=this.nextElementSibling; if(f) f.style.display='flex';" />
         <div class="brand-fallback-logo">
@@ -31,62 +38,116 @@
       </div>
       <div class="brand-text">
         <div class="brand-name">@brandName</div>
-        <div class="brand-tag">Sistema Gestor</div>
+        <div class="brand-tag">@roleTagText</div>
       </div>
     </a>
   </div>
 
   <!-- Scrollable Navigations -->
   <div class="sidebar-scrollable">
-    @* ================= GESTIÓN PRINCIPAL ================= *@
-    <nav class="nav-section">
-      <div class="nav-label">Panel Principal</div>
 
-      
-      <a class="nav-link @(activeNav == "productos" ? "is-active" : "")" asp-controller="Producto" asp-action="Index" data-tooltip="Productos" title="Productos">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z" />
-          <path d="m8.5 8.5 7 7" />
-        </svg>
-        <span>Productos</span>
-      </a>
+    @if (isCliente)
+    {
+      @* ================= MENÚ CLIENTE ================= *@
+      <nav class="nav-section">
+        <div class="nav-label">Mi Tienda</div>
 
-      <a class="nav-link @(activeNav == "usuarios" ? "is-active" : "")" asp-controller="Usuario" asp-action="Index" data-tooltip="Usuarios" title="Usuarios">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-          <circle cx="9" cy="7" r="4" />
-          <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-        </svg>
-        <span>Usuarios</span>
-      </a>
+        <a class="nav-link @(activeNav == "catalogo" ? "is-active" : "")" asp-controller="Tienda" asp-action="Catalogo" data-tooltip="Catálogo" title="Catálogo">
+          <i class="bi bi-grid-fill fs-5 me-1"></i>
+          <span>Catálogo</span>
+        </a>
 
-      <a class="nav-link @(activeNav == "categorias" ? "is-active" : "")" asp-controller="Categoria" asp-action="Index" data-tooltip="Categorias" title="Categorias">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-          <circle cx="9" cy="7" r="4" />
-          <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-        </svg>
-        <span>Categorias</span>
-      </a>
+        <a class="nav-link @(activeNav == "carrito" ? "is-active" : "")" asp-controller="Tienda" asp-action="Carrito" data-tooltip="Carrito" title="Carrito">
+          <i class="bi bi-cart3 fs-5 me-1"></i>
+          <span>Carrito</span>
+        </a>
 
-    </nav>
+        <a class="nav-link @(activeNav == "pedidos" ? "is-active" : "")" asp-controller="Tienda" asp-action="MisPedidos" data-tooltip="Mis Pedidos" title="Mis Pedidos">
+          <i class="bi bi-receipt-cutoff fs-5 me-1"></i>
+          <span>Mis Pedidos</span>
+        </a>
+      </nav>
+    }
+    else if (isAdmin)
+    {
+      @* ================= MENÚ ADMINISTRADOR ================= *@
+      <nav class="nav-section">
+        <div class="nav-label">Administración</div>
 
-    @* ================= ACCESOS RÁPIDOS ================= *@
-    <nav class="nav-section">
-      <div class="nav-label">Accesos</div>
+        <a class="nav-link @(activeNav == "dashboard" ? "is-active" : "")" asp-controller="Usuario" asp-action="Dashboard" data-tooltip="Dashboard" title="Dashboard / Panel General">
+          <i class="bi bi-speedometer2 fs-5 me-1"></i>
+          <span>Dashboard</span>
+        </a>
 
-      <a class="nav-link" href="/" target="_blank" data-tooltip="Ver Tienda Pública" title="Ver Tienda Pública">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10" />
-          <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
-          <path d="M2 12h20" />
-        </svg>
-        <span>Tienda Pública</span>
-        <i class="bi bi-box-arrow-up-right small text-muted ms-auto"></i>
-      </a>
-    </nav>
+        <a class="nav-link @(activeNav == "productos" ? "is-active" : "")" asp-controller="Producto" asp-action="Index" data-tooltip="Productos" title="Gestión de Productos">
+          <i class="bi bi-box-seam fs-5 me-1"></i>
+          <span>Productos</span>
+        </a>
+
+        <a class="nav-link @(activeNav == "inventario" ? "is-active" : "")" asp-controller="Empleado" asp-action="Inventario" data-tooltip="Inventario" title="Gestión de Inventario / Stock">
+          <i class="bi bi-boxes fs-5 me-1"></i>
+          <span>Inventario</span>
+        </a>
+
+        <a class="nav-link @(activeNav == "pedidos" ? "is-active" : "")" asp-controller="Empleado" asp-action="Pedidos" data-tooltip="Pedidos" title="Gestión de Pedidos">
+          <i class="bi bi-clipboard-check fs-5 me-1"></i>
+          <span>Pedidos</span>
+        </a>
+
+        <a class="nav-link @(activeNav == "usuarios" ? "is-active" : "")" asp-controller="Usuario" asp-action="Index" data-tooltip="Usuarios" title="Gestión de Usuarios">
+          <i class="bi bi-people-fill fs-5 me-1"></i>
+          <span>Usuarios</span>
+        </a>
+
+        <a class="nav-link @(activeNav == "categorias" ? "is-active" : "")" asp-controller="Categoria" asp-action="Index" data-tooltip="Categorías" title="Gestión de Categorías">
+          <i class="bi bi-tags-fill fs-5 me-1"></i>
+          <span>Categorías</span>
+        </a>
+      </nav>
+
+      @* ================= ACCESOS RÁPIDOS (Admin) ================= *@
+      <nav class="nav-section">
+        <div class="nav-label">Tienda Pública</div>
+
+        <a class="nav-link @(activeNav == "catalogo" ? "is-active" : "")" asp-controller="Tienda" asp-action="Catalogo" data-tooltip="Catálogo Tienda" title="Ir al Catálogo de la Tienda">
+          <i class="bi bi-shop fs-5 me-1 text-primary"></i>
+          <span>Tienda Pública</span>
+        </a>
+      </nav>
+    }
+    else if (isEmpleado)
+    {
+      @* ================= MENÚ EMPLEADO ================= *@
+      <nav class="nav-section">
+        <div class="nav-label">Panel Empleado</div>
+
+        <a class="nav-link @(activeNav == "productos" ? "is-active" : "")" asp-controller="Empleado" asp-action="Productos" data-tooltip="Productos" title="Catálogo de Productos">
+          <i class="bi bi-capsule fs-5 me-1"></i>
+          <span>Productos</span>
+        </a>
+
+        <a class="nav-link @(activeNav == "inventario" ? "is-active" : "")" asp-controller="Empleado" asp-action="Inventario" data-tooltip="Inventario" title="Gestión de Stock / Inventario">
+          <i class="bi bi-boxes fs-5 me-1"></i>
+          <span>Inventario</span>
+        </a>
+
+        <a class="nav-link @(activeNav == "pedidos" ? "is-active" : "")" asp-controller="Empleado" asp-action="Pedidos" data-tooltip="Pedidos" title="Gestión de Pedidos de Clientes">
+          <i class="bi bi-clipboard-check fs-5 me-1"></i>
+          <span>Pedidos</span>
+        </a>
+      </nav>
+
+      @* ================= ACCESOS RÁPIDOS (Empleado) ================= *@
+      <nav class="nav-section">
+        <div class="nav-label">Tienda Pública</div>
+
+        <a class="nav-link @(activeNav == "catalogo" ? "is-active" : "")" asp-controller="Tienda" asp-action="Catalogo" data-tooltip="Ver Tienda" title="Ir al Catálogo de la Tienda">
+          <i class="bi bi-shop fs-5 me-1 text-primary"></i>
+          <span>Tienda Pública</span>
+        </a>
+      </nav>
+    }
+
   </div>
     
   @* ================= FOOTER / PROFILE ================= *@

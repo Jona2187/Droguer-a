@@ -1,0 +1,196 @@
+@model IEnumerable<Drogueria.Models.Pedido>
+@{
+    ViewData["Title"] = "Pedidos";
+    ViewData["ActiveNav"] = "pedidos";
+}
+
+@if (TempData["Exito"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: 12px;">
+        <i class="bi bi-check-circle-fill me-2"></i>@TempData["Exito"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 12px;">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@{
+    var pendientes = Model.Count(p => p.Estado == "Pendiente");
+    var confirmados = Model.Count(p => p.Estado == "Confirmado");
+    var entregados = Model.Count(p => p.Estado == "Entregado");
+    var cancelados = Model.Count(p => p.Estado == "Cancelado");
+}
+
+<div class="ped-header">
+    <h1><i class="bi bi-clipboard-check"></i> Pedidos</h1>
+    <span class="text-muted small">@Model.Count() pedidos en total</span>
+</div>
+
+<div class="ped-stats-row">
+    <div class="ped-stat-card">
+        <div class="ped-stat-icon yellow"><i class="bi bi-clock-history"></i></div>
+        <div><div class="ped-stat-value">@pendientes</div><div class="ped-stat-label">Pendientes</div></div>
+    </div>
+    <div class="ped-stat-card">
+        <div class="ped-stat-icon purple"><i class="bi bi-check2-circle"></i></div>
+        <div><div class="ped-stat-value">@confirmados</div><div class="ped-stat-label">Confirmados</div></div>
+    </div>
+    <div class="ped-stat-card">
+        <div class="ped-stat-icon green"><i class="bi bi-truck"></i></div>
+        <div><div class="ped-stat-value">@entregados</div><div class="ped-stat-label">Entregados</div></div>
+    </div>
+    <div class="ped-stat-card">
+        <div class="ped-stat-icon red"><i class="bi bi-x-circle"></i></div>
+        <div><div class="ped-stat-value">@cancelados</div><div class="ped-stat-label">Cancelados</div></div>
+    </div>
+</div>
+
+<div class="ped-search-bar">
+    <div class="ped-search-wrap">
+        <i class="bi bi-search"></i>
+        <input type="text" class="ped-search-input" id="pedBuscar" placeholder="Buscar por cliente o ID..." oninput="filtrarPedidos()">
+    </div>
+    <select class="ped-filter-select" id="pedEstadoFilter" onchange="filtrarPedidos()">
+        <option value="">Todos los estados</option>
+        <option value="Pendiente">Pendiente</option>
+        <option value="Confirmado">Confirmado</option>
+        <option value="Entregado">Entregado</option>
+        <option value="Cancelado">Cancelado</option>
+    </select>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="ped-empty">
+        <i class="bi bi-clipboard-x"></i>
+        <p>No hay pedidos registrados aún.</p>
+    </div>
+}
+else
+{
+    <div class="ped-table-wrap">
+        <table class="ped-table" id="pedTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Cliente</th>
+                    <th>Fecha</th>
+                    <th>Items</th>
+                    <th>Total</th>
+                    <th>Estado</th>
+                    <th>Cambiar estado</th>
+                    <th>Detalle</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var p in Model)
+                {
+                    var badgeClass = p.Estado.ToLower();
+                    var shortId = p.Id.ToString().Substring(0, 8).ToUpper();
+                    var clientName = p.Usuario != null
+                        ? $"{p.Usuario.Nombre} {p.Usuario.Apellido}".Trim()
+                        : "Cliente desconocido";
+
+                    <tr class="ped-row" data-cliente="@clientName.ToLower()" data-id="@shortId.ToLower()" data-estado="@p.Estado">
+                        <td><code class="small">@shortId</code></td>
+                        <td class="fw-semibold">@clientName</td>
+                        <td class="text-muted small">@p.Fecha.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>@p.Detalles.Count</td>
+                        <td class="fw-bold">$@p.Total.ToString("N2")</td>
+                        <td>
+                            <span class="ped-badge @badgeClass">
+                                @if (p.Estado == "Pendiente") { <i class="bi bi-clock"></i> }
+                                else if (p.Estado == "Confirmado") { <i class="bi bi-check2"></i> }
+                                else if (p.Estado == "Entregado") { <i class="bi bi-truck"></i> }
+                                else { <i class="bi bi-x-lg"></i> }
+                                @p.Estado
+                            </span>
+                        </td>
+                        <td>
+                            <form asp-controller="Empleado" asp-action="CambiarEstadoPedido" method="post" class="ped-estado-form">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@p.Id" />
+                                <select name="estado" class="ped-estado-select">
+                                    <option value="Pendiente" selected="@(p.Estado == "Pendiente")">Pendiente</option>
+                                    <option value="Confirmado" selected="@(p.Estado == "Confirmado")">Confirmado</option>
+                                    <option value="Entregado" selected="@(p.Estado == "Entregado")">Entregado</option>
+                                    <option value="Cancelado" selected="@(p.Estado == "Cancelado")">Cancelado</option>
+                                </select>
+                                <button type="submit" class="ped-btn-change" title="Cambiar estado">
+                                    <i class="bi bi-arrow-repeat"></i>
+                                </button>
+                            </form>
+                        </td>
+                        <td>
+                            <button type="button" class="ped-details-toggle" onclick="toggleDetalles('@p.Id')">
+                                <i class="bi bi-eye"></i> Ver
+                            </button>
+                        </td>
+                    </tr>
+                    <tr class="ped-details-row" id="det-@p.Id">
+                        <td colspan="8">
+                            <div class="ped-details-inner">
+                                <table class="ped-detail-table">
+                                    <thead>
+                                        <tr><th></th><th>Producto</th><th>Precio unit.</th><th>Cantidad</th><th>Subtotal</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var d in p.Detalles)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    @if (!string.IsNullOrEmpty(d.Producto?.Imagen))
+                                                    {
+                                                        <img src="~/@d.Producto.Imagen" class="ped-detail-img" alt="" />
+                                                    }
+                                                </td>
+                                                <td>@(d.Producto?.Nombre ?? "Producto eliminado")</td>
+                                                <td>$@d.PrecioUnitario.ToString("N2")</td>
+                                                <td>@d.Cantidad</td>
+                                                <td class="fw-bold">$@d.Subtotal.ToString("N2")</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+<script>
+    function toggleDetalles(id) {
+        const row = document.getElementById('det-' + id);
+        if (row) row.classList.toggle('show');
+    }
+
+    function filtrarPedidos() {
+        const buscar = document.getElementById('pedBuscar').value.toLowerCase();
+        const estado = document.getElementById('pedEstadoFilter').value;
+        const rows = document.querySelectorAll('.ped-row');
+        rows.forEach(r => {
+            const matchCliente = r.dataset.cliente.includes(buscar) || r.dataset.id.includes(buscar);
+            const matchEstado = !estado || r.dataset.estado === estado;
+            const show = matchCliente && matchEstado;
+            r.style.display = show ? '' : 'none';
+            // Also hide/show the detail row below
+            const nextRow = r.nextElementSibling;
+            if (nextRow && nextRow.classList.contains('ped-details-row')) {
+                if (!show) {
+                    nextRow.classList.remove('show');
+                    nextRow.style.display = 'none';
+                } else {
+                    nextRow.style.display = '';
+                }
+            }
+        });
+    }
+</script>

@@ -18,43 +18,65 @@ namespace Drogueria.Controllers
         }
 
         // POST: /Account/Login
-        // Lo usan los 3 modales (Empleado, Administrador, Cliente) del Index.
-        // "rolEsperado" viaja como campo oculto en cada formulario para que
-        // nadie entre por el modal de Cliente con una cuenta de Administrador, etc.
+        // Admite peticiones AJAX (para no recargar ni desubicar al usuario) y peticiones normales.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(string email, string password, string rolEsperado)
         {
-            email = email?.Trim().ToLower() ?? "";
+            var isAjax = Request.Headers["X-Requested-With"] == "XMLHttpRequest" ||
+                         Request.Headers["Accept"].ToString().Contains("application/json");
 
+            var term = email?.Trim().ToLower() ?? "";
+
+            // Buscar usuario por correo electrónico o por nombre
             var usuario = await _context.Usuarios
-                .FirstOrDefaultAsync(u => u.Email.ToLower() == email);
+                .FirstOrDefaultAsync(u => u.Email.ToLower() == term || 
+                                         u.Nombre.ToLower() == term || 
+                                         (u.Nombre + " " + u.Apellido).ToLower() == term);
 
-            // Usuario no existe o la contraseña no coincide con el hash guardado
-            if (usuario == null || !BCrypt.Net.BCrypt.Verify(password ?? "", usuario.Password))
+            // Verificar contraseña (con fallback a texto plano si la clave no era un hash BCrypt válido)
+            bool esValido = false;
+            if (usuario != null && !string.IsNullOrEmpty(usuario.Password))
             {
-                TempData["Error"] = "Correo o contraseña incorrectos.";
-                TempData["AbrirModal"] = ObtenerModal(rolEsperado);
-                return RedirectToAction("Pagina_Inicio", "Home");
+                try
+                {
+                    esValido = BCrypt.Net.BCrypt.Verify(password ?? "", usuario.Password);
+                }
+                catch
+                {
+                    esValido = (usuario.Password == password);
+                }
             }
 
-            // Cuenta desactivada (borrado lógico desde el panel de Usuarios)
+            // 1. Usuario no existe o contraseña incorrecta
+            if (usuario == null || !esValido)
+            {
+                var msg = "Por favor, valide si el usuario o la contraseña son correctos.";
+                if (isAjax)
+                {
+                    return Json(new { success = false, message = msg });
+                }
+
+                TempData["Error"] = msg;
+                TempData["AbrirModal"] = ObtenerModal(rolEsperado);
+                return RedirectToAction("Index", "Home");
+            }
+
+            // 2. Cuenta desactivada
             if (!usuario.Estado)
             {
-                TempData["Error"] = "Tu cuenta está desactivada. Contacta a un administrador.";
+                var msg = "Tu cuenta se encuentra desactivada. Contacta al equipo de soporte.";
+                if (isAjax)
+                {
+                    return Json(new { success = false, message = msg });
+                }
+
+                TempData["Error"] = msg;
                 TempData["AbrirModal"] = ObtenerModal(rolEsperado);
-                return RedirectToAction("Pagina_Inicio", "Home");
+                return RedirectToAction("Index", "Home");
             }
 
-            // El rol real del usuario no corresponde al modal por el que entró
-            if (!string.IsNullOrWhiteSpace(rolEsperado) &&
-                !string.Equals(usuario.Rol, rolEsperado, StringComparison.OrdinalIgnoreCase))
-            {
-                TempData["Error"] = $"Este acceso es exclusivo para el rol '{rolEsperado}'.";
-                TempData["AbrirModal"] = ObtenerModal(rolEsperado);
-                return RedirectToAction("Pagina_Inicio", "Home");
-            }
-
+            // Autenticación correcta
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, usuario.Uuid),
@@ -77,13 +99,19 @@ namespace Drogueria.Controllers
 
             TempData["Success"] = $"¡Bienvenido, {usuario.Nombre}!";
 
-            // Redirige según el rol del usuario que acaba de entrar
-            return usuario.Rol switch
+            var redirectUrl = usuario.Rol switch
             {
-                "Administrador" => RedirectToAction("Index", "Usuario"),
-                "Empleado" => RedirectToAction("Index", "Usuario"),
-                _ => RedirectToAction("Pagina_Inicio", "Home")
+                "Administrador" => Url.Action("Dashboard", "Usuario"),
+                "Empleado" => Url.Action("Productos", "Empleado"),
+                _ => Url.Action("Catalogo", "Tienda")
             };
+
+            if (isAjax)
+            {
+                return Json(new { success = true, redirectUrl });
+            }
+
+            return Redirect(redirectUrl ?? "/Home/Index");
         }
 
         // POST: /Account/Register  (registro público desde el modal de Cliente)
@@ -91,22 +119,37 @@ namespace Drogueria.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(string nombre, string apellido, string email, string password)
         {
+            var isAjax = Request.Headers["X-Requested-With"] == "XMLHttpRequest" ||
+                         Request.Headers["Accept"].ToString().Contains("application/json");
+
             email = email?.Trim().ToLower() ?? "";
 
             if (string.IsNullOrWhiteSpace(nombre) || string.IsNullOrWhiteSpace(apellido) ||
                 string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
             {
-                TempData["Error"] = "Completa todos los campos para crear tu cuenta.";
+                var msg = "Completa todos los campos para crear tu cuenta.";
+                if (isAjax)
+                {
+                    return Json(new { success = false, message = msg });
+                }
+
+                TempData["Error"] = msg;
                 TempData["AbrirModal"] = "_RegistroCliente";
-                return RedirectToAction("Pagina_Inicio", "Home");
+                return RedirectToAction("Index", "Home");
             }
 
             var existe = await _context.Usuarios.AnyAsync(u => u.Email.ToLower() == email);
             if (existe)
             {
-                TempData["Error"] = $"El correo '{email}' ya está registrado.";
+                var msg = $"El correo '{email}' ya se encuentra registrado.";
+                if (isAjax)
+                {
+                    return Json(new { success = false, message = msg });
+                }
+
+                TempData["Error"] = msg;
                 TempData["AbrirModal"] = "_RegistroCliente";
-                return RedirectToAction("Pagina_Inicio", "Home");
+                return RedirectToAction("Index", "Home");
             }
 
             var usuario = new Usuario
@@ -122,19 +165,42 @@ namespace Drogueria.Controllers
             _context.Usuarios.Add(usuario);
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = "¡Cuenta creada con éxito! Ya puedes iniciar sesión.";
+            var exitoMsg = "¡Cuenta creada con éxito! Ya puedes iniciar sesión.";
+            if (isAjax)
+            {
+                return Json(new { success = true, message = exitoMsg, openModal = "_LoginCliente" });
+            }
+
+            TempData["Success"] = exitoMsg;
             TempData["AbrirModal"] = "_LoginCliente";
-            return RedirectToAction("Pagina_Inicio", "Home");
+            return RedirectToAction("Index", "Home");
         }
 
-        // POST: /Account/Logout
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+        // GET y POST: /Account/Logout
+        [HttpGet, HttpPost]
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            try
+            {
+                HttpContext.Session.Clear();
+            }
+            catch { }
+
             TempData["Success"] = "Sesión cerrada correctamente.";
-            return RedirectToAction("Pagina_Inicio", "Home");
+            return RedirectToAction("Index", "Home");
+        }
+
+        // GET: /Account/AccessDenied
+        [HttpGet]
+        public IActionResult AccessDenied()
+        {
+            TempData["Error"] = "No tienes permisos para acceder a esa sección.";
+            if (User.Identity?.IsAuthenticated == true && User.IsInRole("Cliente"))
+            {
+                return RedirectToAction("Catalogo", "Tienda");
+            }
+            return RedirectToAction("Index", "Home");
         }
 
         // Decide qué modal reabrir en el Index cuando el login/registro falla

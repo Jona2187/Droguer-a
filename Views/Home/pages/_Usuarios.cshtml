@@ -67,7 +67,7 @@
     </div>
 
     <div class="kpi-card">
-        <div class="kpi-icon k-info">
+        <div class="kpi-icon k-primary">
             <i class="bi bi-shield-lock-fill"></i>
         </div>
         <div class="kpi-data">
@@ -154,7 +154,7 @@
                         var avatarColor = "u-primary";
                         var rolLower = user.Rol?.ToLower() ?? "";
                         if (rolLower.Contains("admin")) { avatarColor = "u-purple"; }
-                        else if (rolLower.Contains("empleado")) { avatarColor = "u-info"; }
+                        else if (rolLower.Contains("empleado")) { avatarColor = "u-teal"; }
                         else if (rolLower.Contains("cliente")) { avatarColor = "u-orange"; }
 
                         <tr class="fila-usuario" data-rol="@rolLower">
@@ -183,7 +183,7 @@
                                 }
                                 else if (rolLower.Contains("empleado") || rolLower.Contains("farmac"))
                                 {
-                                    <span class="tag t-info">
+                                    <span class="tag t-teal">
                                         <i class="bi bi-person-badge"></i> @user.Rol
                                     </span>
                                 }
@@ -474,7 +474,24 @@
         });
 
         fila.classList.add("table-active");
-        fila.scrollIntoView({ behavior: "smooth", block: "center" });
+
+        const startY = window.scrollY;
+        const rect = fila.getBoundingClientRect();
+        const targetY = startY + rect.top - (window.innerHeight / 2 - rect.height / 2);
+        const duration = 180;
+
+        function animarScroll(inicio, fin, tiempoActual) {
+            const progreso = Math.min(tiempoActual / duration, 1);
+            const ease = 1 - Math.pow(1 - progreso, 3);
+            window.scrollTo({ top: inicio + (fin - inicio) * ease, behavior: "auto" });
+
+            if (progreso < 1) {
+                requestAnimationFrame((ts) => animarScroll(inicio, fin, ts - startTime));
+            }
+        }
+
+        const startTime = performance.now();
+        requestAnimationFrame((ts) => animarScroll(startY, targetY, ts - startTime));
     }
 
     function createUsuario() {

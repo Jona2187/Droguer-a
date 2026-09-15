@@ -25,6 +25,8 @@
 
     <!-- Site / Dashboard Styles -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/tienda.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/empleado.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Drogueria.site.css" asp-append-version="true" />
 </head>
 <body>
@@ -44,38 +46,54 @@
                         <i class="bi bi-list fs-5"></i>
                     </button>
                     <div class="header-breadcrumb d-none d-md-flex align-items-center gap-2">
-                        <a asp-controller="Home" asp-action="Index" class="text-muted small text-decoration-none d-flex align-items-center gap-1 hover-primary">
+                        @{
+                            var topbarHomeUrl = User.IsInRole("Cliente") ? "/Tienda/Catalogo" : (User.IsInRole("Empleado") ? "/Empleado/Productos" : "/Usuario");
+                        }
+                        <a href="@topbarHomeUrl" class="text-muted small text-decoration-none d-flex align-items-center gap-1 hover-primary">
                             <i class="bi bi-house-door" style="font-size: 13px;"></i>
                             <span>Droguería</span>
                         </a>
                         <i class="bi bi-chevron-right text-muted" style="font-size: 10px; opacity: 0.6;"></i>
-                        <span class="fw-semibold small px-2 py-0-5 rounded-pill" style="background: var(--primary-soft); color: var(--primary);">
+                        <span class="fw-semibold small px-2-5 py-1 rounded-pill" style="background: var(--primary-soft); color: var(--primary);">
                             @(ViewData["Title"] ?? "Dashboard")
                         </span>
                     </div>
                 </div>
 
                 <div class="header-right">
-                    <div class="header-search d-none d-sm-flex align-items-center position-relative">
-                        <i class="bi bi-search position-absolute text-muted" style="left: 12px; font-size: 13px;"></i>
-                        <input type="text" placeholder="Buscar en el sistema..." class="form-control form-control-sm ps-5 pe-4" style="border-radius: 999px; background: var(--bg-muted); border: 1px solid var(--border);" />
-                        <kbd class="position-absolute end-0 me-2 small text-muted px-1 rounded border d-none d-md-inline-block" style="font-size: 10px; background: var(--bg-card); font-family: 'JetBrains Mono', monospace;">Ctrl K</kbd>
-                    </div>
-
                     <div class="header-actions d-flex align-items-center gap-2">
                         <!-- Dark / Light Theme Toggle Button -->
                         <button class="btn-icon" id="themeToggleBtn" title="Cambiar tema oscuro / claro" type="button" aria-label="Cambiar tema">
                             <i class="bi bi-moon-stars" id="themeIcon"></i>
                         </button>
 
+                        @{
+                            var topbarUserName = User.Identity?.IsAuthenticated == true ? User.Identity.Name : "Usuario";
+                            var topbarRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "";
+                            var topbarInitials = !string.IsNullOrEmpty(topbarUserName) && topbarUserName.Length >= 2
+                                ? topbarUserName.Substring(0, 2).ToUpper()
+                                : "US";
+                            var isRoleAdmin = topbarRole == "Administrador";
+                            var isRoleEmp = topbarRole == "Empleado";
+                            var roleBadgeBg = isRoleAdmin ? "rgba(124, 58, 237, 0.12)" : (isRoleEmp ? "rgba(20, 184, 166, 0.12)" : "var(--primary-soft)");
+                            var roleBadgeColor = isRoleAdmin ? "#7c3aed" : (isRoleEmp ? "#0d9488" : "var(--primary)");
+                        }
                         <div class="d-none d-md-flex align-items-center gap-2 ps-2 ms-1 border-start" style="border-color: var(--border) !important;">
-                            <div class="cell-user-avatar u-primary" style="width: 32px; height: 32px; font-size: 11px; border-radius: 8px;">
-                                AD
+                            <div class="cell-user-avatar" style="width: 34px; height: 34px; font-size: 11.5px; font-weight: 700; border-radius: 10px; background: @roleBadgeBg; color: @roleBadgeColor; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.06);">
+                                @topbarInitials
                             </div>
                             <div class="d-flex flex-column" style="line-height: 1.2;">
-                                <span class="fw-semibold small" style="color: var(--t-base);">Admin</span>
-                                <span class="text-muted" style="font-size: 10.5px;">En línea</span>
+                                <span class="fw-bold small" style="color: var(--t-base);">@topbarUserName</span>
+                                <span class="badge rounded-pill" style="font-size: 10px; padding: 2px 8px; width: fit-content; background: @roleBadgeBg; color: @roleBadgeColor;">@topbarRole</span>
                             </div>
+
+                            <!-- Botón de Cerrar Sesión -->
+                            <form method="post" asp-controller="Account" asp-action="Logout" class="ms-2">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-outline-danger border-0 rounded-circle p-1 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="Cerrar sesión" aria-label="Cerrar sesión">
+                                    <i class="bi bi-box-arrow-right fs-6"></i>
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>

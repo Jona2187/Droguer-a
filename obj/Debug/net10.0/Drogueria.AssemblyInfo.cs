@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Drogueria")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e2b54c03a9474075a855d74315013c63a5d630e2")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+717008c391bffa3a222fcfd980e6aa92fb006ea7")]
 [assembly: System.Reflection.AssemblyProductAttribute("Drogueria")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Drogueria")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

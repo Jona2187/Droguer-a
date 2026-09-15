@@ -211,13 +211,13 @@
         </a>
         <div class="pub-mobile-divider"></div>
         <div class="pub-mobile-section-label">Iniciar sesion como</div>
-        <a href="/Auth/LoginEmpleado" id="mobileLoginEmpleado">
+        <a href="#" id="mobileLoginEmpleado" data-bs-toggle="modal" data-bs-target="#_LoginEmpleado">
             <i class="bi bi-person-badge-fill"></i> Empleado
         </a>
-        <a href="/Auth/LoginAdmin" id="mobileLoginAdmin">
+        <a href="#" id="mobileLoginAdmin" data-bs-toggle="modal" data-bs-target="#_LoginAdmin">
             <i class="bi bi-shield-lock-fill"></i> Administrador
         </a>
-        <a href="/Auth/LoginCliente" id="mobileLoginCliente">
+        <a href="#" id="mobileLoginCliente" data-bs-toggle="modal" data-bs-target="#_LoginCliente">
             <i class="bi bi-bag-heart-fill"></i> Cliente
         </a>
     </div>
@@ -225,7 +225,28 @@
     <!-- ====================================================
          CONTENIDO PRINCIPAL
     ===================================================== -->
-    <main role="main" class="pub-main-content">
+    <main role="main" class="pub-main-content position-relative">
+        @if (TempData["Success"] != null || TempData["Exito"] != null || TempData["Error"] != null)
+        {
+            <div class="position-fixed top-0 end-0 p-3" style="z-index: 1100; margin-top: 75px; max-width: 420px; width: 100%;">
+                @if (TempData["Success"] != null || TempData["Exito"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show shadow-lg rounded-3 d-flex align-items-center gap-2" role="alert">
+                        <i class="bi bi-check-circle-fill fs-5"></i>
+                        <div>@(TempData["Success"] ?? TempData["Exito"])</div>
+                        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                    </div>
+                }
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show shadow-lg rounded-3 d-flex align-items-center gap-2" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+                        <div>@TempData["Error"]</div>
+                        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                    </div>
+                }
+            </div>
+        }
         @RenderBody()
     </main>
 

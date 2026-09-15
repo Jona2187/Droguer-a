@@ -14,6 +14,36 @@ namespace Drogueria.Controllers
             _context = context;
         }
 
+        // Dashboard Administrador (Métricas, accesos rápidos y últimos pedidos)
+        public async Task<IActionResult> Dashboard()
+        {
+            ViewBag.TotalProductos = await _context.Productos.CountAsync();
+            ViewBag.TotalUsuarios = await _context.Usuarios.CountAsync();
+            ViewBag.TotalCategorias = await _context.Categorias.CountAsync();
+            ViewBag.TotalPedidos = await _context.Pedidos.CountAsync();
+            ViewBag.IngresosTotales = await _context.Pedidos.Where(p => p.Estado != "Cancelado").SumAsync(p => (decimal?)p.Total) ?? 0m;
+
+            ViewBag.PedidosPendientes = await _context.Pedidos.CountAsync(p => p.Estado == "Pendiente");
+            ViewBag.PedidosConfirmados = await _context.Pedidos.CountAsync(p => p.Estado == "Confirmado");
+            ViewBag.PedidosEntregados = await _context.Pedidos.CountAsync(p => p.Estado == "Entregado");
+            ViewBag.PedidosCancelados = await _context.Pedidos.CountAsync(p => p.Estado == "Cancelado");
+
+            ViewBag.ProductosStockBajo = await _context.Productos
+                .Include(p => p.Categoria)
+                .Where(p => p.Stock <= 10)
+                .OrderBy(p => p.Stock)
+                .Take(5)
+                .ToListAsync();
+
+            var ultimosPedidos = await _context.Pedidos
+                .Include(p => p.Usuario)
+                .OrderByDescending(p => p.Fecha)
+                .Take(6)
+                .ToListAsync();
+
+            return View("~/Views/Home/pages/_Dashboard.cshtml", ultimosPedidos);
+        }
+
         // Listar usuarios
         public async Task<IActionResult> Index()
         {
@@ -44,7 +74,7 @@ namespace Drogueria.Controllers
                 if (emailExiste)
                 {
                     TempData["Error"] = $"El correo '{usuario.Email}' ya está registrado con otro usuario.";
-                    return RedirectToAction(nameof(Index));
+                    return Redirect("/Usuario");
                 }
             }
 
@@ -59,11 +89,11 @@ namespace Drogueria.Controllers
                 _context.Usuarios.Add(usuario);
                 await _context.SaveChangesAsync();
                 TempData["Success"] = $"Usuario ({usuario.Rol}) {usuario.Nombre} creado con éxito.";
-                return RedirectToAction(nameof(Index));
+                return Redirect("/Usuario");
             }
 
             TempData["Error"] = "Por favor verifica los campos obligatorios del formulario.";
-            return RedirectToAction(nameof(Index));
+            return Redirect("/Usuario");
         }
 
         // Alternar Estado Activo / Inactivo

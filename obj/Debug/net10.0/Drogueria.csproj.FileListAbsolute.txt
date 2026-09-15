@@ -183,7 +183,9 @@ D:\Drogueria 19-09\Drogueria\bin\Debug\net10.0\Drogueria.dll
 D:\Drogueria 19-09\Drogueria\bin\Debug\net10.0\Drogueria.pdb
 D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\Drogueria.genruntimeconfig.cache
 D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\ref\Drogueria.dll
-d:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\compressed\wldxpjaezf-{0}-pc4uy0z9uv-pc4uy0z9uv.gz
-d:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\compressed\b1lgrntdql-{0}-vwz9uptrxb-vwz9uptrxb.gz
 d:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\compressed\ezcgvd667l-{0}-xrgd5ng1o6-xrgd5ng1o6.gz
+D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\compressed\vn9b975ip5-{0}-zmc0q5o2jp-zmc0q5o2jp.gz
+D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\compressed\tet9j3lm9y-{0}-4adaa55nqq-4adaa55nqq.gz
+D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\compressed\b1lgrntdql-{0}-0y043pgvuu-0y043pgvuu.gz
+D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\compressed\wldxpjaezf-{0}-kh8gzl7x7p-kh8gzl7x7p.gz
 D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt

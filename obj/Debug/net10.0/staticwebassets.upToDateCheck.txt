@@ -1,6 +1,8 @@
+wwwroot\css\empleado.css
 wwwroot\css\landingPages.css
 wwwroot\css\layout-publico.css
 wwwroot\css\site.css
+wwwroot\css\tienda.css
 wwwroot\favicon.ico
 wwwroot\img\1.jpeg
 wwwroot\img\2.jpeg
@@ -68,10 +70,15 @@ wwwroot\lib\jquery\dist\jquery.slim.js
 wwwroot\lib\jquery\dist\jquery.slim.min.js
 wwwroot\lib\jquery\dist\jquery.slim.min.map
 wwwroot\lib\jquery\LICENSE.txt
+wwwroot\uploads\productos\30d70b6e-678c-461a-9b2c-1f432a7f3703.jpg
+wwwroot\uploads\productos\31c49724-5b93-458a-8ab3-7371d47eb5d8.jpg
 wwwroot\uploads\productos\ace07228-1437-4442-8ac0-075aaf39f491.jpg
+wwwroot\uploads\productos\c0847deb-0d36-44a8-9a4d-246ded08020a.jpg
+wwwroot\uploads\productos\e4638baf-4c8d-4f23-8b03-12eab1c34b31.jpg
+wwwroot\uploads\productos\f9a028a7-0428-4146-bb57-19b58b517d83.jpg
 D:\Drogueria 19-09\Drogueria\wwwroot\css\landingPages.css
 D:\Drogueria 19-09\Drogueria\wwwroot\css\layout-publico.css
-D:\Drogueria 19-09\Drogueria\wwwroot\css\site.css
+D:\Drogueria 19-09\Drogueria\wwwroot\css\empleado.css
 D:\Drogueria 19-09\Drogueria\wwwroot\favicon.ico
 D:\Drogueria 19-09\Drogueria\wwwroot\js\landingPages.js
 D:\Drogueria 19-09\Drogueria\wwwroot\js\site.js
@@ -134,3 +141,5 @@ D:\Drogueria 19-09\Drogueria\wwwroot\lib\jquery\dist\jquery.slim.js
 D:\Drogueria 19-09\Drogueria\wwwroot\lib\jquery\dist\jquery.slim.min.js
 D:\Drogueria 19-09\Drogueria\wwwroot\lib\jquery\dist\jquery.slim.min.map
 D:\Drogueria 19-09\Drogueria\wwwroot\lib\jquery\LICENSE.txt
+D:\Drogueria 19-09\Drogueria\wwwroot\css\site.css
+D:\Drogueria 19-09\Drogueria\wwwroot\css\tienda.css

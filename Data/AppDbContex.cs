@@ -13,6 +13,8 @@ public class AppDbContex : DbContext
     public DbSet<Usuario> Usuarios { get; set; }
     public DbSet<Categoria> Categorias { get; set; }
     public DbSet<Producto> Productos { get; set; }
+    public DbSet<Pedido> Pedidos { get; set; }
+    public DbSet<DetallePedido> DetallesPedido { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -39,6 +41,44 @@ public class AppDbContex : DbContext
             .HasOne(p => p.Categoria)
             .WithMany()
             .HasForeignKey(p => p.CategoriaId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Pedido — PK como char(36) UUID en MySQL
+        modelBuilder.Entity<Pedido>()
+            .Property(p => p.Id)
+            .HasColumnType("char(36)")
+            .ValueGeneratedNever();
+
+        modelBuilder.Entity<Pedido>()
+            .HasOne(p => p.Usuario)
+            .WithMany()
+            .HasForeignKey(p => p.UsuarioId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // DetallePedido — PK como char(36) UUID en MySQL
+        modelBuilder.Entity<DetallePedido>()
+            .Property(d => d.Id)
+            .HasColumnType("char(36)")
+            .ValueGeneratedNever();
+
+        modelBuilder.Entity<DetallePedido>()
+            .Property(d => d.PedidoId)
+            .HasColumnType("char(36)");
+
+        modelBuilder.Entity<DetallePedido>()
+            .Property(d => d.ProductoId)
+            .HasColumnType("char(36)");
+
+        modelBuilder.Entity<DetallePedido>()
+            .HasOne(d => d.Pedido)
+            .WithMany(p => p.Detalles)
+            .HasForeignKey(d => d.PedidoId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<DetallePedido>()
+            .HasOne(d => d.Producto)
+            .WithMany()
+            .HasForeignKey(d => d.ProductoId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }
