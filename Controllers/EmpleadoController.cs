@@ -83,6 +83,7 @@ namespace Drogueria.Controllers
         {
             var pedidos = await _context.Pedidos
                 .Include(p => p.Usuario)
+                .Include(p => p.Repartidor)
                 .Include(p => p.Detalles)
                     .ThenInclude(d => d.Producto)
                 .OrderByDescending(p => p.Fecha)
@@ -90,6 +91,11 @@ namespace Drogueria.Controllers
 
             ViewData["Title"] = "Pedidos";
             ViewData["ActiveNav"] = "pedidos";
+
+            ViewBag.Repartidores = await _context.Usuarios
+                .Where(u => u.Rol == "Repartidor" && u.Estado)
+                .OrderBy(u => u.Nombre)
+                .ToListAsync();
 
             return View("~/Views/Empleado/_Pedidos.cshtml", pedidos);
         }
@@ -106,7 +112,7 @@ namespace Drogueria.Controllers
                 return RedirectToAction(nameof(Pedidos));
             }
 
-            var estadosValidos = new[] { "Pendiente", "Confirmado", "Entregado", "Cancelado" };
+            var estadosValidos = new[] { "Pendiente", "Confirmado", "En camino", "Entregado", "Cancelado" };
             if (!estadosValidos.Contains(estado))
             {
                 TempData["Error"] = "Estado no válido.";
@@ -120,5 +126,47 @@ namespace Drogueria.Controllers
             TempData["Exito"] = $"Pedido actualizado a '{estado}'.";
             return RedirectToAction(nameof(Pedidos));
         }
+
+        // POST: /Empleado/AsignarRepartidor
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AsignarRepartidor(Guid id, string? repartidorId)
+        {
+            var pedido = await _context.Pedidos.FindAsync(id);
+            if (pedido == null)
+            {
+                TempData["Error"] = "Pedido no encontrado.";
+                return RedirectToAction(nameof(Pedidos));
+            }
+
+            if (string.IsNullOrWhiteSpace(repartidorId))
+            {
+                pedido.RepartidorId = null;
+                TempData["Exito"] = "Repartidor desasignado del pedido.";
+            }
+            else
+            {
+                var repartidor = await _context.Usuarios.FirstOrDefaultAsync(u => u.Uuid == repartidorId && u.Rol == "Repartidor");
+                if (repartidor == null)
+                {
+                    TempData["Error"] = "El repartidor seleccionado no existe o no es válido.";
+                    return RedirectToAction(nameof(Pedidos));
+                }
+
+                pedido.RepartidorId = repartidor.Uuid;
+                // Si el pedido estaba Pendiente, podemos pasarlo a Confirmado o En camino automáticamente al asignar repartidor
+                if (pedido.Estado == "Pendiente")
+                {
+                    pedido.Estado = "Confirmado";
+                }
+                TempData["Exito"] = $"Repartidor '{repartidor.Nombre} {repartidor.Apellido}' asignado al pedido.";
+            }
+
+            _context.Pedidos.Update(pedido);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Pedidos));
+        }
     }
 }
+

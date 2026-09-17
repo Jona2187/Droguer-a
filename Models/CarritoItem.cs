@@ -10,5 +10,6 @@ public class CarritoItem
     public string? Imagen { get; set; }
     public decimal Precio { get; set; }
     public int Cantidad { get; set; } = 1;
+    public int StockDisponible { get; set; } = 99; // Stock disponible del producto
     public decimal Subtotal => Precio * Cantidad;
 }

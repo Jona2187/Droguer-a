@@ -107,7 +107,6 @@ D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\rjsmrazor.dswa.cache.json
 D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\rjsmcshtml.dswa.cache.json
 D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\scopedcss\bundle\Drogueria.styles.css
 D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\compressed\o06jgbgt1e-{0}-1o6ao0m696-1o6ao0m696.gz
-D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\compressed\i4ky0vfvt2-{0}-61n19gt1b8-61n19gt1b8.gz
 D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\compressed\jye7jjmaf6-{0}-ct0k5mo1m0-ct0k5mo1m0.gz
 D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\compressed\qitglnop4l-{0}-t1cqhe9u97-t1cqhe9u97.gz
 D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\compressed\q2fzkl7s52-{0}-c2jlpeoesf-c2jlpeoesf.gz
@@ -186,6 +185,6 @@ D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\ref\Drogueria.dll
 d:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\compressed\ezcgvd667l-{0}-xrgd5ng1o6-xrgd5ng1o6.gz
 D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\compressed\vn9b975ip5-{0}-zmc0q5o2jp-zmc0q5o2jp.gz
 D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\compressed\tet9j3lm9y-{0}-4adaa55nqq-4adaa55nqq.gz
-D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\compressed\b1lgrntdql-{0}-0y043pgvuu-0y043pgvuu.gz
 D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\compressed\wldxpjaezf-{0}-kh8gzl7x7p-kh8gzl7x7p.gz
-D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt
+D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\compressed\b1lgrntdql-{0}-q00xdv3v2v-q00xdv3v2v.gz
+D:\Drogueria 19-09\Drogueria\obj\Debug\net10.0\compressed\i4ky0vfvt2-{0}-w9b5jd780r-w9b5jd780r.gz

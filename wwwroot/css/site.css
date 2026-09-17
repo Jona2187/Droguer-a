@@ -463,6 +463,7 @@ body.modal-open .sticky-top {
     color: var(--primary);
     transform: translateX(3px);
 }
+
 .d-sidebar .nav-link:hover i {
     transform: scale(1.1);
     color: var(--primary);
@@ -1932,6 +1933,7 @@ body.modal-open .sticky-top {
     overflow: hidden;
     box-shadow: 0 12px 36px rgba(0, 0, 0, 0.04);
 }
+
 .dash-hero::before {
     content: '';
     position: absolute;
@@ -1998,6 +2000,7 @@ body.modal-open .sticky-top {
     position: relative;
     overflow: hidden;
 }
+
 .dash-kpi-card::before {
     content: '';
     position: absolute;
@@ -2008,10 +2011,22 @@ body.modal-open .sticky-top {
     background: transparent;
     transition: background 0.3s ease;
 }
-.dash-kpi-card.purple::before { background: linear-gradient(90deg, #7c3aed, #a855f7); }
-.dash-kpi-card.teal::before { background: linear-gradient(90deg, #0d9488, #2dd4bf); }
-.dash-kpi-card.orange::before { background: linear-gradient(90deg, #f59e0b, #fb923c); }
-.dash-kpi-card.blue::before { background: linear-gradient(90deg, #2563eb, #60a5fa); }
+
+.dash-kpi-card.purple::before {
+    background: linear-gradient(90deg, #7c3aed, #a855f7);
+}
+
+.dash-kpi-card.teal::before {
+    background: linear-gradient(90deg, #0d9488, #2dd4bf);
+}
+
+.dash-kpi-card.orange::before {
+    background: linear-gradient(90deg, #f59e0b, #fb923c);
+}
+
+.dash-kpi-card.blue::before {
+    background: linear-gradient(90deg, #2563eb, #60a5fa);
+}
 
 .dash-kpi-card:hover {
     transform: translateY(-5px);
@@ -2036,6 +2051,7 @@ body.modal-open .sticky-top {
     font-size: 24px;
     transition: transform 0.25s ease;
 }
+
 .dash-kpi-card:hover .dash-kpi-icon {
     transform: scale(1.12) rotate(4deg);
 }
@@ -2045,16 +2061,19 @@ body.modal-open .sticky-top {
     color: var(--primary);
     box-shadow: 0 8px 18px rgba(124, 58, 237, 0.22);
 }
+
 .dash-kpi-icon.teal {
     background: linear-gradient(135deg, rgba(20, 184, 166, 0.2), rgba(45, 212, 191, 0.1));
     color: #0d9488;
     box-shadow: 0 8px 18px rgba(20, 184, 166, 0.22);
 }
+
 .dash-kpi-icon.orange {
     background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(251, 146, 60, 0.1));
     color: #d97706;
     box-shadow: 0 8px 18px rgba(245, 158, 11, 0.22);
 }
+
 .dash-kpi-icon.blue {
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(96, 165, 250, 0.1));
     color: #2563eb;
@@ -2069,11 +2088,13 @@ body.modal-open .sticky-top {
     line-height: 1.1;
     margin-bottom: 4px;
 }
+
 .dash-kpi-label {
     font-size: 13px;
     font-weight: 600;
     color: var(--t-muted);
 }
+
 .dash-kpi-footer {
     display: flex;
     align-items: center;
@@ -2094,18 +2115,22 @@ body.modal-open .sticky-top {
     font-size: 11px;
     font-weight: 700;
 }
+
 .dash-trend-pill.green {
     background: rgba(34, 197, 94, 0.14);
     color: #16a34a;
 }
+
 .dash-trend-pill.purple {
     background: rgba(124, 58, 237, 0.14);
     color: var(--primary);
 }
+
 .dash-trend-pill.orange {
     background: rgba(245, 158, 11, 0.14);
     color: #d97706;
 }
+
 .dash-trend-pill.blue {
     background: rgba(59, 130, 246, 0.14);
     color: #2563eb;
@@ -2159,7 +2184,9 @@ body.modal-open .sticky-top {
     transition: all 0.2s ease;
     cursor: pointer;
 }
-.dash-pill-btn:hover, .dash-pill-btn.active {
+
+.dash-pill-btn:hover,
+.dash-pill-btn.active {
     background: var(--primary-soft);
     color: var(--primary);
     border-color: var(--primary-ring);
@@ -2192,6 +2219,7 @@ body.modal-open .sticky-top {
     border-radius: 14px;
     transition: all 0.2s ease;
 }
+
 .dash-stock-item:hover {
     border-color: var(--primary-border);
     transform: translateX(3px);
@@ -2209,6 +2237,7 @@ body.modal-open .sticky-top {
     text-decoration: none;
     transition: all 0.2s ease;
 }
+
 .dash-action-card:hover {
     border-color: var(--primary);
     transform: translateY(-2px);
@@ -2224,6 +2253,7 @@ body.modal-open .sticky-top {
     align-items: center;
     justify-content: space-between;
 }
+
 .pulse-dot {
     width: 10px;
     height: 10px;
@@ -2232,8 +2262,193 @@ body.modal-open .sticky-top {
     box-shadow: 0 0 10px rgba(34, 197, 94, 0.8);
     animation: pulseDot 2s infinite;
 }
+
 @keyframes pulseDot {
-    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
-    70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
-    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+    }
+
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 8px rgba(34, 197, 94, 0);
+    }
+
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+    }
+}
+
+/* ==========================================================================
+   DASHBOARD - TABLAS, ALERTAS DE STOCK Y ESTILOS
+   ========================================================================== */
+
+/* Tarjeta contenedora para tablas y widgets inferiores */
+.table-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header flexible dentro de tarjetas (título + acción) */
+.card-header-flex {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+/* Títulos de tarjetas del dashboard */
+.table-card .card-title,
+.dash-chart-card .card-title {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--t-base);
+    margin: 0;
+    line-height: 1.3;
+}
+
+.table-card .card-subtitle,
+.dash-chart-card .card-subtitle {
+    font-size: 12.5px;
+    color: var(--t-muted);
+    margin: 2px 0 0 0;
+    line-height: 1.4;
+}
+
+/* Tabla estilizada del Dashboard (Adminator) */
+.table-adminator {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+}
+
+.table-adminator thead th {
+    background: var(--bg-muted);
+    color: var(--t-muted);
+    font-size: 11.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding: 12px 16px;
+    border: none;
+    white-space: nowrap;
+}
+
+.table-adminator thead th:first-child {
+    border-radius: 12px 0 0 12px;
+}
+
+.table-adminator thead th:last-child {
+    border-radius: 0 12px 12px 0;
+}
+
+.table-adminator tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.table-adminator tbody tr:hover {
+    background-color: var(--bg-hover);
+}
+
+.table-adminator tbody td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border-soft);
+    color: var(--t-base);
+    font-size: 13.5px;
+    vertical-align: middle;
+}
+
+.table-adminator tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Responsive del table-responsive dentro de table-card */
+.table-card .table-responsive {
+    margin: 0 -24px -24px -24px;
+    border-radius: 0 0 20px 20px;
+    overflow: hidden;
+}
+
+.table-card .table-responsive .table-adminator tbody td:first-child {
+    padding-left: 24px;
+}
+
+.table-card .table-responsive .table-adminator thead th:first-child {
+    padding-left: 24px;
+}
+
+.table-card .table-responsive .table-adminator tbody td:last-child {
+    padding-right: 24px;
+}
+
+.table-card .table-responsive .table-adminator thead th:last-child {
+    padding-right: 24px;
+}
+
+/* ==========================================================================
+   DASHBOARD - RESPONSIVE BREAKPOINTS
+   ========================================================================== */
+@media (max-width: 1200px) {
+    .dash-hero {
+        flex-direction: column;
+        text-align: center;
+        padding: 24px;
+    }
+
+    .dash-hero .d-flex {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .dash-kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+    }
+
+    .dash-hero-title {
+        font-size: 1.5rem;
+    }
+
+    .dash-hero-sub {
+        font-size: 13px;
+    }
+
+    .dash-kpi-val {
+        font-size: 1.5rem;
+    }
+
+    .dash-kpi-icon {
+        width: 42px;
+        height: 42px;
+        font-size: 20px;
+    }
+
+    .dash-chart-header {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .table-card {
+        padding: 16px;
+    }
+
+    .card-header-flex {
+        flex-direction: column;
+        gap: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .dash-kpi-grid {
+        grid-template-columns: 1fr;
+    }
 }

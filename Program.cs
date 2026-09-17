@@ -1,11 +1,22 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Globalization;
 using Drogueria.Data;
+using Drogueria.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddHttpClient("Nominatim", client =>
+{
+    client.BaseAddress = new Uri("https://nominatim.openstreetmap.org");
+    client.DefaultRequestHeaders.Add("User-Agent", "DrogueriaApp/1.0 (contacto@drogueria.com)");
+    client.DefaultRequestHeaders.Add("Accept-Language", "es");
+    client.Timeout = TimeSpan.FromSeconds(10);
+});
+builder.Services.AddSignalR();
+
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -43,7 +54,7 @@ builder.Services.Configure<RequestLocalizationOptions>(opts =>
 });
 
 var app = builder.Build();
-
+    
 app.UseStatusCodePagesWithReExecute("/Home/ErrorStatus", "?code={0}");
 
 app.UseRequestLocalization();
@@ -61,6 +72,9 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}"
 );
 
+app.MapHub<UbicacionHub>("/hubs/ubicacion");
+
 app.Run();
+
 
 

@@ -613,6 +613,67 @@
     </div>
 </div>
 
+<!-- Modal Repartidor -->
+<div class="modal fade modal-login" id="_LoginRepartidor" tabindex="-1" aria-labelledby="_LoginRepartidorLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-login-banner">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                <div class="modal-login-icon-box">
+                    <i class="bi bi-bicycle"></i>
+                </div>
+                <h4 class="modal-login-title" id="_LoginRepartidorLabel">Acceso Repartidor</h4>
+                <p class="modal-login-subtitle">Consulta y gestiona tus domicilios asignados</p>
+            </div>
+            <div class="modal-login-body">
+                <div class="modal-login-alert-container">
+                    @if (TempData["Error"] != null && TempData["AbrirModal"]?.ToString() == "_LoginRepartidor")
+                    {
+                        <div class="alert alert-danger d-flex align-items-center gap-2 mb-3 py-2 px-3 small rounded-3" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill text-danger fs-6 flex-shrink-0"></i>
+                            <div>@TempData["Error"]</div>
+                        </div>
+                    }
+                </div>
+                <form class="modal-login-form" method="post" asp-controller="Account" asp-action="Login">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="rolEsperado" value="Repartidor" />
+                    <div class="mb-3">
+                        <label for="rep-user" class="form-label">Usuario o Correo</label>
+                        <div class="input-group-custom">
+                            <i class="bi bi-person input-icon"></i>
+                            <input type="text" class="form-control" id="rep-user" name="email" placeholder="ej. repartidor@drogueria.com" required autocomplete="username">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="rep-pass" class="form-label">Contraseña</label>
+                        <div class="input-group-custom">
+                            <i class="bi bi-lock input-icon"></i>
+                            <input type="password" class="form-control" id="rep-pass" name="password" placeholder="••••••••" required autocomplete="current-password">
+                            <button type="button" class="btn-toggle-password" onclick="togglePasswordVisibility('rep-pass', this)" title="Ver contraseña">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="rememberRep">
+                            <label class="form-check-label small text-muted" for="rememberRep">Recordar sesión</label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-login-submit">
+                        <span>Iniciar Sesión</span>
+                        <i class="bi bi-arrow-right-short fs-4"></i>
+                    </button>
+                </form>
+            </div>
+            <div class="modal-login-footer">
+                <i class="bi bi-lock-fill me-1 text-primary"></i> Área restringida únicamente a personal autorizado
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script src="~/js/landingPages.js" asp-append-version="true"></script>
 

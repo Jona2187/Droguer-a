@@ -5,6 +5,10 @@
     ViewData["ActiveNav"] = "pedidos";
 }
 
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+
 <div class="container-fluid px-3 px-lg-5">
 
     <!-- Encabezado de Página -->
@@ -14,7 +18,7 @@
                 <i class="bi bi-clock-history text-primary"></i>
                 <span>Historial de Mis Pedidos</span>
             </h1>
-            <p class="text-muted small mb-0">Consulta el estado y los detalles de las compras que has realizado</p>
+            <p class="text-muted small mb-0">Consulta el estado y realiza seguimiento en tiempo real de tus pedidos en camino</p>
         </div>
 
         <a asp-controller="Tienda" asp-action="Catalogo" class="tienda-back-btn">
@@ -59,15 +63,17 @@
             <div class="col-12">
                 @foreach (var pedido in Model)
                 {
+                    var isEnCamino = pedido.Estado == "En camino";
                     var estadoClase = pedido.Estado.ToLower() switch
                     {
                         "confirmado" => "confirmado",
+                        "en camino" => "confirmado",
                         "entregado" => "entregado",
                         "cancelado" => "cancelado",
                         _ => "pendiente"
                     };
 
-                    <div class="pedido-card">
+                    <div class="pedido-card mb-4 @(isEnCamino ? "border-warning" : "")" style="@(isEnCamino ? "border: 2px solid #f59e0b;" : "")">
                         <!-- Cabecera del pedido -->
                         <div class="pedido-card-header">
                             <div class="d-flex flex-wrap align-items-center gap-3">
@@ -82,13 +88,28 @@
                             </div>
 
                             <div class="d-flex align-items-center gap-3">
-                                <span class="pedido-estado @estadoClase">
-                                    <i class="bi bi-circle-fill" style="font-size: 8px;"></i>
+                                <span class="pedido-estado @estadoClase" style="@(isEnCamino ? "background: rgba(245, 158, 11, 0.15); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.3);" : "")">
+                                    <i class="bi @(isEnCamino ? "bi-truck" : "bi-circle-fill")" style="font-size: 10px;"></i>
                                     @pedido.Estado
                                 </span>
                                 <span class="fs-5 fw-bold text-primary">$@pedido.Total.ToString("N2")</span>
                             </div>
                         </div>
+
+                        <!-- Si está EN CAMINO: mostrar mapa de seguimiento en tiempo real -->
+                        @if (isEnCamino)
+                        {
+                            <div class="p-3 border-bottom bg-warning-subtle text-warning-emphasis">
+                                <div class="d-flex align-items-center justify-content-between mb-2 flex-wrap gap-2">
+                                    <span class="fw-bold d-flex align-items-center gap-2">
+                                        <i class="bi bi-geo-alt-fill text-danger fs-5 animate-pulse"></i>
+                                        <span>Tu pedido está en camino. Ubicación del repartidor en tiempo real:</span>
+                                    </span>
+                                    <span class="badge bg-warning text-dark font-monospace" id="clientGpsStatus-@pedido.Id">Rastreando repartidor...</span>
+                                </div>
+                                <div id="client-map-@pedido.Id" style="height: 260px; width: 100%; border-radius: 12px;" class="shadow-sm border"></div>
+                            </div>
+                        }
 
                         <!-- Detalles del pedido -->
                         <div class="pedido-card-body">
@@ -127,3 +148,80 @@
         </div>
     }
 </div>
+
+@section Scripts {
+    <!-- Leaflet JS & SignalR JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Inicializar SignalR para cliente
+            const connection = new signalR.HubConnectionBuilder()
+                .withUrl("/hubs/ubicacion")
+                .withAutomaticReconnect()
+                .build();
+
+            connection.start().then(() => {
+                console.log("Cliente conectado a SignalR Hub");
+                // Suscribirse a grupos de los pedidos en camino
+                @foreach (var p in Model.Where(p => p.Estado == "En camino"))
+                {
+                    <text>
+                    connection.invoke("JoinOrderGroup", "@p.Id").catch(err => console.error(err));
+                    </text>
+                }
+            }).catch(err => console.error(err));
+
+            const clientMarkers = {};
+            const clientMaps = {};
+
+            @foreach (var p in Model.Where(p => p.Estado == "En camino"))
+            {
+                <text>
+                (function() {
+                    const pedidoId = "@p.Id";
+                    const initialLat = @(p.LatitudRepartidor.HasValue ? p.LatitudRepartidor.Value.ToString(System.Globalization.CultureInfo.InvariantCulture) : "4.60971");
+                    const initialLng = @(p.LongitudRepartidor.HasValue ? p.LongitudRepartidor.Value.ToString(System.Globalization.CultureInfo.InvariantCulture) : "-74.08175");
+
+                    const map = L.map('client-map-' + pedidoId).setView([initialLat, initialLng], 15);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; OpenStreetMap'
+                    }).addTo(map);
+
+                    const deliveryIcon = L.divIcon({
+                        className: 'custom-repartidor-marker',
+                        html: '<div style="background:#f59e0b; color:white; border-radius:50%; width:38px; height:38px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.3); border:2px solid white;"><i class="bi bi-truck fs-5"></i></div>',
+                        iconSize: [38, 38],
+                        iconAnchor: [19, 19]
+                    });
+
+                    const marker = L.marker([initialLat, initialLng], { icon: deliveryIcon }).addTo(map)
+                        .bindPopup("<b>Repartidor</b><br>Tu pedido viene en camino.")
+                        .openPopup();
+
+                    clientMaps[pedidoId] = map;
+                    clientMarkers[pedidoId] = marker;
+                })();
+                </text>
+            }
+
+            // Escuchar actualizaciones de ubicación enviadas por el repartidor
+            connection.on("ReceiveLocation", function (pedidoId, lat, lng) {
+                const marker = clientMarkers[pedidoId];
+                const map = clientMaps[pedidoId];
+                const statusElem = document.getElementById('clientGpsStatus-' + pedidoId);
+
+                if (marker && map) {
+                    marker.setLatLng([lat, lng]);
+                    map.panTo([lat, lng]);
+                    if (statusElem) {
+                        statusElem.textContent = `En vivo: Repartidor en movimiento (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+                        statusElem.className = "badge bg-success text-white font-monospace";
+                    }
+                }
+            });
+        });
+    </script>
+}
+

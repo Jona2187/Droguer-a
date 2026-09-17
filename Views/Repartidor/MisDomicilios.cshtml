@@ -1,0 +1,296 @@
+﻿@model IEnumerable<Drogueria.Models.Pedido>
+@{
+    ViewData["Title"] = "Mis Domicilios";
+    ViewData["ActiveNav"] = "misdomicilios";
+    Layout = "~/Views/Shared/_LayoutCliente.cshtml";
+    var lista = Model ?? Enumerable.Empty<Drogueria.Models.Pedido>();
+    var totalAsignados = lista.Count();
+    var enCamino = lista.Count(p => p.Estado == "En camino");
+    var entregados = lista.Count(p => p.Estado == "Entregado");
+    var pendientes = lista.Count(p => p.Estado == "Pendiente" || p.Estado == "Confirmado");
+}
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<style>
+.domicilios-wrap { padding: 28px 24px; max-width: 1200px; margin: 0 auto; }
+@@media (max-width: 576px) { .domicilios-wrap { padding: 16px 12px; } }
+
+.domicilio-card { background: var(--bg-card); border-radius: 18px; border: 1px solid var(--border); box-shadow: 0 2px 12px rgba(0,0,0,.06); overflow: hidden; margin-bottom: 24px; }
+.domicilio-card.en-camino { border: 2px solid #f59e0b; box-shadow: 0 2px 20px rgba(245,158,11,.18); }
+[data-bs-theme="dark"] .domicilio-card { box-shadow: 0 2px 16px rgba(0,0,0,.4); }
+[data-bs-theme="dark"] .domicilio-card.en-camino { box-shadow: 0 2px 24px rgba(245,158,11,.28); }
+
+.domicilio-card-header { padding: 20px 24px 16px; border-bottom: 1px solid var(--border); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+.domicilio-card-body { padding: 20px 24px; }
+
+.domicilio-info-map { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+@@media (max-width: 768px) { .domicilio-info-map { grid-template-columns: 1fr; } .domicilio-card-header { flex-direction: column; align-items: flex-start; } }
+
+.domicilio-map-box { border-radius: 12px; overflow: hidden; border: 1px solid var(--border); min-height: 260px; background: var(--bg-muted); display: flex; flex-direction: column; }
+.domicilio-map-box .map-label { padding: 8px 12px; font-size: 12px; font-weight: 600; color: var(--t-muted); background: var(--bg-muted); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 6px; }
+.domicilio-map-placeholder { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 16px; color: var(--t-muted); text-align: center; min-height: 220px; }
+
+.info-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; font-size: 14px; }
+.info-row > i { color: var(--primary); margin-top: 2px; flex-shrink: 0; }
+.info-row .label { font-weight: 600; color: var(--t-muted); font-size: 11px; text-transform: uppercase; letter-spacing: .4px; margin-bottom: 2px; }
+.info-row .value { color: var(--t-base); font-weight: 500; }
+
+.product-list { list-style: none; padding: 0; margin: 0; }
+.product-list li { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px dashed var(--border); font-size: 13px; color: var(--t-base); }
+.product-list li:last-child { border-bottom: none; }
+.domicilio-card-body .border-top { border-color: var(--border) !important; }
+
+.estado-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: 99px; font-size: 12px; font-weight: 700; }
+.estado-encamino  { background: rgba(245,158,11,.15); color: #d97706; border: 1px solid rgba(245,158,11,.3); }
+.estado-entregado { background: rgba(16,185,129,.15);  color: #10b981; border: 1px solid rgba(16,185,129,.3); }
+.estado-pendiente { background: rgba(124,58,237,.15);  color: var(--primary); border: 1px solid rgba(124,58,237,.3); }
+[data-bs-theme="dark"] .estado-encamino  { background: rgba(245,158,11,.22);  color: #fbbf24; border-color: rgba(245,158,11,.4); }
+[data-bs-theme="dark"] .estado-entregado { background: rgba(16,185,129,.22);   color: #34d399; border-color: rgba(16,185,129,.4); }
+[data-bs-theme="dark"] .estado-pendiente { background: rgba(139,92,246,.22);   color: #a78bfa; border-color: rgba(139,92,246,.4); }
+
+.gps-badge { font-size: 11px; padding: 3px 10px; border-radius: 99px; font-weight: 600; font-family: monospace; display: inline-flex; align-items: center; }
+
+.map-legend { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 5px 10px; font-size: 11px; display: flex; gap: 14px; flex-wrap: wrap; color: var(--t-muted); margin: 4px 8px 0; }
+.map-legend span { display: inline-flex; align-items: center; gap: 5px; }
+</style>
+
+<div class="domicilios-wrap">
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i> @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="mb-4">
+    <h1 class="fw-bold mb-1" style="font-size: clamp(1.4rem, 4vw, 2rem);">Mis Domicilios <span>🛵</span></h1>
+    <p class="text-muted mb-0" style="font-size:14px;">Gestiona tus entregas y comparte tu ubicacion GPS en tiempo real.</p>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3"><div class="dash-kpi-card purple p-3"><span class="dash-kpi-label">Total</span><div class="dash-kpi-val">@totalAsignados</div></div></div>
+    <div class="col-6 col-md-3"><div class="dash-kpi-card orange p-3"><span class="dash-kpi-label">Pendientes</span><div class="dash-kpi-val">@pendientes</div></div></div>
+    <div class="col-6 col-md-3"><div class="dash-kpi-card teal p-3"><span class="dash-kpi-label">En Camino</span><div class="dash-kpi-val">@enCamino</div></div></div>
+    <div class="col-6 col-md-3"><div class="dash-kpi-card blue p-3"><span class="dash-kpi-label">Entregados</span><div class="dash-kpi-val">@entregados</div></div></div>
+</div>
+
+@if (!lista.Any())
+{
+    <div class="domicilio-card text-center p-5">
+        <i class="bi bi-geo-alt fs-1 text-muted opacity-50 d-block mb-3"></i>
+        <h5 class="fw-bold">No tienes domicilios asignados</h5>
+        <p class="text-muted small mb-0">Cuando un empleado te asigne un pedido, aparecera aqui.</p>
+    </div>
+}
+else
+{
+    @foreach (var p in lista)
+    {
+        var shortId = p.Id.ToString().Substring(0, 8).ToUpper();
+        var clientName = p.Usuario != null ? $"{p.Usuario.Nombre} {p.Usuario.Apellido}".Trim() : "Cliente";
+        var isEnCamino = p.Estado == "En camino";
+        var isEntregado = p.Estado == "Entregado";
+
+        <div class="domicilio-card @(isEnCamino ? "en-camino" : "")">
+            <div class="domicilio-card-header">
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <code class="fw-bold fs-6 text-primary">#@shortId</code>
+                    <span class="estado-badge @(isEnCamino ? "estado-encamino" : isEntregado ? "estado-entregado" : "estado-pendiente")">
+                        <i class="bi @(isEnCamino ? "bi-truck" : isEntregado ? "bi-check-all" : "bi-clock")"></i> @p.Estado
+                    </span>
+                    @if (isEnCamino)
+                    {
+                        <span class="gps-badge bg-danger text-white" id="gpsStatus-@p.Id"><i class="bi bi-broadcast me-1"></i>Obteniendo GPS...</span>
+                    }
+                </div>
+                <div class="d-flex gap-2 flex-wrap">
+                    @if (!isEntregado && !isEnCamino)
+                    {
+                        <form asp-controller="Repartidor" asp-action="CambiarEstado" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@p.Id" />
+                            <input type="hidden" name="estado" value="En camino" />
+                            <button type="submit" class="btn btn-warning rounded-pill px-4 fw-semibold d-inline-flex align-items-center gap-2"><i class="bi bi-play-circle-fill"></i> Iniciar Entrega</button>
+                        </form>
+                    }
+                    @if (isEnCamino)
+                    {
+                        <form asp-controller="Repartidor" asp-action="CambiarEstado" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@p.Id" />
+                            <input type="hidden" name="estado" value="Entregado" />
+                            <button type="submit" class="btn btn-success rounded-pill px-4 fw-semibold d-inline-flex align-items-center gap-2"><i class="bi bi-check-circle-fill"></i> Marcar Entregado</button>
+                        </form>
+                    }
+                </div>
+            </div>
+            <div class="domicilio-card-body">
+                <div class="domicilio-info-map">
+                    <div>
+                        <div class="info-row"><i class="bi bi-person-fill"></i><div><div class="label">Cliente</div><div class="value">@clientName</div><div class="text-muted" style="font-size:12px;">@(p.Usuario?.Email ?? "")</div></div></div>
+                        @{
+                            var dirRaw = p.DireccionEntrega ?? "";
+                            var dirPartes = dirRaw.Split('|');
+                            var dirNombre = dirPartes.Length > 0 ? dirPartes[0].Trim() : "";
+                            var dirCalle  = dirPartes.Length > 1 ? dirPartes[1].Trim() : dirRaw;
+                            var dirTel    = dirPartes.Length > 2 ? dirPartes[2].Trim() : "";
+                            // Quitar el segmento GEO: del teléfono si quedó junto
+                            if (dirTel.Contains("| GEO:")) dirTel = dirTel.Split("| GEO:")[0].Trim();
+                        }
+                        <div class="info-row"><i class="bi bi-geo-alt-fill" style="color:#ef4444;"></i>
+                            <div>
+                                <div class="label">Direccion de Entrega</div>
+                                @if (string.IsNullOrEmpty(dirRaw))
+                                {
+                                    <div class="value text-muted fst-italic">Sin direccion registrada</div>
+                                }
+                                else
+                                {
+                                    <div class="value fw-bold">@dirNombre</div>
+                                    <div class="text-muted" style="font-size:12px;">@dirCalle</div>
+                                    @if (!string.IsNullOrEmpty(dirTel))
+                                    {
+                                        <div class="text-muted" style="font-size:12px;"><i class="bi bi-telephone me-1"></i>@dirTel.Replace("Tel:","").Trim()</div>
+                                    }
+                                }
+                            </div>
+                        </div>
+                        <div class="info-row"><i class="bi bi-calendar3"></i><div><div class="label">Fecha</div><div class="value">@p.Fecha.ToString("dd/MM/yyyy HH:mm")</div></div></div>
+                        <div class="info-row"><i class="bi bi-bag-fill"></i><div><div class="label">Productos (@p.Detalles.Count)</div>
+                            <ul class="product-list mt-1">
+                                @foreach (var d in p.Detalles)
+                                {
+                                    <li><span>@(d.Producto?.Nombre ?? "Producto") <span class="text-muted">x @d.Cantidad</span></span><span class="fw-bold text-primary">$@d.Subtotal.ToString("N2")</span></li>
+                                }
+                            </ul>
+                        </div></div>
+                        <div class="d-flex align-items-center justify-content-between mt-3 pt-3 border-top">
+                            <span class="text-muted fw-semibold" style="font-size:13px;">Total del Pedido</span>
+                            <span class="fs-5 fw-bold text-primary">$@p.Total.ToString("N2")</span>
+                        </div>
+                    </div>
+                    <div class="domicilio-map-box">
+                        <div class="map-label"><i class="bi bi-map text-primary"></i>
+                            @if (isEnCamino) { <span>GPS Repartidor + Destino Cliente</span> }
+                            else if (isEntregado && p.LatitudRepartidor.HasValue) { <span>Ultima Ubicacion Registrada</span> }
+                            else { <span>Mapa — activo al iniciar entrega</span> }
+                        </div>
+                        @if (isEnCamino || (isEntregado && p.LatitudRepartidor.HasValue))
+                        {
+                            <div id="map-@p.Id" data-direccion="@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(p.DireccionEntrega ?? ""))" style="height:280px;width:100%;"></div>
+                            @if (isEnCamino && !string.IsNullOrEmpty(p.DireccionEntrega))
+                            {
+                                <div class="map-legend">
+                                    <span><span style="display:inline-block;width:11px;height:11px;border-radius:50%;background:#f59e0b;border:1px solid rgba(0,0,0,.2);"></span> Tu ubicación</span>
+                                    <span><span style="display:inline-block;width:11px;height:11px;border-radius:50%;background:#ef4444;border:1px solid rgba(0,0,0,.2);"></span> Destino del cliente</span>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="domicilio-map-placeholder">
+                                <i class="bi bi-map" style="font-size:2.5rem;opacity:.25;margin-bottom:10px;"></i>
+                                <span style="font-size:13px;font-weight:600;">El mapa se activa al iniciar la entrega</span>
+                                <span style="font-size:11px;margin-top:4px;">Presiona Iniciar Entrega para activar el GPS</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+</div>
+
+@section Scripts {
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const connection = new signalR.HubConnectionBuilder().withUrl("/hubs/ubicacion").withAutomaticReconnect().build();
+    connection.start().catch(err => console.error("SignalR:", err));
+
+    @foreach (var p in lista.Where(p => p.Estado == "En camino"))
+    {
+        // Extraer GEO query en C# antes de entrar al bloque <text>
+        var partesDirP = (p.DireccionEntrega ?? "").Split('|');
+        var geoQueryP = "";
+        var popupNombreP = partesDirP.Length > 0 ? partesDirP[0].Trim() : "Cliente";
+        var popupCalleP  = partesDirP.Length > 1 ? partesDirP[1].Trim() : (p.DireccionEntrega ?? "");
+        var geoSegP = partesDirP.FirstOrDefault(s => s.TrimStart().StartsWith("GEO:"));
+        if (geoSegP != null)
+            geoQueryP = geoSegP.Replace("GEO:", "").Trim();
+        else
+            geoQueryP = popupCalleP;
+
+        <text>
+    (function(){
+        const pid = "@p.Id";
+        const lat0 = @(p.LatitudRepartidor.HasValue ? p.LatitudRepartidor.Value.ToString(System.Globalization.CultureInfo.InvariantCulture) : "4.60971");
+        const lng0 = @(p.LongitudRepartidor.HasValue ? p.LongitudRepartidor.Value.ToString(System.Globalization.CultureInfo.InvariantCulture) : "-74.08175");
+        const map = L.map("map-"+pid).setView([lat0,lng0],15);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"(c) OpenStreetMap"}).addTo(map);
+        const iconRep = L.divIcon({className:"",html:'<div style="background:#f59e0b;color:#fff;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(0,0,0,.3);border:2px solid #fff;"><i class=\"bi bi-truck fs-5\"></i></div>',iconSize:[38,38],iconAnchor:[19,19]});
+        const marker = L.marker([lat0,lng0],{icon:iconRep}).addTo(map).bindPopup("<b>Tu ubicacion actual</b>").openPopup();
+
+        // Geocodificar destino via servidor (el query ya viene limpio desde C#)
+        const geoQuery = "@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(geoQueryP))";
+        if (geoQuery.trim() !== '') {
+            fetch('/Direccion/Geocodificar?' + new URLSearchParams({ direccion: geoQuery, ciudad: '' }), {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    const iconDest = L.divIcon({className:'',html:'<div style="background:#ef4444;color:#fff;border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(0,0,0,.4);border:2px solid #fff;"><i class=\"bi bi-house-fill\" style=\"font-size:16px;\"></i></div>',iconSize:[34,34],iconAnchor:[17,17]});
+                    L.marker([data.lat, data.lon], {icon: iconDest})
+                        .addTo(map)
+                        .bindPopup('<b>@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(popupNombreP))</b><br>@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(popupCalleP))')
+                        .openPopup();
+                }
+            })
+            .catch(err => console.error('Destino no geocodificado:', err));
+        }
+
+        const statusEl = document.getElementById("gpsStatus-"+pid);
+        if("geolocation" in navigator){
+            navigator.geolocation.watchPosition(
+                function(pos){
+                    const lat=pos.coords.latitude, lng=pos.coords.longitude;
+                    marker.setLatLng([lat,lng]); map.panTo([lat,lng]);
+                    if(statusEl){ statusEl.innerHTML='<i class="bi bi-broadcast me-1"></i>GPS: '+lat.toFixed(4)+', '+lng.toFixed(4); statusEl.className="gps-badge bg-success text-white"; }
+                    if(connection.state===signalR.HubConnectionState.Connected) connection.invoke("EnviarUbicacion",pid,lat,lng).catch(console.error);
+                    const fd=new FormData(); fd.append("id",pid); fd.append("lat",lat); fd.append("lng",lng);
+                    fetch("/Repartidor/ActualizarUbicacion",{method:"POST",body:fd}).catch(console.error);
+                },
+                function(err){ if(statusEl){ statusEl.textContent="Error GPS: "+err.message; statusEl.className="gps-badge bg-danger text-white"; } },
+                {enableHighAccuracy:true,timeout:15000,maximumAge:0}
+            );
+        } else { if(statusEl) statusEl.textContent="GPS no soportado"; }
+    })();
+        </text>
+    }
+
+    @foreach (var p in lista.Where(p => p.Estado == "Entregado" && p.LatitudRepartidor.HasValue))
+    {
+        <text>
+    (function(){
+        const map = L.map("map-@p.Id").setView([@(p.LatitudRepartidor!.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)),@(p.LongitudRepartidor!.Value.ToString(System.Globalization.CultureInfo.InvariantCulture))],15);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"(c) OpenStreetMap"}).addTo(map);
+        L.marker([@(p.LatitudRepartidor!.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)),@(p.LongitudRepartidor!.Value.ToString(System.Globalization.CultureInfo.InvariantCulture))]).addTo(map).bindPopup("Ultima ubicacion").openPopup();
+    })();
+        </text>
+    }
+});
+</script>
+}

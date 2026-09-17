@@ -20,12 +20,24 @@ namespace Drogueria.Controllers
         public async Task<IActionResult> Index()
         {
             // Traer hasta 8 productos activos con stock para la vitrina pública
-            var productos = await _context.Productos
-                .Include(p => p.Categoria)
-                .Where(p => p.Estado && p.Stock > 0)
-                .OrderByDescending(p => p.FechaCreacion)
-                .Take(8)
-                .ToListAsync();
+            List<Producto> productos = new();
+            try
+            {
+                if (_context?.Productos != null)
+                {
+                    productos = await _context.Productos
+                        .Include(p => p.Categoria)
+                        .Where(p => p.Estado && p.Stock > 0)
+                        .OrderByDescending(p => p.FechaCreacion)
+                        .Take(8)
+                        .ToListAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error al consultar productos de vitrina: {ex.Message}");
+                productos = new List<Producto>();
+            }
 
             ViewBag.ProductosVitrina = productos;
             return View("~/Views/Home/Pagina_Inicio/Index.cshtml");
@@ -35,12 +47,24 @@ namespace Drogueria.Controllers
         [HttpGet]
         public async Task<IActionResult> Pagina_Inicio()
         {
-            var productos = await _context.Productos
-                .Include(p => p.Categoria)
-                .Where(p => p.Estado && p.Stock > 0)
-                .OrderByDescending(p => p.FechaCreacion)
-                .Take(8)
-                .ToListAsync();
+            List<Producto> productos = new();
+            try
+            {
+                if (_context?.Productos != null)
+                {
+                    productos = await _context.Productos
+                        .Include(p => p.Categoria)
+                        .Where(p => p.Estado && p.Stock > 0)
+                        .OrderByDescending(p => p.FechaCreacion)
+                        .Take(8)
+                        .ToListAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error al consultar productos de vitrina: {ex.Message}");
+                productos = new List<Producto>();
+            }
 
             ViewBag.ProductosVitrina = productos;
             return View("~/Views/Home/Pagina_Inicio/Index.cshtml");

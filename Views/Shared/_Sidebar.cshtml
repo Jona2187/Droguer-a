@@ -9,13 +9,15 @@
     var isCliente = string.Equals(userRole, "Cliente", StringComparison.OrdinalIgnoreCase);
     var isAdmin = string.Equals(userRole, "Administrador", StringComparison.OrdinalIgnoreCase);
     var isEmpleado = string.Equals(userRole, "Empleado", StringComparison.OrdinalIgnoreCase);
+    var isRepartidor = string.Equals(userRole, "Repartidor", StringComparison.OrdinalIgnoreCase);
     var initials = !string.IsNullOrEmpty(userName) && userName.Length >= 2 
         ? userName.Substring(0, 2).ToUpper() 
         : brandInitial;
         
-    var roleTagText = isAdmin ? "Panel Administrador" : (isEmpleado ? "Panel Empleado" : "Tienda Online");
-    var homeUrl = isCliente ? "/Tienda/Catalogo" : (isEmpleado ? "/Empleado/Productos" : "/Usuario");
+    var roleTagText = isAdmin ? "Panel Administrador" : (isEmpleado ? "Panel Empleado" : (isRepartidor ? "Panel Repartidor" : "Tienda Online"));
+    var homeUrl = isCliente ? "/Tienda/Catalogo" : (isEmpleado ? "/Empleado/Productos" : (isRepartidor ? "/Repartidor/MisDomicilios" : "/Usuario"));
 }
+
 
 <aside class="d-sidebar" id="appSidebar">
 
@@ -147,6 +149,19 @@
         </a>
       </nav>
     }
+    else if (isRepartidor)
+    {
+      @* ================= MENÚ REPARTIDOR ================= *@
+      <nav class="nav-section">
+        <div class="nav-label">Panel Repartidor</div>
+
+        <a class="nav-link @(activeNav == "misdomicilios" || activeNav == "domicilios" ? "is-active" : "")" asp-controller="Repartidor" asp-action="MisDomicilios" data-tooltip="Mis Domicilios" title="Pedidos Asignados y Rutas">
+          <i class="bi bi-truck fs-5 me-1"></i>
+          <span>Mis Domicilios</span>
+        </a>
+      </nav>
+    }
+
 
   </div>
     

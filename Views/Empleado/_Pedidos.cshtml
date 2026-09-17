@@ -22,8 +22,10 @@
 @{
     var pendientes = Model.Count(p => p.Estado == "Pendiente");
     var confirmados = Model.Count(p => p.Estado == "Confirmado");
+    var enCamino = Model.Count(p => p.Estado == "En camino");
     var entregados = Model.Count(p => p.Estado == "Entregado");
     var cancelados = Model.Count(p => p.Estado == "Cancelado");
+    var repartidores = ViewBag.Repartidores as List<Drogueria.Models.Usuario> ?? new List<Drogueria.Models.Usuario>();
 }
 
 <div class="ped-header">
@@ -41,7 +43,11 @@
         <div><div class="ped-stat-value">@confirmados</div><div class="ped-stat-label">Confirmados</div></div>
     </div>
     <div class="ped-stat-card">
-        <div class="ped-stat-icon green"><i class="bi bi-truck"></i></div>
+        <div class="ped-stat-icon orange" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;"><i class="bi bi-truck"></i></div>
+        <div><div class="ped-stat-value">@enCamino</div><div class="ped-stat-label">En camino</div></div>
+    </div>
+    <div class="ped-stat-card">
+        <div class="ped-stat-icon green"><i class="bi bi-check-all"></i></div>
         <div><div class="ped-stat-value">@entregados</div><div class="ped-stat-label">Entregados</div></div>
     </div>
     <div class="ped-stat-card">
@@ -59,6 +65,7 @@
         <option value="">Todos los estados</option>
         <option value="Pendiente">Pendiente</option>
         <option value="Confirmado">Confirmado</option>
+        <option value="En camino">En camino</option>
         <option value="Entregado">Entregado</option>
         <option value="Cancelado">Cancelado</option>
     </select>
@@ -80,6 +87,7 @@ else
                     <th>ID</th>
                     <th>Cliente</th>
                     <th>Fecha</th>
+                    <th>Repartidor</th>
                     <th>Items</th>
                     <th>Total</th>
                     <th>Estado</th>
@@ -90,23 +98,42 @@ else
             <tbody>
                 @foreach (var p in Model)
                 {
-                    var badgeClass = p.Estado.ToLower();
+                    var badgeClass = p.Estado.ToLower().Replace(" ", "-");
                     var shortId = p.Id.ToString().Substring(0, 8).ToUpper();
                     var clientName = p.Usuario != null
                         ? $"{p.Usuario.Nombre} {p.Usuario.Apellido}".Trim()
                         : "Cliente desconocido";
+                    var repName = p.Repartidor != null
+                        ? $"{p.Repartidor.Nombre} {p.Repartidor.Apellido}".Trim()
+                        : null;
 
                     <tr class="ped-row" data-cliente="@clientName.ToLower()" data-id="@shortId.ToLower()" data-estado="@p.Estado">
                         <td><code class="small">@shortId</code></td>
                         <td class="fw-semibold">@clientName</td>
                         <td class="text-muted small">@p.Fecha.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>
+                            <form asp-controller="Empleado" asp-action="AsignarRepartidor" method="post" class="d-flex align-items-center gap-1">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@p.Id" />
+                                <select name="repartidorId" class="form-select form-select-sm" style="max-width: 150px; font-size: 12px; border-radius: 8px;" onchange="this.form.submit()">
+                                    <option value="">-- Sin asignar --</option>
+                                    @foreach (var rep in repartidores)
+                                    {
+                                        <option value="@rep.Uuid" selected="@(p.RepartidorId == rep.Uuid)">
+                                            @rep.Nombre @rep.Apellido
+                                        </option>
+                                    }
+                                </select>
+                            </form>
+                        </td>
                         <td>@p.Detalles.Count</td>
                         <td class="fw-bold">$@p.Total.ToString("N2")</td>
                         <td>
-                            <span class="ped-badge @badgeClass">
+                            <span class="ped-badge @badgeClass" style="@(p.Estado == "En camino" ? "background: rgba(245, 158, 11, 0.15); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.3);" : "")">
                                 @if (p.Estado == "Pendiente") { <i class="bi bi-clock"></i> }
                                 else if (p.Estado == "Confirmado") { <i class="bi bi-check2"></i> }
-                                else if (p.Estado == "Entregado") { <i class="bi bi-truck"></i> }
+                                else if (p.Estado == "En camino") { <i class="bi bi-truck"></i> }
+                                else if (p.Estado == "Entregado") { <i class="bi bi-check-all"></i> }
                                 else { <i class="bi bi-x-lg"></i> }
                                 @p.Estado
                             </span>
@@ -118,6 +145,7 @@ else
                                 <select name="estado" class="ped-estado-select">
                                     <option value="Pendiente" selected="@(p.Estado == "Pendiente")">Pendiente</option>
                                     <option value="Confirmado" selected="@(p.Estado == "Confirmado")">Confirmado</option>
+                                    <option value="En camino" selected="@(p.Estado == "En camino")">En camino</option>
                                     <option value="Entregado" selected="@(p.Estado == "Entregado")">Entregado</option>
                                     <option value="Cancelado" selected="@(p.Estado == "Cancelado")">Cancelado</option>
                                 </select>
@@ -133,7 +161,8 @@ else
                         </td>
                     </tr>
                     <tr class="ped-details-row" id="det-@p.Id">
-                        <td colspan="8">
+                        <td colspan="9">
+
                             <div class="ped-details-inner">
                                 <table class="ped-detail-table">
                                     <thead>

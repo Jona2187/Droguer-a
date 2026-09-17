@@ -1,9 +1,11 @@
 @model IEnumerable<Drogueria.Models.Pedido>
+@using System.Globalization
 @{
     ViewData["Title"] = "Dashboard Administrador";
     ViewData["ActiveNav"] = "dashboard";
     Layout = "~/Views/Shared/_Topbar.cshtml";
 
+    var fechaActual = (DateTime)(ViewBag.FechaActual ?? DateTime.Now);
     var totalProductos = ViewBag.TotalProductos ?? 0;
     var totalUsuarios = ViewBag.TotalUsuarios ?? 0;
     var totalCategorias = ViewBag.TotalCategorias ?? 0;
@@ -15,6 +17,7 @@
     var pedidosEntregados = ViewBag.PedidosEntregados ?? 0;
     var pedidosCancelados = ViewBag.PedidosCancelados ?? 0;
 
+    var ventasUltimos7Dias = ViewBag.VentasUltimos7Dias as decimal[] ?? new decimal[7];
     var productosStockBajo = ViewBag.ProductosStockBajo as List<Drogueria.Models.Producto> ?? new List<Drogueria.Models.Producto>();
     var ultimosPedidos = Model ?? Enumerable.Empty<Drogueria.Models.Pedido>();
 }
@@ -49,6 +52,7 @@
         </h1>
         <p class="dash-hero-sub">
             Supervisa en tiempo real las ventas, la rotación de inventario de medicamentos y los pedidos procesados en tu farmacia.
+            <span class="text-muted small d-block mt-1"><i class="bi bi-calendar3 me-1"></i>@fechaActual.ToString("dddd, dd 'de' MMMM 'de' yyyy", new CultureInfo("es-ES"))</span>
         </p>
     </div>
     <div class="d-flex align-items-center gap-2 flex-wrap">
@@ -166,15 +170,15 @@
                         <i class="bi bi-graph-up text-primary"></i>
                         <span>Rendimiento y Ventas Recientes</span>
                     </h3>
-                    <p class="dash-chart-sub">Comparativa estimada de facturación e ingresos</p>
+                    <p class="dash-chart-sub">Comparativa de ventas de los últimos 7 días</p>
                 </div>
                 <div class="d-flex gap-2">
                     <button class="dash-pill-btn active">7 Días</button>
                     <button class="dash-pill-btn">Mes Actual</button>
                 </div>
             </div>
-            <div style="position: relative; flex: 1; min-height: 260px;">
-                <canvas id="salesChart"></canvas>
+            <div style="position: relative; flex: 1; min-height: 260px; height: 300px; width: 100%;">
+                <canvas id="salesChart" style="width: 100% !important; height: 100% !important;"></canvas>
             </div>
         </div>
     </div>
@@ -191,8 +195,8 @@
                     <p class="dash-chart-sub">Distribución porcentual de órdenes</p>
                 </div>
             </div>
-            <div style="position: relative; flex: 1; min-height: 240px;" class="d-flex align-items-center justify-content-center">
-                <canvas id="ordersStatusChart"></canvas>
+            <div style="position: relative; flex: 1; min-height: 240px; height: 280px; width: 100%;" class="d-flex align-items-center justify-content-center">
+                <canvas id="ordersStatusChart" style="width: 100% !important; height: 100% !important;"></canvas>
             </div>
         </div>
     </div>
@@ -354,13 +358,25 @@
         gradient.addColorStop(0, 'rgba(124, 58, 237, 0.35)');
         gradient.addColorStop(1, 'rgba(124, 58, 237, 0.0)');
 
+        // Generar labels de los últimos 7 días en español
+        const fechaActual = new Date(@fechaActual.Year, @(fechaActual.Month - 1), @fechaActual.Day);
+        const labels7Dias = [];
+        const diasSemana = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+        for (let i = 6; i >= 0; i--) {
+            const fecha = new Date(fechaActual.getTime());
+            fecha.setDate(fecha.getDate() - i);
+            labels7Dias.push(diasSemana[fecha.getDay()]);
+        }
+
+        const datosVentas = [@string.Join(", ", ventasUltimos7Dias.Select(v => v.ToString("F2", CultureInfo.InvariantCulture)))];
+
         new Chart(ctxSales, {
             type: 'line',
             data: {
-                labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+                labels: labels7Dias,
                 datasets: [{
                     label: 'Ventas ($)',
-                    data: [120, 340, 280, 510, 420, 680, @((double)ingresosTotales > 0 ? (double)ingresosTotales : 750)],
+                    data: datosVentas,
                     borderColor: '#7c3aed',
                     borderWidth: 3,
                     backgroundColor: gradient,
@@ -399,6 +415,7 @@
                     },
                     y: {
                         grid: { color: gridColor, drawBorder: false },
+                        beginAtZero: true,
                         ticks: {
                             color: textColor,
                             font: { family: 'Inter', size: 12 },

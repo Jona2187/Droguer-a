@@ -8,19 +8,23 @@
     var initials = !string.IsNullOrEmpty(userName) && userName.Length >= 2
         ? userName.Substring(0, 2).ToUpper()
         : "CL";
+    var esRepartidor = User.IsInRole("Repartidor");
 
-    // Obtener cantidad de items en el carrito desde la sesión
+    // Obtener cantidad de items en el carrito desde la sesión (solo para clientes)
     int carritoCount = 0;
-    try
+    if (!esRepartidor)
     {
-        var sessionJson = Context.Session.GetString("Carrito");
-        if (!string.IsNullOrEmpty(sessionJson))
+        try
         {
-            var items = JsonSerializer.Deserialize<List<CarritoItem>>(sessionJson);
-            carritoCount = items?.Sum(i => i.Cantidad) ?? 0;
+            var sessionJson = Context.Session.GetString("Carrito");
+            if (!string.IsNullOrEmpty(sessionJson))
+            {
+                var items = JsonSerializer.Deserialize<List<CarritoItem>>(sessionJson);
+                carritoCount = items?.Sum(i => i.Cantidad) ?? 0;
+            }
         }
+        catch { }
     }
-    catch { }
 }
 <!DOCTYPE html>
 <html lang="es" data-bs-theme="light">
@@ -74,19 +78,29 @@
 
             <!-- Navigation Links (Desktop) -->
             <div class="cliente-nav-links d-none d-md-flex">
-                <a asp-controller="Tienda" asp-action="Catalogo" class="cliente-nav-item @(activeNav == "catalogo" ? "active" : "")">
-                    <i class="bi bi-grid-fill"></i>
-                    <span>Catálogo</span>
-                </a>
-                <a asp-controller="Tienda" asp-action="Carrito" class="cliente-nav-item @(activeNav == "carrito" ? "active" : "") position-relative">
-                    <i class="bi bi-cart3"></i>
-                    <span>Carrito</span>
-                    <span id="navCartBadge" class="cliente-cart-badge @(carritoCount > 0 ? "visible" : "")">@carritoCount</span>
-                </a>
-                <a asp-controller="Tienda" asp-action="MisPedidos" class="cliente-nav-item @(activeNav == "pedidos" ? "active" : "")">
-                    <i class="bi bi-bag-check-fill"></i>
-                    <span>Mis Pedidos</span>
-                </a>
+                @if (esRepartidor)
+                {
+                    <a asp-controller="Repartidor" asp-action="MisDomicilios" class="cliente-nav-item @(activeNav == "misdomicilios" ? "active" : "")">
+                        <i class="bi bi-bicycle"></i>
+                        <span>Mis Domicilios</span>
+                    </a>
+                }
+                else
+                {
+                    <a asp-controller="Tienda" asp-action="Catalogo" class="cliente-nav-item @(activeNav == "catalogo" ? "active" : "")">
+                        <i class="bi bi-grid-fill"></i>
+                        <span>Catálogo</span>
+                    </a>
+                    <a asp-controller="Tienda" asp-action="Carrito" class="cliente-nav-item @(activeNav == "carrito" ? "active" : "") position-relative">
+                        <i class="bi bi-cart3"></i>
+                        <span>Carrito</span>
+                        <span id="navCartBadge" class="cliente-cart-badge @(carritoCount > 0 ? "visible" : "")">@carritoCount</span>
+                    </a>
+                    <a asp-controller="Tienda" asp-action="MisPedidos" class="cliente-nav-item @(activeNav == "pedidos" ? "active" : "")">
+                        <i class="bi bi-bag-check-fill"></i>
+                        <span>Mis Pedidos</span>
+                    </a>
+                }
             </div>
 
             <!-- Right Actions -->
@@ -102,7 +116,7 @@
                         <div class="cliente-avatar">@initials</div>
                         <div class="cliente-user-meta d-none d-lg-flex flex-column text-start">
                             <span class="cliente-user-name">@userName</span>
-                            <span class="cliente-user-role">Cliente</span>
+                            <span class="cliente-user-role">@(esRepartidor ? "Repartidor" : "Cliente")</span>
                         </div>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end cliente-dropdown shadow-lg border-0 rounded-4 p-2" aria-labelledby="userDropdown">
@@ -110,21 +124,32 @@
                             <div class="fw-bold small text-truncate">@userName</div>
                             <div class="text-muted small text-truncate" style="font-size: 11px;">@userEmail</div>
                         </li>
-                        <li>
-                            <a class="dropdown-item rounded-3 py-2 d-flex align-items-center gap-2" asp-controller="Tienda" asp-action="Catalogo">
-                                <i class="bi bi-grid text-primary"></i> Catálogo
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item rounded-3 py-2 d-flex align-items-center gap-2" asp-controller="Tienda" asp-action="Carrito">
-                                <i class="bi bi-cart3 text-primary"></i> Mi Carrito
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item rounded-3 py-2 d-flex align-items-center gap-2" asp-controller="Tienda" asp-action="MisPedidos">
-                                <i class="bi bi-bag-check text-primary"></i> Mis Pedidos
-                            </a>
-                        </li>
+                        @if (esRepartidor)
+                        {
+                            <li>
+                                <a class="dropdown-item rounded-3 py-2 d-flex align-items-center gap-2" asp-controller="Repartidor" asp-action="MisDomicilios">
+                                    <i class="bi bi-bicycle text-primary"></i> Mis Domicilios
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li>
+                                <a class="dropdown-item rounded-3 py-2 d-flex align-items-center gap-2" asp-controller="Tienda" asp-action="Catalogo">
+                                    <i class="bi bi-grid text-primary"></i> Catálogo
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item rounded-3 py-2 d-flex align-items-center gap-2" asp-controller="Tienda" asp-action="Carrito">
+                                    <i class="bi bi-cart3 text-primary"></i> Mi Carrito
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item rounded-3 py-2 d-flex align-items-center gap-2" asp-controller="Tienda" asp-action="MisPedidos">
+                                    <i class="bi bi-bag-check text-primary"></i> Mis Pedidos
+                                </a>
+                            </li>
+                        }
                         <li><hr class="dropdown-divider my-1"></li>
                         <li>
                             <form method="post" asp-controller="Account" asp-action="Logout" class="m-0">
@@ -147,16 +172,25 @@
         <!-- Mobile Drawer Menu -->
         <div class="cliente-mobile-drawer" id="mobileDrawer">
             <div class="cliente-mobile-nav">
-                <a asp-controller="Tienda" asp-action="Catalogo" class="cliente-mobile-item @(activeNav == "catalogo" ? "active" : "")">
-                    <i class="bi bi-grid-fill"></i> Catálogo
-                </a>
-                <a asp-controller="Tienda" asp-action="Carrito" class="cliente-mobile-item @(activeNav == "carrito" ? "active" : "")">
-                    <i class="bi bi-cart3"></i> Carrito
-                    <span id="mobileNavCartBadge" class="cliente-cart-badge ms-auto @(carritoCount > 0 ? "visible" : "")">@carritoCount</span>
-                </a>
-                <a asp-controller="Tienda" asp-action="MisPedidos" class="cliente-mobile-item @(activeNav == "pedidos" ? "active" : "")">
-                    <i class="bi bi-bag-check-fill"></i> Mis Pedidos
-                </a>
+                @if (esRepartidor)
+                {
+                    <a asp-controller="Repartidor" asp-action="MisDomicilios" class="cliente-mobile-item @(activeNav == "misdomicilios" ? "active" : "")">
+                        <i class="bi bi-bicycle"></i> Mis Domicilios
+                    </a>
+                }
+                else
+                {
+                    <a asp-controller="Tienda" asp-action="Catalogo" class="cliente-mobile-item @(activeNav == "catalogo" ? "active" : "")">
+                        <i class="bi bi-grid-fill"></i> Catálogo
+                    </a>
+                    <a asp-controller="Tienda" asp-action="Carrito" class="cliente-mobile-item @(activeNav == "carrito" ? "active" : "")">
+                        <i class="bi bi-cart3"></i> Carrito
+                        <span id="mobileNavCartBadge" class="cliente-cart-badge ms-auto @(carritoCount > 0 ? "visible" : "")">@carritoCount</span>
+                    </a>
+                    <a asp-controller="Tienda" asp-action="MisPedidos" class="cliente-mobile-item @(activeNav == "pedidos" ? "active" : "")">
+                        <i class="bi bi-bag-check-fill"></i> Mis Pedidos
+                    </a>
+                }
                 <hr class="my-2" />
                 <form method="post" asp-controller="Account" asp-action="Logout" class="m-0">
                     @Html.AntiForgeryToken()

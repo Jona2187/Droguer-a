@@ -17,6 +17,10 @@ namespace Drogueria.Controllers
         // Dashboard Administrador (Métricas, accesos rápidos y últimos pedidos)
         public async Task<IActionResult> Dashboard()
         {
+            var hoy = DateTime.Now;
+            var hace7Dias = hoy.AddDays(-7);
+
+            ViewBag.FechaActual = hoy;
             ViewBag.TotalProductos = await _context.Productos.CountAsync();
             ViewBag.TotalUsuarios = await _context.Usuarios.CountAsync();
             ViewBag.TotalCategorias = await _context.Categorias.CountAsync();
@@ -34,6 +38,26 @@ namespace Drogueria.Controllers
                 .OrderBy(p => p.Stock)
                 .Take(5)
                 .ToListAsync();
+
+            // Obtener ventas de los últimos 7 días para el gráfico
+            var ventasPor7Dias = await _context.Pedidos
+                .Where(p => p.Fecha >= hace7Dias && p.Estado != "Cancelado")
+                .GroupBy(p => p.Fecha.Date)
+                .Select(g => new { Fecha = g.Key, Total = g.Sum(p => p.Total) })
+                .OrderBy(v => v.Fecha)
+                .ToListAsync();
+
+            // Crear array con las ventas de cada día (0 si no hubo ventas ese día)
+            var ventasPorDia = new decimal[7];
+            for (int i = 0; i < 7; i++)
+            {
+                var fecha = hace7Dias.AddDays(i).Date;
+                var venta = ventasPor7Dias.FirstOrDefault(v => v.Fecha == fecha);
+                ventasPorDia[i] = venta?.Total ?? 0m;
+            }
+
+            ViewBag.VentasUltimos7Dias = ventasPorDia;
+            ViewBag.HayDatosReales = ventasPorDia.Any(v => v > 0);
 
             var ultimosPedidos = await _context.Pedidos
                 .Include(p => p.Usuario)
@@ -56,14 +80,17 @@ namespace Drogueria.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Usuario usuario)
         {
-            // Validar que el rol sea uno de los permitidos: Empleado, Administrador, Cliente
+            // Validar que el rol sea uno de los permitidos: Empleado, Administrador, Repartidor, Cliente
             var rolNormalizado = usuario.Rol?.Trim();
             if (string.Equals(rolNormalizado, "Administrador", StringComparison.OrdinalIgnoreCase))
                 usuario.Rol = "Administrador";
+            else if (string.Equals(rolNormalizado, "Repartidor", StringComparison.OrdinalIgnoreCase))
+                usuario.Rol = "Repartidor";
             else if (string.Equals(rolNormalizado, "Cliente", StringComparison.OrdinalIgnoreCase))
                 usuario.Rol = "Cliente";
             else
                 usuario.Rol = "Empleado";
+
 
             // Validar correo duplicado
             if (!string.IsNullOrWhiteSpace(usuario.Email))
@@ -190,10 +217,13 @@ namespace Drogueria.Controllers
             var rol = usuario.Rol?.Trim();
             if (string.Equals(rol, "Administrador", StringComparison.OrdinalIgnoreCase))
                 existente.Rol = "Administrador";
+            else if (string.Equals(rol, "Repartidor", StringComparison.OrdinalIgnoreCase))
+                existente.Rol = "Repartidor";
             else if (string.Equals(rol, "Cliente", StringComparison.OrdinalIgnoreCase))
                 existente.Rol = "Cliente";
             else
                 existente.Rol = "Empleado";
+
 
             // Guardar cambios
             await _context.SaveChangesAsync();

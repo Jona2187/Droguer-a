@@ -10,8 +10,10 @@
     var activos = lista.Count(u => u.Estado);
     var admins = lista.Count(u => string.Equals(u.Rol, "Administrador", StringComparison.OrdinalIgnoreCase));
     var empleados = lista.Count(u => string.Equals(u.Rol, "Empleado", StringComparison.OrdinalIgnoreCase));
+    var repartidores = lista.Count(u => string.Equals(u.Rol, "Repartidor", StringComparison.OrdinalIgnoreCase));
     var clientes = lista.Count(u => string.Equals(u.Rol, "Cliente", StringComparison.OrdinalIgnoreCase));
 }
+
 
 @* ================= ALERTA DE MENSAJES ================= *@
 @if (TempData["Success"] != null)
@@ -120,8 +122,10 @@
                 <option value="">Todos los roles</option>
                 <option value="administrador">Administrador</option>
                 <option value="empleado">Empleado</option>
+                <option value="repartidor">Repartidor</option>
                 <option value="cliente">Cliente</option>
             </select>
+
         </div>
     </div>
 
@@ -154,8 +158,9 @@
                         var avatarColor = "u-primary";
                         var rolLower = user.Rol?.ToLower() ?? "";
                         if (rolLower.Contains("admin")) { avatarColor = "u-purple"; }
+                        else if (rolLower.Contains("repartidor")) { avatarColor = "u-orange"; }
                         else if (rolLower.Contains("empleado")) { avatarColor = "u-teal"; }
-                        else if (rolLower.Contains("cliente")) { avatarColor = "u-orange"; }
+                        else if (rolLower.Contains("cliente")) { avatarColor = "u-primary"; }
 
                         <tr class="fila-usuario" data-rol="@rolLower">
                             <!-- Nombre y Correo -->
@@ -181,6 +186,12 @@
                                         <i class="bi bi-shield-check"></i> @(string.IsNullOrEmpty(user.Rol) ? "Administrador" : user.Rol)
                                     </span>
                                 }
+                                else if (rolLower.Contains("repartidor"))
+                                {
+                                    <span class="tag t-active" style="background: rgba(245, 158, 11, 0.15); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.3);">
+                                        <i class="bi bi-truck"></i> @user.Rol
+                                    </span>
+                                }
                                 else if (rolLower.Contains("empleado") || rolLower.Contains("farmac"))
                                 {
                                     <span class="tag t-teal">
@@ -194,6 +205,7 @@
                                     </span>
                                 }
                             </td>
+
 
                             <!-- Estado -->
                             <td>
@@ -299,9 +311,11 @@
                             <select class="form-select" id="rolUsuario" name="Rol" required>
                                 <option value="Cliente" selected>Cliente</option>
                                 <option value="Empleado">Empleado</option>
+                                <option value="Repartidor">Repartidor</option>
                                 <option value="Administrador">Administrador</option>
                             </select>
                         </div>
+
 
                         <div class="col-sm-6">
                             <label class="form-label" for="passwordUsuario">Contraseña</label>
@@ -374,9 +388,11 @@
                             <select class="form-select" id="rolEditar" name="Rol" required>
                                 <option value="Cliente" selected>Cliente</option>
                                 <option value="Empleado">Empleado</option>
+                                <option value="Repartidor">Repartidor</option>
                                 <option value="Administrador">Administrador</option>
                             </select>
                         </div>
+
 
                         <div class="col-sm-6">
                             <label class="form-label" for="passwordEditar">Contraseña</label>
@@ -531,9 +547,10 @@
         if (estadoInput) estadoInput.checked = String(estado).toLowerCase() === "true";
         if (rolSelect) {
             const valorRol = (rol || "cliente").toLowerCase();
-            const rolesValidos = ["cliente", "empleado", "administrador"];
+            const rolesValidos = ["cliente", "empleado", "repartidor", "administrador"];
             rolSelect.value = rolesValidos.includes(valorRol) ? valorRol.charAt(0).toUpperCase() + valorRol.slice(1) : "Cliente";
         }
+
     }
 
     function updateUsuario(uuid) {
