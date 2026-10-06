@@ -26,6 +26,30 @@ namespace Drogueria.Controllers
 
             var term = email?.Trim().ToLower() ?? "";
 
+            if (string.IsNullOrWhiteSpace(term) || string.IsNullOrWhiteSpace(password))
+            {
+                var msg = "Completa todos los campos obligatorios para ingresar.";
+                if (isAjax) return Json(new { success = false, message = msg });
+                TempData["Error"] = msg;
+                TempData["AbrirModal"] = ObtenerModal(rolEsperado);
+                return RedirectToAction("Index", "Home");
+            }
+
+            if (term.Contains("@"))
+            {
+                var emailRegex = new System.Text.RegularExpressions.Regex(
+                    @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
+                    System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                if (!emailRegex.IsMatch(term))
+                {
+                    var msg = "El correo electrónico ingresado no tiene un formato válido (debe incluir '@', un dominio y su extensión como .com o .co).";
+                    if (isAjax) return Json(new { success = false, message = msg });
+                    TempData["Error"] = msg;
+                    TempData["AbrirModal"] = ObtenerModal(rolEsperado);
+                    return RedirectToAction("Index", "Home");
+                }
+            }
+
             var usuario = await _context.Usuarios
                 .FirstOrDefaultAsync(u => u.Email.ToLower() == term ||
                                          u.Nombre.ToLower() == term ||
@@ -41,6 +65,15 @@ namespace Drogueria.Controllers
             if (usuario == null || !esValido)
             {
                 var msg = "Por favor, valide si el usuario o la contraseña son correctos.";
+                if (isAjax) return Json(new { success = false, message = msg });
+                TempData["Error"] = msg;
+                TempData["AbrirModal"] = ObtenerModal(rolEsperado);
+                return RedirectToAction("Index", "Home");
+            }
+
+            if (!string.Equals(usuario.Rol?.Trim(), rolEsperado?.Trim(), StringComparison.OrdinalIgnoreCase))
+            {
+                var msg = "Esta cuenta debe ingresar por el acceso correspondiente a su rol.";
                 if (isAjax) return Json(new { success = false, message = msg });
                 TempData["Error"] = msg;
                 TempData["AbrirModal"] = ObtenerModal(rolEsperado);
