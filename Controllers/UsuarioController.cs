@@ -93,9 +93,18 @@ namespace Drogueria.Controllers
             else
                 usuario.Rol = "Empleado";
 
-            // Validar correo duplicado
+            // Validar formato de correo y duplicado
             if (!string.IsNullOrWhiteSpace(usuario.Email))
             {
+                var emailRegex = new System.Text.RegularExpressions.Regex(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                if (!emailRegex.IsMatch(usuario.Email.Trim()))
+                {
+                    var errorMsg = "El correo electrónico debe ser válido (incluir '@', un dominio y una extensión como .com o .co).";
+                    if (isAjax) return Json(new { success = false, message = errorMsg });
+                    TempData["Error"] = errorMsg;
+                    return Redirect("/Usuario");
+                }
+
                 var emailExiste = await _context.Usuarios
                     .AnyAsync(u => u.Email.ToLower() == usuario.Email.Trim().ToLower());
 
@@ -230,9 +239,18 @@ namespace Drogueria.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            // Validar correo duplicado (excluyendo al propio usuario que se está editando)
+            // Validar formato de correo y duplicado (excluyendo al propio usuario que se está editando)
             if (!string.IsNullOrWhiteSpace(usuario.Email))
             {
+                var emailRegex = new System.Text.RegularExpressions.Regex(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                if (!emailRegex.IsMatch(usuario.Email.Trim()))
+                {
+                    var errorMsg = "El correo electrónico debe ser válido (incluir '@', un dominio y una extensión como .com o .co).";
+                    if (isAjax) return Json(new { success = false, message = errorMsg });
+                    TempData["Error"] = errorMsg;
+                    return RedirectToAction(nameof(Index));
+                }
+
                 var emailExiste = await _context.Usuarios
                     .AnyAsync(u => u.Uuid != usuario.Uuid && u.Email.ToLower() == usuario.Email.Trim().ToLower());
 

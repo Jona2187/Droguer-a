@@ -533,7 +533,7 @@
                         <label for="client-user" class="form-label">Correo Electrónico</label>
                         <div class="input-group-custom">
                             <i class="bi bi-envelope input-icon"></i>
-                            <input type="email" class="form-control" id="client-user" name="email" placeholder="tu-correo@ejemplo.com" required autocomplete="email">
+                            <input type="email" class="form-control" id="client-user" name="email" placeholder="tu-correo@ejemplo.com" required autocomplete="email" pattern="^[a-zA-Z0-9._%+-]+@@[a-zA-Z0-9.-]+\.(com|co|org|net|edu|gov|es|io|[a-zA-Z]{2,})$" title="Ejemplo: correo@@dominio.com o .co">
                         </div>
                     </div>
                     <div class="mb-3">
@@ -595,14 +595,14 @@
                             <label for="reg-name" class="form-label">Nombre</label>
                             <div class="input-group-custom">
                                 <i class="bi bi-person input-icon"></i>
-                                <input type="text" class="form-control" id="reg-name" name="nombre" placeholder="Juan" required autocomplete="given-name">
+                                <input type="text" class="form-control" id="reg-name" name="nombre" placeholder="Juan" required minlength="2" maxlength="100" autocomplete="given-name">
                             </div>
                         </div>
                         <div class="col-6">
                             <label for="reg-apellido" class="form-label">Apellido</label>
                             <div class="input-group-custom">
                                 <i class="bi bi-person input-icon"></i>
-                                <input type="text" class="form-control" id="reg-apellido" name="apellido" placeholder="Perez" required autocomplete="family-name">
+                                <input type="text" class="form-control" id="reg-apellido" name="apellido" placeholder="Pérez" required minlength="2" maxlength="100" autocomplete="family-name">
                             </div>
                         </div>
                     </div>
@@ -610,14 +610,15 @@
                         <label for="reg-email" class="form-label">Correo Electrónico</label>
                         <div class="input-group-custom">
                             <i class="bi bi-envelope input-icon"></i>
-                            <input type="email" class="form-control" id="reg-email" name="email" placeholder="tu-correo@ejemplo.com" required autocomplete="email">
+                            <input type="email" class="form-control" id="reg-email" name="email" placeholder="tu-correo@ejemplo.com" required autocomplete="email" pattern="^[a-zA-Z0-9._%+-]+@@[a-zA-Z0-9.-]+\.(com|co|org|net|edu|gov|es|io|[a-zA-Z]{2,})$" title="El correo debe contener '@@', un dominio y extensión como .com o .co">
                         </div>
+                        <small class="text-muted" style="font-size: 11px;">Formato requerido: usuario@@dominio.com o .co</small>
                     </div>
                     <div class="mb-3">
                         <label for="reg-pass" class="form-label">Contraseña</label>
                         <div class="input-group-custom">
                             <i class="bi bi-lock input-icon"></i>
-                            <input type="password" class="form-control" id="reg-pass" name="password" placeholder="••••••••" required autocomplete="new-password">
+                            <input type="password" class="form-control" id="reg-pass" name="password" placeholder="••••••••" required minlength="6" maxlength="255" autocomplete="new-password">
                             <button type="button" class="btn-toggle-password" onclick="togglePasswordVisibility('reg-pass', this)" title="Ver contraseña">
                                 <i class="bi bi-eye"></i>
                             </button>

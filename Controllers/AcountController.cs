@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +25,29 @@ namespace Drogueria.Controllers
                          Request.Headers["Accept"].ToString().Contains("application/json");
 
             var term = email?.Trim().ToLower() ?? "";
+
+            if (string.IsNullOrWhiteSpace(term) || string.IsNullOrWhiteSpace(password))
+            {
+                var msg = "Completa todos los campos obligatorios para ingresar.";
+                if (isAjax) return Json(new { success = false, message = msg });
+                TempData["Error"] = msg;
+                TempData["AbrirModal"] = ObtenerModal(rolEsperado);
+                return RedirectToAction("Index", "Home");
+            }
+
+            // Validar formato si se ingresó un correo electrónico (contiene '@')
+            if (term.Contains("@"))
+            {
+                var emailRegex = new System.Text.RegularExpressions.Regex(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                if (!emailRegex.IsMatch(term))
+                {
+                    var msg = "El correo electrónico ingresado no tiene un formato válido (debe incluir '@', un dominio y su extensión como .com o .co).";
+                    if (isAjax) return Json(new { success = false, message = msg });
+                    TempData["Error"] = msg;
+                    TempData["AbrirModal"] = ObtenerModal(rolEsperado);
+                    return RedirectToAction("Index", "Home");
+                }
+            }
 
             var usuario = await _context.Usuarios
                 .FirstOrDefaultAsync(u => u.Email.ToLower() == term ||
@@ -96,7 +119,17 @@ namespace Drogueria.Controllers
             if (string.IsNullOrWhiteSpace(nombre) || string.IsNullOrWhiteSpace(apellido) ||
                 string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
             {
-                var msg = "Completa todos los campos para crear tu cuenta.";
+                var msg = "Completa todos los campos obligatorios para crear tu cuenta.";
+                if (isAjax) return Json(new { success = false, message = msg });
+                TempData["Error"] = msg; TempData["AbrirModal"] = "_RegistroCliente";
+                return RedirectToAction("Index", "Home");
+            }
+
+            // Validar formato de correo (debe tener @, punto y extensión .com, .co, etc.)
+            var emailRegex = new System.Text.RegularExpressions.Regex(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            if (!emailRegex.IsMatch(email))
+            {
+                var msg = "El correo electrónico debe tener un formato válido con '@', un dominio y su terminación (ejemplo: usuario@dominio.com o .co).";
                 if (isAjax) return Json(new { success = false, message = msg });
                 TempData["Error"] = msg; TempData["AbrirModal"] = "_RegistroCliente";
                 return RedirectToAction("Index", "Home");

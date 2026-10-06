@@ -251,11 +251,11 @@
                                 <div class="modal-producto-qty-row">
                                     <label for="modalCantidad" class="qty-label">Cantidad:</label>
                                     <div class="modal-qty-stepper">
-                                        <button type="button" class="qty-btn" onclick="cambiarCantidadModal(-1)">
+                                        <button type="button" class="qty-btn" id="btnModalMinus" onclick="cambiarCantidadModal(-1)">
                                             <i class="bi bi-dash"></i>
                                         </button>
-                                        <input type="number" id="modalCantidad" name="cantidad" value="1" min="1" max="99" class="qty-input" />
-                                        <button type="button" class="qty-btn" onclick="cambiarCantidadModal(1)">
+                                        <input type="number" id="modalCantidad" name="cantidad" value="1" min="1" max="99" class="qty-input" oninput="validarEntradaModal(this)" onchange="validarEntradaModal(this)" />
+                                        <button type="button" class="qty-btn" id="btnModalPlus" onclick="cambiarCantidadModal(1)">
                                             <i class="bi bi-plus"></i>
                                         </button>
                                     </div>
@@ -476,7 +476,10 @@
         const inputQty = document.getElementById('modalCantidad');
         inputQty.value = 1;
         const limiteNum = parseInt(limiteMax);
-        inputQty.max = (!isNaN(limiteNum) && limiteNum > 0) ? Math.min(stockNum, limiteNum) : stockNum;
+        const stockNumVal = stockNum || 0;
+        const maxVal = (!isNaN(limiteNum) && limiteNum > 0) ? Math.min(stockNumVal, limiteNum) : stockNumVal;
+        inputQty.max = maxVal > 0 ? maxVal : 1;
+        actualizarBotonesModal();
 
         const imgEl = document.getElementById('modalProductoImg');
         const noImgEl = document.getElementById('modalProductoNoImg');
@@ -494,6 +497,17 @@
         bootstrap.Modal.getOrCreateInstance(modalEl).show();
     }
 
+    function actualizarBotonesModal() {
+        const input = document.getElementById('modalCantidad');
+        if (!input) return;
+        let val = parseInt(input.value) || 1;
+        let max = parseInt(input.max) || 99;
+        const btnMinus = document.getElementById('btnModalMinus');
+        const btnPlus = document.getElementById('btnModalPlus');
+        if (btnMinus) btnMinus.disabled = val <= 1;
+        if (btnPlus) btnPlus.disabled = val >= max;
+    }
+
     function cambiarCantidadModal(delta) {
         const input = document.getElementById('modalCantidad');
         let val = parseInt(input.value) || 1;
@@ -502,6 +516,20 @@
         if (val < 1) val = 1;
         if (val > max) val = max;
         input.value = val;
+        actualizarBotonesModal();
+    }
+
+    function validarEntradaModal(input) {
+        let val = parseInt(input.value);
+        let max = parseInt(input.max) || 99;
+        if (!isNaN(val) && val > max) {
+            input.value = max;
+            mostrarToast(`La cantidad máxima permitida para este producto es de ${max} unidades.`, 'warning');
+        }
+        if (!isNaN(val) && val < 1) {
+            input.value = 1;
+        }
+        actualizarBotonesModal();
     }
 
     async function agregarDesdeModal(e) {

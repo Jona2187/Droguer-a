@@ -1,4 +1,4 @@
-﻿@model List<Drogueria.Models.CarritoItem>
+@model List<Drogueria.Models.CarritoItem>
 <style>
 /* Permitir que el modal no corte el dropdown */
 #modalDireccion .modal-body { overflow: visible !important; }
@@ -201,7 +201,7 @@
                                         ? (item.Imagen.StartsWith("http") ? item.Imagen : (item.Imagen.StartsWith("/") ? item.Imagen : "/" + item.Imagen))
                                         : "";
 
-                                    <tr data-producto-id="@item.ProductoId" data-stock="@item.StockDisponible">
+                                    <tr data-producto-id="@item.ProductoId" data-stock="@item.StockDisponible" data-limite="@(item.LimiteMaximoPorPedido?.ToString() ?? "")">
                                         <td>
                                             <div class="d-flex align-items-center gap-3">
                                                 @if (!string.IsNullOrEmpty(imgUrl))
@@ -222,6 +222,12 @@
                                                 }
                                                 <div>
                                                     <span class="carrito-item-name">@item.Nombre</span>
+                                                    @if (item.LimiteMaximoPorPedido.HasValue && item.LimiteMaximoPorPedido.Value > 0)
+                                                    {
+                                                        <div class="text-muted" style="font-size: 11px;">
+                                                            <i class="bi bi-exclamation-circle me-1 text-warning"></i>Límite: máx. @item.LimiteMaximoPorPedido.Value /pedido
+                                                        </div>
+                                                    }
                                                 </div>
                                             </div>
                                         </td>
@@ -235,15 +241,17 @@
                                                         data-producto-id="@item.ProductoId"
                                                         onclick="ajustarCantidad('@item.ProductoId', -1, this)"
                                                         @(item.Cantidad <= 1 ? "disabled" : "")>-</button>
-                                                <input type="number" value="@item.Cantidad" min="1" max="@item.StockDisponible"
+                                                <input type="number" value="@item.Cantidad" min="1" max="@item.MaximoPermitido"
                                                        class="carrito-qty-input item-cantidad-input"
                                                        data-producto-id="@item.ProductoId"
                                                        data-stock="@item.StockDisponible"
+                                                       data-limite="@(item.LimiteMaximoPorPedido?.ToString() ?? "")"
+                                                       oninput="validarEntradaManualCarrito(this)"
                                                        onchange="cambiarCantidadManual(this)" />
                                                 <button type="button" class="btn btn-outline-secondary btn-sm px-2 py-1 btn-incrementar"
                                                         data-producto-id="@item.ProductoId"
                                                         onclick="ajustarCantidad('@item.ProductoId', 1, this)"
-                                                        @(item.Cantidad >= item.StockDisponible ? "disabled" : "")>+</button>
+                                                        @(item.Cantidad >= item.MaximoPermitido ? "disabled" : "")>+</button>
                                             </div>
                                         </td>
                                         <td style="text-align: right;" class="carrito-subtotal text-nowrap"
@@ -1009,28 +1017,62 @@ document.addEventListener('DOMContentLoaded', function () {
         return true;
     }
 
-    // ═══════════════════════════════════════════════════════
-    //  UTILIDADES CARRITO (sin cambios respecto a la versión original)
-    // ═══════════════════════════════════════════════════════
+    function obtenerMaxPermitido(input) {
+        const stock = parseInt(input.getAttribute('data-stock')) || 99;
+        const limiteMax = parseInt(input.getAttribute('data-limite'));
+        if (!isNaN(limiteMax) && limiteMax > 0) {
+            return Math.min(stock, limiteMax);
+        }
+        return stock;
+    }
 
     async function ajustarCantidad(productoId, delta, btn) {
         const input = document.querySelector(`.item-cantidad-input[data-producto-id="${productoId}"]`);
         if (!input) return;
         const cantidadActual = parseInt(input.value) || 1;
-        const stockDisponible = parseInt(input.getAttribute('data-stock')) || 99;
+        const maxPermitido = obtenerMaxPermitido(input);
         const nuevaCantidad = cantidadActual + delta;
-        if (nuevaCantidad < 1 || nuevaCantidad > stockDisponible) return;
+        if (nuevaCantidad < 1 || nuevaCantidad > maxPermitido) {
+            actualizarBotones(productoId);
+            return;
+        }
         input.value = nuevaCantidad;
+        actualizarBotones(productoId);
         await actualizarCantidadAjax(productoId, nuevaCantidad);
+    }
+
+    function validarEntradaManualCarrito(input) {
+        const maxPermitido = obtenerMaxPermitido(input);
+        let val = parseInt(input.value);
+        if (!isNaN(val) && val > maxPermitido) {
+            input.value = maxPermitido;
+            const limiteMax = parseInt(input.getAttribute('data-limite'));
+            if (!isNaN(limiteMax) && limiteMax > 0 && maxPermitido === limiteMax) {
+                mostrarToast(`El límite máximo por pedido para este producto es de ${limiteMax} unidades.`, 'warning');
+            } else {
+                mostrarToast(`Solo hay ${maxPermitido} unidades disponibles.`, 'warning');
+            }
+        }
+        const productoId = input.getAttribute('data-producto-id');
+        if (productoId) actualizarBotones(productoId);
     }
 
     async function cambiarCantidadManual(input) {
         const productoId = input.getAttribute('data-producto-id');
-        const stockDisponible = parseInt(input.getAttribute('data-stock')) || 99;
+        const maxPermitido = obtenerMaxPermitido(input);
         let cantidad = parseInt(input.value) || 1;
         if (cantidad < 1) cantidad = 1;
-        if (cantidad > stockDisponible) cantidad = stockDisponible;
+        if (cantidad > maxPermitido) {
+            cantidad = maxPermitido;
+            const limiteMax = parseInt(input.getAttribute('data-limite'));
+            if (!isNaN(limiteMax) && limiteMax > 0 && maxPermitido === limiteMax) {
+                mostrarToast(`El límite máximo por pedido para este producto es de ${limiteMax} unidades.`, 'warning');
+            } else {
+                mostrarToast(`Solo hay ${maxPermitido} unidades disponibles.`, 'warning');
+            }
+        }
         input.value = cantidad;
+        actualizarBotones(productoId);
         await actualizarCantidadAjax(productoId, cantidad);
     }
 
@@ -1057,13 +1099,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 mostrarToast('Cantidad actualizada', 'success');
             } else {
                 mostrarToast(data.message || 'Error al actualizar cantidad', 'danger');
-                if (data.stockDisponible !== undefined) {
-                    const input = document.querySelector(`.item-cantidad-input[data-producto-id="${productoId}"]`);
-                    if (input) {
-                        input.value = data.stockDisponible;
-                        input.setAttribute('data-stock', data.stockDisponible);
-                        actualizarBotones(productoId);
+                const input = document.querySelector(`.item-cantidad-input[data-producto-id="${productoId}"]`);
+                if (input) {
+                    if (data.limiteMaximo !== undefined) input.setAttribute('data-limite', data.limiteMaximo);
+                    if (data.stockDisponible !== undefined) input.setAttribute('data-stock', data.stockDisponible);
+                    const maxPermitido = obtenerMaxPermitido(input);
+                    if (parseInt(input.value) > maxPermitido) {
+                        input.value = maxPermitido;
                     }
+                    actualizarBotones(productoId);
                 }
             }
         } catch (e) {
@@ -1076,11 +1120,11 @@ document.addEventListener('DOMContentLoaded', function () {
         const input = document.querySelector(`.item-cantidad-input[data-producto-id="${productoId}"]`);
         if (!input) return;
         const cantidad = parseInt(input.value) || 1;
-        const stock = parseInt(input.getAttribute('data-stock')) || 99;
+        const maxPermitido = obtenerMaxPermitido(input);
         const btnMenos = document.querySelector(`.btn-decrementar[data-producto-id="${productoId}"]`);
         const btnMas = document.querySelector(`.btn-incrementar[data-producto-id="${productoId}"]`);
         if (btnMenos) btnMenos.disabled = cantidad <= 1;
-        if (btnMas) btnMas.disabled = cantidad >= stock;
+        if (btnMas) btnMas.disabled = cantidad >= maxPermitido;
     }
 
     async function eliminarDelCarrito(productoId, btn) {
@@ -1156,9 +1200,6 @@ document.addEventListener('DOMContentLoaded', function () {
         if (typeof actualizarBadgeCarrito === 'function') actualizarBadgeCarrito(totalItems);
     }
 
-    // ═══════════════════════════════════════════════════════
-    //  HELPERS
-    // ═══════════════════════════════════════════════════════
     function resaltarCampo(id, mensaje) {
         const el = document.getElementById(id);
         if (!el) return;

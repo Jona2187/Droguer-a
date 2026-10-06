@@ -252,7 +252,7 @@
                             <label class="form-label" for="crearMiligramos">Dosis / Concentración <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <input type="number" class="form-control" id="crearMiligramos" name="Miligramos"
-                                       placeholder="Ej. 500" min="1" max="50000" required />
+                                       placeholder="Ej. 500" min="1" max="10000" required />
                                 <select class="form-select" id="crearUnidadMedida" name="UnidadMedida" style="max-width: 105px;" required>
                                     <option value="mg">mg</option>
                                     <option value="ml">ml</option>
@@ -283,7 +283,7 @@
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
                                 <input type="number" class="form-control" id="crearPrecio" name="Precio"
-                                       placeholder="0.00" min="0.01" step="0.01" required />
+                                       placeholder="0.00" min="0.01" max="500000" step="0.01" required />
                             </div>
                         </div>
 
@@ -298,21 +298,21 @@
                         <div class="col-sm-4">
                             <label class="form-label" for="crearStock">Stock Actual <span class="text-danger">*</span></label>
                             <input type="number" class="form-control" id="crearStock" name="Stock"
-                                   placeholder="0" min="0" value="0" required />
+                                   placeholder="0" min="0" max="50000" value="0" required />
                         </div>
 
                         <!-- Stock Mínimo (Límite Alerta) -->
                         <div class="col-sm-4">
                             <label class="form-label" for="crearStockMinimo">Límite Stock Alerta <span class="text-danger">*</span></label>
                             <input type="number" class="form-control" id="crearStockMinimo" name="StockMinimo"
-                                   placeholder="5" min="0" value="5" required title="Notifica stock bajo si el inventario llega a esta cantidad" />
+                                   placeholder="5" min="0" max="5000" value="5" required title="Notifica stock bajo si el inventario llega a esta cantidad" />
                         </div>
 
                         <!-- Límite Máximo Por Pedido -->
                         <div class="col-sm-4">
                             <label class="form-label" for="crearLimiteMaximo">Máx. pastillas/ud. por pedido</label>
                             <input type="number" class="form-control" id="crearLimiteMaximo" name="LimiteMaximoPorPedido"
-                                   placeholder="Sin límite" min="1" max="1000" title="Restringe el máximo de unidades que un cliente puede pedir" />
+                                   placeholder="Sin límite" min="1" max="100" title="Restringe el máximo de unidades que un cliente puede pedir (Máx 100)" />
                         </div>
 
                         <!-- Imagen -->
@@ -377,7 +377,7 @@
                             <label class="form-label" for="editarMiligramos">Dosis / Concentración <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <input type="number" class="form-control" id="editarMiligramos" name="Miligramos"
-                                       placeholder="Ej. 500" min="1" max="50000" required />
+                                       placeholder="Ej. 500" min="1" max="10000" required />
                                 <select class="form-select" id="editarUnidadMedida" name="UnidadMedida" style="max-width: 105px;" required>
                                     <option value="mg">mg</option>
                                     <option value="ml">ml</option>
@@ -388,7 +388,6 @@
                                     <option value="ud">ud</option>
                                     <option value="caps">caps</option>
                                     <option value="tab">tab</option>
-                                    
                                 </select>
                             </div>
                         </div>
@@ -411,7 +410,7 @@
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
                                 <input type="number" class="form-control" id="editarPrecio" name="Precio"
-                                       placeholder="0.00" min="0.01" step="0.01" required />
+                                       placeholder="0.00" min="0.01" max="500000" step="0.01" required />
                             </div>
                         </div>
 
@@ -426,21 +425,21 @@
                         <div class="col-sm-4">
                             <label class="form-label" for="editarStock">Stock Actual <span class="text-danger">*</span></label>
                             <input type="number" class="form-control" id="editarStock" name="Stock"
-                                   placeholder="0" min="0" required />
+                                   placeholder="0" min="0" max="50000" required />
                         </div>
 
                         <!-- Stock Mínimo (Límite Alerta) -->
                         <div class="col-sm-4">
                             <label class="form-label" for="editarStockMinimo">Límite Stock Alerta <span class="text-danger">*</span></label>
                             <input type="number" class="form-control" id="editarStockMinimo" name="StockMinimo"
-                                   placeholder="5" min="0" required />
+                                   placeholder="5" min="0" max="5000" required />
                         </div>
 
                         <!-- Límite Máximo Por Pedido -->
                         <div class="col-sm-4">
                             <label class="form-label" for="editarLimiteMaximo">Máx. pastillas/ud. por pedido</label>
                             <input type="number" class="form-control" id="editarLimiteMaximo" name="LimiteMaximoPorPedido"
-                                   placeholder="Sin límite" min="1" max="1000" />
+                                   placeholder="Sin límite" min="1" max="100" />
                         </div>
 
                         <!-- Imagen -->

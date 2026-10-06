@@ -121,7 +121,7 @@ else
                     <form asp-controller="Empleado" asp-action="ActualizarStock" method="post" class="inv-stock-form">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="id" value="@p.Id" />
-                        <input type="number" name="stock" class="inv-stock-input" value="@p.Stock" min="0" />
+                        <input type="number" name="stock" class="inv-stock-input" value="@p.Stock" min="0" max="50000" />
                         <button type="submit" class="inv-btn-update" title="Guardar stock">
                             <i class="bi bi-check-lg"></i> Guardar
                         </button>

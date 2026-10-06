@@ -10,17 +10,18 @@ public class Usuario
     public string Uuid { get; set; } = Guid.NewGuid().ToString();
 
     [Required(ErrorMessage = "El nombre es obligatorio")]
-    [StringLength(100)]
+    [StringLength(100, ErrorMessage = "El nombre no puede superar 100 caracteres")]
     public string Nombre { get; set; } = "";
 
     [Required(ErrorMessage = "El apellido es obligatorio")]
-    [StringLength(100)]
+    [StringLength(100, ErrorMessage = "El apellido no puede superar 100 caracteres")]
     public string Apellido { get; set; } = "";
 
     [Required(ErrorMessage = "El correo electrónico es obligatorio")]
     [EmailAddress(ErrorMessage = "El correo electrónico no es válido")]
+    [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", ErrorMessage = "El correo electrónico debe ser válido, contener '@', un dominio y una extensión como .com o .co")]
     [DataType(DataType.EmailAddress)]
-    [StringLength(150)]
+    [StringLength(150, ErrorMessage = "El correo no puede superar 150 caracteres")]
     public string Email { get; set; } = "";
 
     [Required(ErrorMessage = "La contraseña es obligatoria")]

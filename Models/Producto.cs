@@ -16,7 +16,7 @@ public class Producto
     public string? Descripcion { get; set; }
 
     [Required(ErrorMessage = "La dosis o concentración es obligatoria")]
-    [Range(1, 50000, ErrorMessage = "La dosis debe estar entre 1 y 50,000")]
+    [Range(1, 10000, ErrorMessage = "La dosis debe estar entre 1 y 10,000")]
     public int Miligramos { get; set; }
 
     [Required(ErrorMessage = "La unidad de medida es obligatoria")]
@@ -25,7 +25,7 @@ public class Producto
 
     [Required(ErrorMessage = "El precio es obligatorio")]
     [Column(TypeName = "decimal(10,2)")]
-    [Range(0.01, 9999999.99, ErrorMessage = "El precio debe ser mayor a 0")]
+    [Range(0.01, 500000.00, ErrorMessage = "El precio debe estar entre $0.01 y $500,000.00")]
     public decimal Precio { get; set; }
 
     // FK → Categoria
@@ -36,14 +36,14 @@ public class Producto
     public Categoria? Categoria { get; set; }
 
     [Required(ErrorMessage = "El stock es obligatorio")]
-    [Range(0, int.MaxValue, ErrorMessage = "El stock no puede ser negativo")]
+    [Range(0, 50000, ErrorMessage = "El stock debe estar entre 0 y 50,000 unidades")]
     public int Stock { get; set; } = 0;
 
     [Required(ErrorMessage = "El límite de stock para alerta es obligatorio")]
-    [Range(0, int.MaxValue, ErrorMessage = "El stock mínimo no puede ser negativo")]
+    [Range(0, 5000, ErrorMessage = "El stock mínimo de alerta debe estar entre 0 y 5,000 unidades")]
     public int StockMinimo { get; set; } = 5;
 
-    [Range(1, 1000, ErrorMessage = "El límite por pedido debe estar entre 1 y 1000 pastillas/unidades")]
+    [Range(1, 100, ErrorMessage = "El límite por pedido debe estar entre 1 y 100 unidades por cliente")]
     public int? LimiteMaximoPorPedido { get; set; }
 
     // Ruta relativa de la imagen: "uploads/productos/filename.jpg"

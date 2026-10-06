@@ -145,7 +145,33 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
     // =========================================================================
-    // 4. AUTO-DISMISS GLOBAL DE ALERTAS (TempData y Bootstrap .alert)
+    // 4. PREVENCIÓN GLOBAL DE NÚMEROS NEGATIVOS Y LÍMITES EN INPUTS
+    // =========================================================================
+    document.addEventListener('input', function (e) {
+        if (e.target && e.target.tagName === 'INPUT' && e.target.type === 'number') {
+            const minAttr = e.target.getAttribute('min');
+            const minVal = minAttr !== null ? parseFloat(minAttr) : 0;
+            if (e.target.value !== '' && parseFloat(e.target.value) < minVal) {
+                e.target.value = minVal;
+                if (window.showAppToast) {
+                    window.showAppToast(`No se permiten valores numéricos inferiores a ${minVal}.`, 'warning');
+                }
+            }
+            const maxAttr = e.target.getAttribute('max');
+            if (maxAttr !== null) {
+                const maxVal = parseFloat(maxAttr);
+                if (!isNaN(maxVal) && e.target.value !== '' && parseFloat(e.target.value) > maxVal) {
+                    e.target.value = maxVal;
+                    if (window.showAppToast) {
+                        window.showAppToast(`El límite máximo permitido para este campo es ${maxVal}.`, 'warning');
+                    }
+                }
+            }
+        }
+    });
+
+    // =========================================================================
+    // 5. AUTO-DISMISS GLOBAL DE ALERTAS (TempData y Bootstrap .alert)
     // =========================================================================
     function autoDismissAlerts() {
         document.querySelectorAll('.alert.alert-dismissible').forEach(function (alert) {

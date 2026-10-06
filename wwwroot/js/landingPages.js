@@ -99,10 +99,59 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
+    // ── Global Listener for Number Inputs (Bloqueo de números negativos y límites) ─────
+    document.addEventListener('input', function (e) {
+        if (e.target && e.target.tagName === 'INPUT' && e.target.type === 'number') {
+            const minVal = parseFloat(e.target.getAttribute('min'));
+            const minAllowed = !isNaN(minVal) ? minVal : 0;
+            if (e.target.value !== '' && parseFloat(e.target.value) < minAllowed) {
+                e.target.value = minAllowed;
+            }
+            const maxVal = parseFloat(e.target.getAttribute('max'));
+            if (!isNaN(maxVal) && e.target.value !== '' && parseFloat(e.target.value) > maxVal) {
+                e.target.value = maxVal;
+            }
+        }
+    });
+
     // ── Formularios de Login y Registro AJAX en Modales ─────
     document.querySelectorAll('.modal-login-form').forEach(form => {
         form.addEventListener('submit', async function (e) {
             e.preventDefault();
+
+            // Validar correo electrónico en el Front-End
+            const emailInput = form.querySelector('input[name="email"]');
+            if (emailInput) {
+                const emailVal = emailInput.value.trim();
+                const esRegistro = form.action.toLowerCase().includes('register');
+                const esEmailField = emailInput.type === 'email' || emailVal.includes('@') || esRegistro;
+
+                if (esEmailField) {
+                    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|co|org|net|edu|gov|es|io|[a-zA-Z]{2,})$/i;
+                    if (!emailRegex.test(emailVal)) {
+                        const msg = 'Ingresa un correo electrónico válido que incluya "@", un dominio y su extensión (ej. usuario@dominio.com o .co).';
+                        if (window.showAppToast) window.showAppToast(msg, 'error');
+                        else alert(msg);
+                        emailInput.focus();
+                        return;
+                    }
+                }
+            }
+
+            // Validar campos numéricos para prevenir negativos
+            const numInputs = form.querySelectorAll('input[type="number"]');
+            for (let numInput of numInputs) {
+                const minAllowed = parseFloat(numInput.getAttribute('min')) || 0;
+                if (numInput.value !== '' && parseFloat(numInput.value) < minAllowed) {
+                    const msg = `Los campos numéricos no permiten números inferiores a ${minAllowed}.`;
+                    if (window.showAppToast) window.showAppToast(msg, 'error');
+                    else alert(msg);
+                    numInput.value = minAllowed;
+                    numInput.focus();
+                    return;
+                }
+            }
+
             const submitBtn = form.querySelector('button[type="submit"]');
             const origHtml = submitBtn ? submitBtn.innerHTML : '';
             if (submitBtn) {

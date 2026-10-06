@@ -104,6 +104,8 @@ namespace Drogueria.Controllers
             if (itemExistente != null)
             {
                 itemExistente.Cantidad = nuevaCantidadTotal;
+                itemExistente.StockDisponible = producto.Stock;
+                itemExistente.LimiteMaximoPorPedido = producto.LimiteMaximoPorPedido;
             }
             else
             {
@@ -113,7 +115,9 @@ namespace Drogueria.Controllers
                     Nombre = producto.Nombre,
                     Imagen = producto.Imagen,
                     Precio = producto.Precio,
-                    Cantidad = cantidad
+                    Cantidad = cantidad,
+                    StockDisponible = producto.Stock,
+                    LimiteMaximoPorPedido = producto.LimiteMaximoPorPedido
                 });
             }
 
@@ -139,7 +143,7 @@ namespace Drogueria.Controllers
         {
             var carrito = ObtenerCarrito();
 
-            // Sincronizar stock actual de cada producto
+            // Sincronizar stock actual y limite de cada producto
             if (carrito.Any())
             {
                 var productosIds = carrito.Select(c => c.ProductoId).ToList();
@@ -152,6 +156,7 @@ namespace Drogueria.Controllers
                     if (productos.TryGetValue(item.ProductoId, out var producto))
                     {
                         item.StockDisponible = producto.Stock;
+                        item.LimiteMaximoPorPedido = producto.LimiteMaximoPorPedido;
                     }
                 }
             }
