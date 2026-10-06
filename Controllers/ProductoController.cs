@@ -38,9 +38,11 @@ namespace Drogueria.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
-            [Bind("Nombre,Descripcion,Precio,CategoriaId,Stock,Estado")] Producto producto,
+            [Bind("Nombre,Descripcion,Miligramos,UnidadMedida,Precio,CategoriaId,Stock,StockMinimo,LimiteMaximoPorPedido,Estado")] Producto producto,
             IFormFile? imagenFile)
         {
+            var isAjax = Request.Headers["X-Requested-With"] == "XMLHttpRequest" || Request.Headers.Accept.ToString().Contains("application/json");
+
             if (ModelState.IsValid)
             {
                 producto.Id = Guid.NewGuid();
@@ -49,11 +51,39 @@ namespace Drogueria.Controllers
 
                 _context.Productos.Add(producto);
                 await _context.SaveChangesAsync();
-                TempData["Exito"] = $"Producto '{producto.Nombre}' creado correctamente.";
+
+                var successMsg = $"Producto '{producto.Nombre}' creado correctamente.";
+                if (isAjax)
+                {
+                    return Json(new {
+                        success = true,
+                        message = successMsg,
+                        producto = new {
+                            id = producto.Id,
+                            nombre = producto.Nombre,
+                            descripcion = producto.Descripcion,
+                            miligramos = producto.Miligramos,
+                            unidadMedida = producto.UnidadMedida,
+                            precio = producto.Precio,
+                            stock = producto.Stock,
+                            stockMinimo = producto.StockMinimo,
+                            limiteMaximoPorPedido = producto.LimiteMaximoPorPedido,
+                            estado = producto.Estado,
+                            imagen = producto.Imagen,
+                            categoriaId = producto.CategoriaId
+                        }
+                    });
+                }
+
+                TempData["Exito"] = successMsg;
                 return RedirectToAction(nameof(Index));
             }
 
-            TempData["Error"] = "Error al crear el producto. Verifique los datos.";
+            var primerError = ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault()?.ErrorMessage;
+            var errorMsg = !string.IsNullOrEmpty(primerError) ? primerError : "Error al crear el producto. Verifique los datos.";
+            if (isAjax) return Json(new { success = false, message = errorMsg });
+
+            TempData["Error"] = errorMsg;
             return await CargarVistaConError();
         }
 
@@ -62,10 +92,16 @@ namespace Drogueria.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(
             Guid id,
-            [Bind("Id,Nombre,Descripcion,Precio,CategoriaId,Stock,Estado,FechaCreacion,Imagen")] Producto producto,
+            [Bind("Id,Nombre,Descripcion,Miligramos,UnidadMedida,Precio,CategoriaId,Stock,StockMinimo,LimiteMaximoPorPedido,Estado,FechaCreacion,Imagen")] Producto producto,
             IFormFile? imagenFile)
         {
-            if (id != producto.Id) return NotFound();
+            var isAjax = Request.Headers["X-Requested-With"] == "XMLHttpRequest" || Request.Headers.Accept.ToString().Contains("application/json");
+
+            if (id != producto.Id)
+            {
+                if (isAjax) return Json(new { success = false, message = "Producto no encontrado." });
+                return NotFound();
+            }
 
             if (ModelState.IsValid)
             {
@@ -80,17 +116,49 @@ namespace Drogueria.Controllers
 
                     _context.Productos.Update(producto);
                     await _context.SaveChangesAsync();
-                    TempData["Exito"] = $"Producto '{producto.Nombre}' actualizado correctamente.";
+                    var successMsg = $"Producto '{producto.Nombre}' actualizado correctamente.";
+
+                    if (isAjax)
+                    {
+                        return Json(new {
+                            success = true,
+                            message = successMsg,
+                            producto = new {
+                                id = producto.Id,
+                                nombre = producto.Nombre,
+                                descripcion = producto.Descripcion,
+                                miligramos = producto.Miligramos,
+                                unidadMedida = producto.UnidadMedida,
+                                precio = producto.Precio,
+                                stock = producto.Stock,
+                                stockMinimo = producto.StockMinimo,
+                                limiteMaximoPorPedido = producto.LimiteMaximoPorPedido,
+                                estado = producto.Estado,
+                                imagen = producto.Imagen,
+                                categoriaId = producto.CategoriaId
+                            }
+                        });
+                    }
+
+                    TempData["Exito"] = successMsg;
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!_context.Productos.Any(p => p.Id == id)) return NotFound();
+                    if (!_context.Productos.Any(p => p.Id == id))
+                    {
+                        if (isAjax) return Json(new { success = false, message = "El producto no existe." });
+                        return NotFound();
+                    }
                     throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
 
-            TempData["Error"] = "Error al actualizar el producto.";
+            var primerEditError = ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault()?.ErrorMessage;
+            var editErrorMsg = !string.IsNullOrEmpty(primerEditError) ? primerEditError : "Error al actualizar el producto.";
+            if (isAjax) return Json(new { success = false, message = editErrorMsg });
+
+            TempData["Error"] = editErrorMsg;
             return await CargarVistaConError();
         }
 
@@ -99,17 +167,23 @@ namespace Drogueria.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
+            var isAjax = Request.Headers["X-Requested-With"] == "XMLHttpRequest" || Request.Headers.Accept.ToString().Contains("application/json");
+
             var producto = await _context.Productos.FindAsync(id);
             if (producto != null)
             {
                 producto.Estado = false;
                 _context.Productos.Update(producto);
                 await _context.SaveChangesAsync();
-                TempData["Exito"] = $"Producto '{producto.Nombre}' desactivado correctamente.";
+                var successMsg = $"Producto '{producto.Nombre}' desactivado correctamente.";
+                if (isAjax) return Json(new { success = true, message = successMsg, id = producto.Id, estado = false });
+                TempData["Exito"] = successMsg;
             }
             else
             {
-                TempData["Error"] = "El producto no fue encontrado.";
+                var errorMsg = "El producto no fue encontrado.";
+                if (isAjax) return Json(new { success = false, message = errorMsg });
+                TempData["Error"] = errorMsg;
             }
 
             return RedirectToAction(nameof(Index));
@@ -120,15 +194,28 @@ namespace Drogueria.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ToggleEstado(Guid id)
         {
+            var isAjax = Request.Headers["X-Requested-With"] == "XMLHttpRequest" || Request.Headers.Accept.ToString().Contains("application/json");
+
             var producto = await _context.Productos.FindAsync(id);
-            if (producto == null) return NotFound();
+            if (producto == null)
+            {
+                if (isAjax) return Json(new { success = false, message = "Producto no encontrado." });
+                return NotFound();
+            }
 
             producto.Estado = !producto.Estado;
             _context.Productos.Update(producto);
             await _context.SaveChangesAsync();
 
             var accion = producto.Estado ? "activado" : "desactivado";
-            TempData["Exito"] = $"Producto '{producto.Nombre}' {accion} correctamente.";
+            var successMsg = $"Producto '{producto.Nombre}' {accion} correctamente.";
+
+            if (isAjax)
+            {
+                return Json(new { success = true, message = successMsg, id = producto.Id, estado = producto.Estado });
+            }
+
+            TempData["Exito"] = successMsg;
             return RedirectToAction(nameof(Index));
         }
 

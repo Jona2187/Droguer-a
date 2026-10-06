@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "XcMkJmha07Q=",
+  "dgSpecHash": "fcrR6IyrWmg=",
   "success": true,
-  "projectFilePath": "d:\\Drogueria 19-09\\Drogueria\\Drogueria.csproj",
+  "projectFilePath": "D:\\Drogueria 19-09\\Drogueria\\Drogueria.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Jonatan H\\.nuget\\packages\\bcrypt.net-next\\4.2.0\\bcrypt.net-next.4.2.0.nupkg.sha512",
     "C:\\Users\\Jonatan H\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",

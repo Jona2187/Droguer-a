@@ -1,94 +1,172 @@
 @{
-    ViewData["Title"] = "Nosotros";
+    ViewData["Title"] = "Sobre Nosotros";
     ViewData["ActiveNav"] = "nosotros";
     Layout = "/Views/Shared/_LayoutPublico.cshtml";
 }
 
 <link rel="stylesheet" href="~/css/landingPages.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 
-<div class="pagina-nosotros">
-    <div class="nosotros-header-bar">
-        <a asp-controller="Home" asp-action="Index" class="boton-volver">
+<div class="pagina-nosotros" style="padding-bottom: 80px;">
+    <!-- Barra Superior de Navegación -->
+    <div class="nosotros-header-bar container-fluid px-4 py-3 d-flex align-items-center justify-content-between" style="max-width: 1200px; margin: 0 auto;">
+        <a asp-controller="Home" asp-action="Index" class="boton-volver d-inline-flex align-items-center gap-2 text-decoration-none">
             <i class="bi bi-arrow-left"></i>
             <span>Volver al inicio</span>
         </a>
+        <div class="d-none d-sm-flex align-items-center gap-2 small" style="color: var(--t-muted, #64748b);">
+            <a href="/" class="text-decoration-none" style="color: inherit;">Inicio</a>
+            <i class="bi bi-chevron-right" style="font-size: 10px;"></i>
+            <span style="color: var(--primary, #7c3aed); font-weight: 600;">Nosotros</span>
+        </div>
     </div>
 
-    <section class="informacion">
-        <div class="informacion-contenido">
+    <!-- Sección Principal / Historia -->
+    <section class="informacion" style="padding: 40px 20px 60px;">
+        <div class="informacion-contenido" style="max-width: 1200px; margin: 0 auto;">
             <div class="informacion-texto">
-                <span class="etiqueta">CONÓCENOS</span>
-                <h2>¿Quiénes somos?</h2>
+                <span class="etiqueta">NUESTRA HISTORIA</span>
+                <h2>Conoce más sobre FarmaVida</h2>
                 <p>
-                    Somos una droguería comprometida con ofrecer productos
-                    de calidad y brindar una excelente atención a nuestros clientes.
+                    <strong>FarmaVida</strong> nació con el firme propósito de humanizar el acceso a la salud. 
+                    Desde nuestros inicios como droguería comunitaria, entendimos que detrás de cada receta médica 
+                    y cada consulta hay una persona buscando bienestar, tranquilidad y confianza para sí misma y sus seres queridos.
                 </p>
                 <p>
-                    Nuestro objetivo es ayudarte a cuidar tu salud y la de tu
-                    familia, ofreciéndote productos confiables y una atención cercana.
+                    A lo largo de los años hemos evolucionado, integrando tecnología de vanguardia para que puedas realizar tus pedidos 
+                    en línea, consultar disponibilidad en tiempo real y recibir tus medicamentos en la comodidad de tu hogar sin perder 
+                    el trato cálido y profesional que siempre nos ha caracterizado.
                 </p>
                 <p>
-                    Trabajamos cada día para brindar un servicio rápido, seguro
-                    y pensado en las necesidades de nuestros clientes.
+                    Hoy en día contamos con un catálogo integral de medicamentos éticos, genéricos, productos de cuidado personal, 
+                    nutrición y bienestar respaldados por los laboratorios farmacéuticos más prestigiosos del país.
                 </p>
             </div>
 
             <div class="informacion-beneficios">
                 <div class="beneficio">
-                    <span>💜</span>
+                    <span class="icono-svg">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 21s-7-4.35-9.5-8.5C.5 8.5 3 4 7 4c2.2 0 4 1.4 5 3 1-1.6 2.8-3 5-3 4 0 6.5 4.5 4.5 8.5C19 16.65 12 21 12 21z" fill="currentColor" />
+                        </svg>
+                    </span>
                     <div>
-                        <h3>Calidad</h3>
-                        <p>Ofrecemos productos seleccionados y confiables.</p>
+                        <h3>Vocación de Servicio</h3>
+                        <p>Cada recomendación y entrega se realiza con empatía, responsabilidad y dedicación.</p>
                     </div>
                 </div>
 
                 <div class="beneficio">
-                    <span>👨‍⚕️</span>
+                    <span class="icono-svg">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <circle cx="12" cy="7" r="4" fill="currentColor" />
+                            <path d="M4 21a8 8 0 0 1 16 0" fill="currentColor" />
+                            <path d="M19 5v6M16 8h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                    </span>
                     <div>
-                        <h3>Atención personalizada</h3>
-                        <p>Estamos disponibles para ayudarte y orientarte.</p>
+                        <h3>Acompañamiento Experto</h3>
+                        <p>Profesionales farmacéuticos listos para asesorarte ante cualquier duda de posología.</p>
                     </div>
                 </div>
 
                 <div class="beneficio">
-                    <span>🤝</span>
+                    <span class="icono-svg">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M8 12l2.5 2.5L16 9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M3 7h5l3 3-2 2-2-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+                            <path d="M21 7h-5l-3 3 2 2 2-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+                        </svg>
+                    </span>
                     <div>
-                        <h3>Confianza</h3>
-                        <p>Tu bienestar es una de nuestras principales prioridades.</p>
+                        <h3>Seguridad y Trazabilidad</h3>
+                        <p>Control riguroso de fechas de vencimiento, almacenamiento térmico y origen garantizado.</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="porque-elegir">
-        <span class="etiqueta">NUESTRO COMPROMISO</span>
-        <h2>¿Por qué elegirnos?</h2>
-
-        <div class="ventajas">
-            <div class="ventaja">
-                <span>⚡</span>
-                <h3>Atención rápida</h3>
-                <p>Te atendemos de manera ágil y eficiente.</p>
+    <!-- Misión y Visión (Tarjetas destacadas) -->
+    <section class="container" style="max-width: 1200px; margin: 0 auto 60px; padding: 0 20px;">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="p-4 p-lg-5 rounded-4 h-100 shadow-sm border" style="background: var(--bg-card, #ffffff); border-color: var(--border, rgba(0,0,0,0.08)) !important;">
+                    <div class="d-inline-flex p-3 rounded-3 mb-3" style="background: rgba(124, 58, 237, 0.12); color: #7c3aed;">
+                        <i class="bi bi-compass fs-3"></i>
+                    </div>
+                    <h3 class="fw-bold mb-3" style="color: var(--t-base, #1e1b4b);">Nuestra Misión</h3>
+                    <p class="mb-0" style="color: var(--t-muted, #64748b); line-height: 1.7;">
+                        Brindar a nuestros clientes y a sus familias soluciones de salud integrales y accesibles, garantizando medicamentos 100% auténticos, atención profesional personalizada y entregas a tiempo que protejan su bienestar.
+                    </p>
+                </div>
             </div>
-
-            <div class="ventaja">
-                <span>💜</span>
-                <h3>Productos de calidad</h3>
-                <p>Trabajamos para ofrecer productos confiables.</p>
+            <div class="col-md-6">
+                <div class="p-4 p-lg-5 rounded-4 h-100 shadow-sm border" style="background: var(--bg-card, #ffffff); border-color: var(--border, rgba(0,0,0,0.08)) !important;">
+                    <div class="d-inline-flex p-3 rounded-3 mb-3" style="background: rgba(13, 148, 136, 0.12); color: #0d9488;">
+                        <i class="bi bi-eye fs-3"></i>
+                    </div>
+                    <h3 class="fw-bold mb-3" style="color: var(--t-base, #1e1b4b);">Nuestra Visión</h3>
+                    <p class="mb-0" style="color: var(--t-muted, #64748b); line-height: 1.7;">
+                        Consolidarnos como la red de droguería líder y de mayor confianza en la región, reconocida por nuestra excelencia en el servicio al cliente, innovación digital, calidez humana y compromiso inquebrantable con la salud pública.
+                    </p>
+                </div>
             </div>
+        </div>
+    </section>
 
-            <div class="ventaja">
-                <span>🏠</span>
-                <h3>Comodidad</h3>
-                <p>Facilitamos el acceso a nuestros productos.</p>
-            </div>
+    <!-- Valores y Compromisos -->
+    <section class="porque-elegir" style="padding: 60px 20px;">
+        <div style="max-width: 1200px; margin: 0 auto; text-align: center;">
+            <span class="etiqueta">NUESTROS VALORES</span>
+            <h2 class="mb-3">Los pilares que nos guían</h2>
+            <p class="texto-seccion mb-5">Principios innegociables que sustentan cada una de nuestras acciones y decisiones.</p>
 
-            <div class="ventaja">
-                <span>🤝</span>
-                <h3>Confianza</h3>
-                <p>Tu salud y bienestar son nuestra prioridad.</p>
+            <div class="ventajas">
+                <div class="ventaja">
+                    <span class="icono-svg">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor"/>
+                        </svg>
+                    </span>
+                    <h3>Integridad y Ética</h3>
+                    <p>Manejo transparente y riguroso de cada medicamento y fórmula médica.</p>
+                </div>
+
+                <div class="ventaja">
+                    <span class="icono-svg">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="currentColor"/>
+                        </svg>
+                    </span>
+                    <h3>Agilidad y Compromiso</h3>
+                    <p>Respuesta rápida y entregas oportunas en cada pedido y domicilio.</p>
+                </div>
+
+                <div class="ventaja">
+                    <span class="icono-svg">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" fill="none" stroke="currentColor" stroke-width="2"/>
+                            <circle cx="9" cy="7" r="4" fill="none" stroke="currentColor" stroke-width="2"/>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87" fill="none" stroke="currentColor" stroke-width="2"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75" fill="none" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </span>
+                    <h3>Cercanía con la Comunidad</h3>
+                    <p>Atención familiar, amable y sensible a las necesidades de cada paciente.</p>
+                </div>
+
+                <div class="ventaja">
+                    <span class="icono-svg">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="none" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </span>
+                    <h3>Calidad Garantizada</h3>
+                    <p>Almacenamiento certificado y laboratorios avalados oficialmente.</p>
+                </div>
             </div>
         </div>
     </section>
 </div>
+

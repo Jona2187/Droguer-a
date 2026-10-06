@@ -144,4 +144,130 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+    // =========================================================================
+    // 4. AUTO-DISMISS GLOBAL DE ALERTAS (TempData y Bootstrap .alert)
+    // =========================================================================
+    function autoDismissAlerts() {
+        document.querySelectorAll('.alert.alert-dismissible').forEach(function (alert) {
+            // Ya procesada
+            if (alert.dataset.autoDismiss) return;
+            alert.dataset.autoDismiss = '1';
+
+            setTimeout(function () {
+                alert.style.transition = 'opacity 0.5s ease, transform 0.5s ease, margin 0.4s ease, padding 0.4s ease, max-height 0.4s ease';
+                alert.style.opacity = '0';
+                alert.style.transform = 'translateY(-8px) scale(0.98)';
+                setTimeout(function () {
+                    alert.style.maxHeight = '0';
+                    alert.style.margin = '0';
+                    alert.style.padding = '0';
+                    alert.style.overflow = 'hidden';
+                    setTimeout(function () { alert.remove(); }, 420);
+                }, 480);
+            }, 3500);
+        });
+    }
+
+    // Ejecutar al cargar
+    autoDismissAlerts();
+
+    // También observar alertas que se inserten dinámicamente
+    const alertObserver = new MutationObserver(function () { autoDismissAlerts(); });
+    alertObserver.observe(document.body, { childList: true, subtree: true });
 });
+
+// =========================================================================
+// 4. SISTEMA GLOBAL DE NOTIFICACIONES TOAST (AJAX FEEDBACK)
+// =========================================================================
+window.showAppToast = function (message, type = 'success') {
+    let container = document.getElementById('appToastContainer');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'appToastContainer';
+        container.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 99999; display: flex; flex-direction: column; gap: 10px; max-width: 380px; width: calc(100% - 40px); pointer-events: none;';
+        document.body.appendChild(container);
+    }
+
+    const toast = document.createElement('div');
+    toast.className = `app-toast toast-${type}`;
+    toast.style.cssText = `
+        pointer-events: auto;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 18px;
+        background: var(--bg-card, #ffffff);
+        color: var(--t-base, #1e293b);
+        border: 1px solid var(--border, rgba(0,0,0,0.1));
+        border-radius: 14px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        font-size: 14px;
+        font-weight: 500;
+        opacity: 0;
+        transform: translateY(-15px) scale(0.95);
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    `;
+
+    let iconHtml = '<i class="bi bi-check-circle-fill text-success fs-5"></i>';
+    if (type === 'error' || type === 'danger') {
+        iconHtml = '<i class="bi bi-exclamation-octagon-fill text-danger fs-5"></i>';
+        toast.style.borderLeft = '4px solid #ef4444';
+    } else if (type === 'warning') {
+        iconHtml = '<i class="bi bi-exclamation-triangle-fill text-warning fs-5"></i>';
+        toast.style.borderLeft = '4px solid #f59e0b';
+    } else if (type === 'info') {
+        iconHtml = '<i class="bi bi-info-circle-fill text-primary fs-5"></i>';
+        toast.style.borderLeft = '4px solid #7c3aed';
+    } else {
+        toast.style.borderLeft = '4px solid #10b981';
+    }
+
+    toast.innerHTML = `
+        <div class="d-flex align-items-center" style="flex-shrink:0;">${iconHtml}</div>
+        <div style="flex:1; line-height: 1.4;">${message}</div>
+        <button type="button" style="background:none;border:none;color:var(--t-muted,#94a3b8);cursor:pointer;padding:0;font-size:16px;" aria-label="Cerrar">&times;</button>
+    `;
+
+    const closeBtn = toast.querySelector('button');
+    closeBtn.addEventListener('click', () => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-15px) scale(0.95)';
+        setTimeout(() => toast.remove(), 300);
+    });
+
+    container.appendChild(toast);
+
+    // Animación de entrada
+    requestAnimationFrame(() => {
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateY(0) scale(1)';
+    });
+
+    // Auto eliminar a los 3.5 segundos
+    setTimeout(() => {
+        if (toast.parentElement) {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(-15px) scale(0.95)';
+            setTimeout(() => toast.remove(), 300);
+        }
+    }, 3500);
+};
+
+// Helper universal para llamadas AJAX con token antiforgery
+window.postFormAjax = async function (url, formData) {
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
+        });
+        return await response.json();
+    } catch (err) {
+        console.error('Error en postFormAjax:', err);
+        return { success: false, message: 'Ocurrió un error en la comunicación con el servidor.' };
+    }
+};
+

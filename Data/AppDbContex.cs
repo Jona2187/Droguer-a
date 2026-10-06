@@ -89,6 +89,14 @@ public class AppDbContex : DbContext
             .HasForeignKey(d => d.PedidoId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        modelBuilder.Entity<Pedido>()
+            .Property(p => p.LatitudRepartidor)
+            .HasColumnType("double");
+
+        modelBuilder.Entity<Pedido>()
+            .Property(p => p.LongitudRepartidor)
+            .HasColumnType("double");
+
             
         // DetallePedido — PK como char(36) UUID en MySQL
         modelBuilder.Entity<DetallePedido>()

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -8,7 +8,7 @@ using Drogueria.Models;
 
 namespace Drogueria.Controllers
 {
-    [Authorize(Roles = "Cliente,Administrador,Empleado")]
+    [Authorize(Roles = "Cliente,Administrador")]
     public class TiendaController : Controller
     {
         private readonly AppDbContex _context;
@@ -18,8 +18,6 @@ namespace Drogueria.Controllers
         {
             _context = context;
         }
-
-        // â”€â”€ CATÃLOGO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
         // GET: /Tienda/Catalogo
         public async Task<IActionResult> Catalogo(string? buscar, Guid? categoriaId)
@@ -52,8 +50,6 @@ namespace Drogueria.Controllers
             return View("~/Views/Tienda/_Catalogo.cshtml", productos);
         }
 
-        // â”€â”€ CARRITO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
         // POST: /Tienda/AgregarAlCarrito
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -80,7 +76,18 @@ namespace Drogueria.Controllers
             int cantidadEnCarrito = itemExistente?.Cantidad ?? 0;
             int nuevaCantidadTotal = cantidadEnCarrito + cantidad;
 
-            // Validar que no exceda el stock disponible
+            // Validar que no exceda el stock disponible ni el límite máximo por pedido
+            if (producto.LimiteMaximoPorPedido.HasValue && nuevaCantidadTotal > producto.LimiteMaximoPorPedido.Value)
+            {
+                var mensaje = $"El producto '{producto.Nombre}' tiene un límite máximo de {producto.LimiteMaximoPorPedido.Value} unidades por pedido.";
+
+                if (isAjax)
+                    return Json(new { success = false, message = mensaje });
+
+                TempData["Error"] = mensaje;
+                return RedirectToAction(nameof(Catalogo));
+            }
+
             if (nuevaCantidadTotal > producto.Stock)
             {
                 var mensaje = producto.Stock == 0
@@ -207,6 +214,16 @@ namespace Drogueria.Controllers
                     return Json(new { success = false, message = "Producto no encontrado." });
 
                 TempData["Error"] = "Producto no encontrado.";
+                return RedirectToAction(nameof(Carrito));
+            }
+
+            if (producto.LimiteMaximoPorPedido.HasValue && cantidad > producto.LimiteMaximoPorPedido.Value)
+            {
+                var mensaje = $"El producto '{producto.Nombre}' tiene un límite máximo de {producto.LimiteMaximoPorPedido.Value} unidades por pedido.";
+                if (isAjax)
+                    return Json(new { success = false, message = mensaje, limiteMaximo = producto.LimiteMaximoPorPedido.Value });
+
+                TempData["Error"] = mensaje;
                 return RedirectToAction(nameof(Carrito));
             }
 

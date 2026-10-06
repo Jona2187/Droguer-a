@@ -80,6 +80,8 @@ namespace Drogueria.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Usuario usuario)
         {
+            var isAjax = Request.Headers["X-Requested-With"] == "XMLHttpRequest" || Request.Headers.Accept.ToString().Contains("application/json");
+
             // Validar que el rol sea uno de los permitidos: Empleado, Administrador, Repartidor, Cliente
             var rolNormalizado = usuario.Rol?.Trim();
             if (string.Equals(rolNormalizado, "Administrador", StringComparison.OrdinalIgnoreCase))
@@ -91,7 +93,6 @@ namespace Drogueria.Controllers
             else
                 usuario.Rol = "Empleado";
 
-
             // Validar correo duplicado
             if (!string.IsNullOrWhiteSpace(usuario.Email))
             {
@@ -100,7 +101,9 @@ namespace Drogueria.Controllers
 
                 if (emailExiste)
                 {
-                    TempData["Error"] = $"El correo '{usuario.Email}' ya está registrado con otro usuario.";
+                    var errorMsg = $"El correo '{usuario.Email}' ya está registrado con otro usuario.";
+                    if (isAjax) return Json(new { success = false, message = errorMsg });
+                    TempData["Error"] = errorMsg;
                     return Redirect("/Usuario");
                 }
             }
@@ -115,11 +118,32 @@ namespace Drogueria.Controllers
 
                 _context.Usuarios.Add(usuario);
                 await _context.SaveChangesAsync();
-                TempData["Success"] = $"Usuario ({usuario.Rol}) {usuario.Nombre} creado con éxito.";
+
+                var successMsg = $"Usuario ({usuario.Rol}) {usuario.Nombre} creado con éxito.";
+                if (isAjax)
+                {
+                    return Json(new {
+                        success = true,
+                        message = successMsg,
+                        usuario = new {
+                            uuid = usuario.Uuid,
+                            nombre = usuario.Nombre,
+                            apellido = usuario.Apellido,
+                            email = usuario.Email,
+                            rol = usuario.Rol,
+                            estado = usuario.Estado
+                        }
+                    });
+                }
+
+                TempData["Success"] = successMsg;
                 return Redirect("/Usuario");
             }
 
-            TempData["Error"] = "Por favor verifica los campos obligatorios del formulario.";
+            var invalidMsg = "Por favor verifica los campos obligatorios del formulario.";
+            if (isAjax) return Json(new { success = false, message = invalidMsg });
+
+            TempData["Error"] = invalidMsg;
             return Redirect("/Usuario");
         }
 
@@ -128,16 +152,22 @@ namespace Drogueria.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ToggleEstado(string id)
         {
+            var isAjax = Request.Headers["X-Requested-With"] == "XMLHttpRequest" || Request.Headers.Accept.ToString().Contains("application/json");
+
             var usuario = await _context.Usuarios.FindAsync(id);
             if (usuario != null)
             {
                 usuario.Estado = !usuario.Estado;
                 await _context.SaveChangesAsync();
-                TempData["Success"] = $"Estado de {usuario.Nombre} actualizado correctamente.";
+                var msg = $"Estado de {usuario.Nombre} actualizado a {(usuario.Estado ? "Activo" : "Inactivo")}.";
+                if (isAjax) return Json(new { success = true, message = msg, estado = usuario.Estado, id = usuario.Uuid });
+                TempData["Success"] = msg;
             }
             else
             {
-                TempData["Error"] = "Usuario no encontrado.";
+                var errorMsg = "Usuario no encontrado.";
+                if (isAjax) return Json(new { success = false, message = errorMsg });
+                TempData["Error"] = errorMsg;
             }
 
             return RedirectToAction(nameof(Index));
@@ -148,16 +178,22 @@ namespace Drogueria.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(string id)
         {
+            var isAjax = Request.Headers["X-Requested-With"] == "XMLHttpRequest" || Request.Headers.Accept.ToString().Contains("application/json");
+
             var usuario = await _context.Usuarios.FindAsync(id);
             if (usuario != null)
             {
                 usuario.Estado = false;
                 await _context.SaveChangesAsync();
-                TempData["Success"] = $"Usuario {usuario.Nombre} desactivado correctamente.";
+                var msg = $"Usuario {usuario.Nombre} desactivado correctamente.";
+                if (isAjax) return Json(new { success = true, message = msg, id = usuario.Uuid, estado = false });
+                TempData["Success"] = msg;
             }
             else
             {
-                TempData["Error"] = "Usuario no encontrado.";
+                var errorMsg = "Usuario no encontrado.";
+                if (isAjax) return Json(new { success = false, message = errorMsg });
+                TempData["Error"] = errorMsg;
             }
 
             return RedirectToAction(nameof(Index));
@@ -168,6 +204,8 @@ namespace Drogueria.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(Usuario usuario)
         {
+            var isAjax = Request.Headers["X-Requested-With"] == "XMLHttpRequest" || Request.Headers.Accept.ToString().Contains("application/json");
+
             // Si el usuario no escribió una contraseña nueva, no la exigimos ni la tocamos
             var nuevaPassword = usuario.Password?.Trim();
             if (string.IsNullOrWhiteSpace(nuevaPassword))
@@ -177,14 +215,18 @@ namespace Drogueria.Controllers
 
             if (!ModelState.IsValid)
             {
-                TempData["Error"] = "Verifica los campos obligatorios.";
+                var errorMsg = "Verifica los campos obligatorios.";
+                if (isAjax) return Json(new { success = false, message = errorMsg });
+                TempData["Error"] = errorMsg;
                 return RedirectToAction(nameof(Index));
             }
 
             var existente = await _context.Usuarios.FindAsync(usuario.Uuid);
             if (existente == null)
             {
-                TempData["Error"] = "Usuario no encontrado.";
+                var errorMsg = "Usuario no encontrado.";
+                if (isAjax) return Json(new { success = false, message = errorMsg });
+                TempData["Error"] = errorMsg;
                 return RedirectToAction(nameof(Index));
             }
 
@@ -196,7 +238,9 @@ namespace Drogueria.Controllers
 
                 if (emailExiste)
                 {
-                    TempData["Error"] = $"El correo '{usuario.Email}' ya está registrado con otro usuario.";
+                    var errorMsg = $"El correo '{usuario.Email}' ya está registrado con otro usuario.";
+                    if (isAjax) return Json(new { success = false, message = errorMsg });
+                    TempData["Error"] = errorMsg;
                     return RedirectToAction(nameof(Index));
                 }
             }
@@ -224,10 +268,27 @@ namespace Drogueria.Controllers
             else
                 existente.Rol = "Empleado";
 
-
             // Guardar cambios
             await _context.SaveChangesAsync();
-            TempData["Success"] = $"Usuario {existente.Nombre} actualizado con éxito.";
+            var successMsg = $"Usuario {existente.Nombre} actualizado con éxito.";
+
+            if (isAjax)
+            {
+                return Json(new {
+                    success = true,
+                    message = successMsg,
+                    usuario = new {
+                        uuid = existente.Uuid,
+                        nombre = existente.Nombre,
+                        apellido = existente.Apellido,
+                        email = existente.Email,
+                        rol = existente.Rol,
+                        estado = existente.Estado
+                    }
+                });
+            }
+
+            TempData["Success"] = successMsg;
             return RedirectToAction(nameof(Index));
         }
 

@@ -149,4 +149,36 @@ else
             item.style.display = (matchNombre && matchCat && matchStock) ? '' : 'none';
         });
     }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.inv-stock-form').forEach(form => {
+            form.addEventListener('submit', async function (e) {
+                e.preventDefault();
+                const btn = form.querySelector('button');
+                const origHtml = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+
+                const res = await window.postFormAjax(form.action, new FormData(form));
+                btn.disabled = false;
+                btn.innerHTML = origHtml;
+
+                if (res.success) {
+                    window.showAppToast(res.message || 'Stock actualizado correctamente.', 'success');
+                    const newStock = parseInt(res.nuevoStock ?? form.querySelector('input[name="stock"]').value);
+                    const card = form.closest('.inv-item');
+                    if (card) {
+                        card.dataset.stock = newStock;
+                        const stockCur = card.querySelector('.inv-stock-current');
+                        if (stockCur) {
+                            stockCur.textContent = newStock;
+                            stockCur.className = 'inv-stock-current ' + (newStock === 0 ? 'out' : newStock <= 10 ? 'low' : 'ok');
+                        }
+                    }
+                } else {
+                    window.showAppToast(res.message || 'Error al actualizar el stock.', 'error');
+                }
+            });
+        });
+    });
 </script>

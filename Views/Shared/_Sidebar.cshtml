@@ -1,7 +1,7 @@
 @using System.Security.Claims
 @{
     var brandInitial = "DR";
-    var brandName = "Droguería";
+    var brandName = "FarmaVida";
     var activeNav = (ViewData["ActiveNav"]?.ToString() ?? "dashboard").ToLower();
     var userName = User.Identity?.IsAuthenticated == true ? User.Identity.Name : "Usuario";
     var userRole = User.FindFirst(ClaimTypes.Role)?.Value ?? "Cliente";
@@ -30,8 +30,8 @@
   <div class="brand-wrapper">
     <a href="@homeUrl" class="brand" title="@brandName">
       <div class="brand-logo">
-        <img src="~/img/logodrogueria.png" alt="logo" class="brand-img" onerror="this.style.display='none'; var f=this.nextElementSibling; if(f) f.style.display='flex';" />
-        <div class="brand-fallback-logo">
+        <img src="~/img/logodrogueria.svg" alt="logo" class="brand-img" onerror="this.style.display='none'; var f=this.nextElementSibling; if(f) f.style.display='flex';" />
+        <div class="brand-fallback-logo" style="display:none;">
           <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z" />
             <path d="m8.5 8.5 7 7" />
@@ -138,16 +138,6 @@
           <span>Pedidos</span>
         </a>
       </nav>
-
-      @* ================= ACCESOS RÁPIDOS (Empleado) ================= *@
-      <nav class="nav-section">
-        <div class="nav-label">Tienda Pública</div>
-
-        <a class="nav-link @(activeNav == "catalogo" ? "is-active" : "")" asp-controller="Tienda" asp-action="Catalogo" data-tooltip="Ver Tienda" title="Ir al Catálogo de la Tienda">
-          <i class="bi bi-shop fs-5 me-1 text-primary"></i>
-          <span>Tienda Pública</span>
-        </a>
-      </nav>
     }
     else if (isRepartidor)
     {
@@ -155,9 +145,14 @@
       <nav class="nav-section">
         <div class="nav-label">Panel Repartidor</div>
 
-        <a class="nav-link @(activeNav == "misdomicilios" || activeNav == "domicilios" ? "is-active" : "")" asp-controller="Repartidor" asp-action="MisDomicilios" data-tooltip="Mis Domicilios" title="Pedidos Asignados y Rutas">
+        <a class="nav-link @(activeNav == "misdomicilios" || activeNav == "domicilios" ? "is-active" : "")" asp-controller="Repartidor" asp-action="MisDomicilios" data-tooltip="Mis Domicilios" title="Pedidos Activos y Rutas">
           <i class="bi bi-truck fs-5 me-1"></i>
           <span>Mis Domicilios</span>
+        </a>
+
+        <a class="nav-link @(activeNav == "historial" ? "is-active" : "")" asp-controller="Repartidor" asp-action="Historial" data-tooltip="Historial" title="Historial de Entregas Completadas">
+          <i class="bi bi-clock-history fs-5 me-1"></i>
+          <span>Historial</span>
         </a>
       </nav>
     }

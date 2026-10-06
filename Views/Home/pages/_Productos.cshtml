@@ -104,12 +104,19 @@
                                         </div>
                                     }
                                     <div>
-                                        <div class="cell-name">@p.Nombre</div>
+                                        <div class="cell-name d-flex align-items-center gap-2">
+                                            @p.Nombre
+                                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle" style="font-size: 11px;">@p.Miligramos @(string.IsNullOrEmpty(p.UnidadMedida) ? "mg" : p.UnidadMedida)</span>
+                                        </div>
                                         @if (!string.IsNullOrEmpty(p.Descripcion))
                                         {
                                             <div class="cell-email" style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
                                                 @p.Descripcion
                                             </div>
+                                        }
+                                        @if (p.LimiteMaximoPorPedido.HasValue)
+                                        {
+                                            <small class="text-muted" style="font-size: 10px;">Máx. @p.LimiteMaximoPorPedido /pedido</small>
                                         }
                                     </div>
                                 </div>
@@ -133,9 +140,9 @@
                                 {
                                     <span class="tag t-unavail">Sin stock</span>
                                 }
-                                else if (p.Stock <= 5)
+                                else if (p.Stock <= p.StockMinimo)
                                 {
-                                    <span class="tag t-used">@p.Stock uds.</span>
+                                    <span class="tag t-used" title="Alerta: Stock por debajo o igual al mínimo (@p.StockMinimo)">@p.Stock uds. (Bajo)</span>
                                 }
                                 else
                                 {
@@ -165,9 +172,13 @@
                                             data-id="@p.Id"
                                             data-nombre="@p.Nombre"
                                             data-descripcion="@(p.Descripcion ?? "")"
+                                            data-miligramos="@p.Miligramos"
+                                            data-unidad-medida="@(string.IsNullOrEmpty(p.UnidadMedida) ? "mg" : p.UnidadMedida)"
                                             data-precio="@p.Precio.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)"
                                             data-categoria-id="@p.CategoriaId"
                                             data-stock="@p.Stock"
+                                            data-stock-minimo="@p.StockMinimo"
+                                            data-limite-maximo="@(p.LimiteMaximoPorPedido?.ToString() ?? "")"
                                             data-estado="@p.Estado.ToString().ToLowerInvariant()"
                                             data-fecha="@p.FechaCreacion.ToString("o")"
                                             data-imagen="@(p.Imagen ?? "")"
@@ -233,11 +244,29 @@
                         <div class="col-sm-8">
                             <label class="form-label" for="crearNombre">Nombre <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="crearNombre" name="Nombre"
-                                   placeholder="Ej. Ibuprofeno 400mg" required maxlength="150" />
+                                   placeholder="Ej. Ibuprofeno" required maxlength="150" />
+                        </div>
+
+                        <!-- Dosis / Concentración y Unidad -->
+                        <div class="col-sm-4">
+                            <label class="form-label" for="crearMiligramos">Dosis / Concentración <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="crearMiligramos" name="Miligramos"
+                                       placeholder="Ej. 500" min="1" max="50000" required />
+                                <select class="form-select" id="crearUnidadMedida" name="UnidadMedida" style="max-width: 105px;" required>
+                                    <option value="mg">mg</option>
+                                    <option value="ml">ml</option>
+                                    <option value="g">g</option>
+                                    <option value="mcg">mcg</option>
+                                    <option value="UI">UI</option>
+                                    <option value="amp">amp</option>                           
+                                    <option value="ud">ud</option>
+                                </select>
+                            </div>
                         </div>
 
                         <!-- Categoría -->
-                        <div class="col-sm-4">
+                        <div class="col-sm-6">
                             <label class="form-label" for="crearCategoria">Categoría <span class="text-danger">*</span></label>
                             <select class="form-select" id="crearCategoria" name="CategoriaId" required>
                                 <option value="">— Seleccionar —</option>
@@ -248,6 +277,16 @@
                             </select>
                         </div>
 
+                        <!-- Precio -->
+                        <div class="col-sm-6">
+                            <label class="form-label" for="crearPrecio">Precio <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="crearPrecio" name="Precio"
+                                       placeholder="0.00" min="0.01" step="0.01" required />
+                            </div>
+                        </div>
+
                         <!-- Descripción -->
                         <div class="col-12">
                             <label class="form-label" for="crearDescripcion">Descripción</label>
@@ -255,26 +294,30 @@
                                       placeholder="Descripción breve del producto..." rows="2" maxlength="500"></textarea>
                         </div>
 
-                        <!-- Precio -->
+                        <!-- Stock Actual -->
                         <div class="col-sm-4">
-                            <label class="form-label" for="crearPrecio">Precio <span class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <span class="input-group-text">$</span>
-                                <input type="number" class="form-control" id="crearPrecio" name="Precio"
-                                       placeholder="0.00" min="0" step="0.01" required />
-                            </div>
+                            <label class="form-label" for="crearStock">Stock Actual <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="crearStock" name="Stock"
+                                   placeholder="0" min="0" value="0" required />
                         </div>
 
-                        <!-- Stock -->
+                        <!-- Stock Mínimo (Límite Alerta) -->
                         <div class="col-sm-4">
-                            <label class="form-label" for="crearStock">Stock</label>
-                            <input type="number" class="form-control" id="crearStock" name="Stock"
-                                   placeholder="0" min="0" value="0" />
+                            <label class="form-label" for="crearStockMinimo">Límite Stock Alerta <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="crearStockMinimo" name="StockMinimo"
+                                   placeholder="5" min="0" value="5" required title="Notifica stock bajo si el inventario llega a esta cantidad" />
+                        </div>
+
+                        <!-- Límite Máximo Por Pedido -->
+                        <div class="col-sm-4">
+                            <label class="form-label" for="crearLimiteMaximo">Máx. pastillas/ud. por pedido</label>
+                            <input type="number" class="form-control" id="crearLimiteMaximo" name="LimiteMaximoPorPedido"
+                                   placeholder="Sin límite" min="1" max="1000" title="Restringe el máximo de unidades que un cliente puede pedir" />
                         </div>
 
                         <!-- Imagen -->
-                        <div class="col-sm-4">
-                            <label class="form-label" for="crearImagen">Imagen</label>
+                        <div class="col-12">
+                            <label class="form-label" for="crearImagen">Imagen del Producto</label>
                             <input type="file" class="form-control" id="crearImagen" name="imagenFile"
                                    accept=".jpg,.jpeg,.png,.webp,.gif" />
                             <small class="text-muted">JPG, PNG, WEBP (opcional)</small>
@@ -326,11 +369,32 @@
                         <div class="col-sm-8">
                             <label class="form-label" for="editarNombre">Nombre <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="editarNombre" name="Nombre"
-                                   placeholder="Ej. Ibuprofeno 400mg" required maxlength="150" />
+                                   placeholder="Ej. Ibuprofeno" required maxlength="150" />
+                        </div>
+
+                        <!-- Dosis / Concentración y Unidad -->
+                        <div class="col-sm-4">
+                            <label class="form-label" for="editarMiligramos">Dosis / Concentración <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="editarMiligramos" name="Miligramos"
+                                       placeholder="Ej. 500" min="1" max="50000" required />
+                                <select class="form-select" id="editarUnidadMedida" name="UnidadMedida" style="max-width: 105px;" required>
+                                    <option value="mg">mg</option>
+                                    <option value="ml">ml</option>
+                                    <option value="g">g</option>
+                                    <option value="mcg">mcg</option>
+                                    <option value="UI">UI</option>
+                                    <option value="amp">amp</option>
+                                    <option value="ud">ud</option>
+                                    <option value="caps">caps</option>
+                                    <option value="tab">tab</option>
+                                    
+                                </select>
+                            </div>
                         </div>
 
                         <!-- Categoría -->
-                        <div class="col-sm-4">
+                        <div class="col-sm-6">
                             <label class="form-label" for="editarCategoria">Categoría <span class="text-danger">*</span></label>
                             <select class="form-select" id="editarCategoria" name="CategoriaId" required>
                                 <option value="">— Seleccionar —</option>
@@ -341,6 +405,16 @@
                             </select>
                         </div>
 
+                        <!-- Precio -->
+                        <div class="col-sm-6">
+                            <label class="form-label" for="editarPrecio">Precio <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="editarPrecio" name="Precio"
+                                       placeholder="0.00" min="0.01" step="0.01" required />
+                            </div>
+                        </div>
+
                         <!-- Descripción -->
                         <div class="col-12">
                             <label class="form-label" for="editarDescripcion">Descripción</label>
@@ -348,25 +422,29 @@
                                       placeholder="Descripción breve del producto..." rows="2" maxlength="500"></textarea>
                         </div>
 
-                        <!-- Precio -->
+                        <!-- Stock Actual -->
                         <div class="col-sm-4">
-                            <label class="form-label" for="editarPrecio">Precio <span class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <span class="input-group-text">$</span>
-                                <input type="number" class="form-control" id="editarPrecio" name="Precio"
-                                       placeholder="0.00" min="0" step="0.01" required />
-                            </div>
+                            <label class="form-label" for="editarStock">Stock Actual <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="editarStock" name="Stock"
+                                   placeholder="0" min="0" required />
                         </div>
 
-                        <!-- Stock -->
+                        <!-- Stock Mínimo (Límite Alerta) -->
                         <div class="col-sm-4">
-                            <label class="form-label" for="editarStock">Stock</label>
-                            <input type="number" class="form-control" id="editarStock" name="Stock"
-                                   placeholder="0" min="0" />
+                            <label class="form-label" for="editarStockMinimo">Límite Stock Alerta <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="editarStockMinimo" name="StockMinimo"
+                                   placeholder="5" min="0" required />
+                        </div>
+
+                        <!-- Límite Máximo Por Pedido -->
+                        <div class="col-sm-4">
+                            <label class="form-label" for="editarLimiteMaximo">Máx. pastillas/ud. por pedido</label>
+                            <input type="number" class="form-control" id="editarLimiteMaximo" name="LimiteMaximoPorPedido"
+                                   placeholder="Sin límite" min="1" max="1000" />
                         </div>
 
                         <!-- Imagen -->
-                        <div class="col-sm-4">
+                        <div class="col-12">
                             <label class="form-label">Imagen actual</label>
                             <div id="editarImagenPreview" class="mb-2"></div>
                             <input type="file" class="form-control" id="editarImagenFile" name="imagenFile"
@@ -430,10 +508,39 @@
     <script>
     let idProductoADesactivar = null;
 
-    function confirmarDesactivarProducto() {
+    async function confirmarDesactivarProducto() {
         if (!idProductoADesactivar) return;
         const form = document.querySelector(`.desactivar-form[data-producto-id="${idProductoADesactivar}"]`);
-        if (form) form.submit();
+        if (!form) return;
+
+        const btnConfirm = document.getElementById("btnConfirmarDesactivar");
+        if (btnConfirm) btnConfirm.disabled = true;
+
+        const formData = new FormData(form);
+        const res = await window.postFormAjax(form.action, formData);
+
+        if (btnConfirm) btnConfirm.disabled = false;
+
+        const modalEl = document.getElementById("glassConfirmModal");
+        if (modalEl) {
+            const modalInstance = bootstrap.Modal.getInstance(modalEl);
+            if (modalInstance) modalInstance.hide();
+        }
+
+        if (res.success) {
+            window.showAppToast(res.message, "success");
+            const tr = form.closest("tr");
+            if (tr) {
+                const tdEstado = tr.querySelector("td:nth-child(5)");
+                if (tdEstado) {
+                    tdEstado.innerHTML = '<span class="tag t-unavail"><span class="tag-dot"></span> Inactivo</span>';
+                }
+                const btnEdit = tr.querySelector(".btn-action-icon.edit");
+                if (btnEdit) btnEdit.setAttribute("data-estado", "false");
+            }
+        } else {
+            window.showAppToast(res.message || "Error al desactivar el producto.", "error");
+        }
     }
 
     function cargarFecha() {
@@ -466,6 +573,61 @@
             });
         });
 
+        // Crear Producto vía AJAX
+        const formCrear = document.querySelector("#modalCrear form");
+        if (formCrear) {
+            formCrear.addEventListener("submit", async function (event) {
+                event.preventDefault();
+                const btnSubmit = formCrear.querySelector("button[type='submit']");
+                if (btnSubmit) { btnSubmit.disabled = true; btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando...'; }
+
+                const formData = new FormData(formCrear);
+                const res = await window.postFormAjax(formCrear.action || "/Producto/Create", formData);
+
+                if (btnSubmit) { btnSubmit.disabled = false; btnSubmit.innerHTML = '<span>Guardar Producto</span><i class="bi bi-arrow-right ms-2"></i>'; }
+
+                if (res.success) {
+                    window.showAppToast(res.message, "success");
+                    formCrear.reset();
+                    const modalEl = document.getElementById("modalCrear");
+                    if (modalEl) {
+                        const modalInstance = bootstrap.Modal.getInstance(modalEl);
+                        if (modalInstance) modalInstance.hide();
+                    }
+                    setTimeout(() => location.reload(), 600);
+                } else {
+                    window.showAppToast(res.message || "Error al crear producto", "error");
+                }
+            });
+        }
+
+        // Editar Producto vía AJAX
+        const formEditar = document.getElementById("formEditar");
+        if (formEditar) {
+            formEditar.addEventListener("submit", async function (event) {
+                event.preventDefault();
+                const btnSubmit = formEditar.querySelector("button[type='submit']");
+                if (btnSubmit) { btnSubmit.disabled = true; btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando...'; }
+
+                const formData = new FormData(formEditar);
+                const res = await window.postFormAjax(formEditar.action, formData);
+
+                if (btnSubmit) { btnSubmit.disabled = false; btnSubmit.innerHTML = '<span>Guardar Cambios</span><i class="bi bi-check-lg ms-2"></i>'; }
+
+                if (res.success) {
+                    window.showAppToast(res.message, "success");
+                    const modalEl = document.getElementById("modalEditar");
+                    if (modalEl) {
+                        const modalInstance = bootstrap.Modal.getInstance(modalEl);
+                        if (modalInstance) modalInstance.hide();
+                    }
+                    setTimeout(() => location.reload(), 600);
+                } else {
+                    window.showAppToast(res.message || "Error al actualizar producto", "error");
+                }
+            });
+        }
+
         // Modal Editar — carga datos desde data-attributes
         const editModal = document.getElementById("modalEditar");
         if (editModal) {
@@ -476,22 +638,36 @@
                 const id          = btn.getAttribute("data-id");
                 const nombre      = btn.getAttribute("data-nombre");
                 const desc        = btn.getAttribute("data-descripcion");
+                const miligramos  = btn.getAttribute("data-miligramos");
+                const unidadMedida= btn.getAttribute("data-unidad-medida") || "mg";
                 const precio      = btn.getAttribute("data-precio");
                 const categoriaId = btn.getAttribute("data-categoria-id");
                 const stock       = btn.getAttribute("data-stock");
+                const stockMinimo = btn.getAttribute("data-stock-minimo");
+                const limiteMax   = btn.getAttribute("data-limite-maximo");
                 const estado      = btn.getAttribute("data-estado");
                 const fecha       = btn.getAttribute("data-fecha");
                 const imagen      = btn.getAttribute("data-imagen");
 
-                document.getElementById("editarId").value       = id || "";
-                document.getElementById("editarNombre").value   = nombre || "";
+                document.getElementById("editarId").value          = id || "";
+                document.getElementById("editarNombre").value      = nombre || "";
                 document.getElementById("editarDescripcion").value = desc || "";
-                document.getElementById("editarPrecio").value   = precio || "";
-                document.getElementById("editarStock").value    = stock || "0";
-                document.getElementById("editarEstado").checked = estado === "true";
-                document.getElementById("editarFecha").value    = fecha || "";
-                document.getElementById("editarImagenActual").value = imagen || "";
-                document.getElementById("formEditar").action    = `/Producto/Edit/${id}`;
+                document.getElementById("editarMiligramos").value  = miligramos || "";
+                
+                const selectUnidad = document.getElementById("editarUnidadMedida");
+                if (selectUnidad) {
+                    selectUnidad.value = unidadMedida;
+                    if (!selectUnidad.value) selectUnidad.value = "mg";
+                }
+
+                document.getElementById("editarPrecio").value      = precio || "";
+                document.getElementById("editarStock").value       = stock || "0";
+                document.getElementById("editarStockMinimo").value = stockMinimo || "5";
+                document.getElementById("editarLimiteMaximo").value= limiteMax || "";
+                document.getElementById("editarEstado").checked    = estado === "true";
+                document.getElementById("editarFecha").value       = fecha || "";
+                document.getElementById("editarImagenActual").value= imagen || "";
+                document.getElementById("formEditar").action       = `/Producto/Edit/${id}`;
 
                 // Seleccionar categoría
                 const selectCat = document.getElementById("editarCategoria");

@@ -286,10 +286,31 @@
     <script>
     let idCategoriaADesactivar = null;
 
-    function confirmarDesactivarCategoria() {
+    async function confirmarDesactivarCategoria() {
         if (!idCategoriaADesactivar) return;
         const form = document.querySelector(`.desactivar-form[data-categoria-id="${idCategoriaADesactivar}"]`);
-        if (form) form.submit();
+        if (!form) return;
+
+        const modalEl = document.getElementById('glassConfirmModal');
+        const modal = bootstrap.Modal.getInstance(modalEl);
+
+        const res = await window.postFormAjax(form.action, new FormData(form));
+        if (res.success) {
+            if (modal) modal.hide();
+            window.showAppToast(res.message || 'Categoría desactivada.', 'success');
+            const fila = form.closest('tr');
+            if (fila) {
+                const tag = fila.querySelector('.tag');
+                if (tag) {
+                    tag.className = 'tag t-unavail';
+                    tag.innerHTML = '<span class="tag-dot"></span> Inactiva';
+                }
+                const editBtn = fila.querySelector('.btn-action-icon.edit');
+                if (editBtn) editBtn.setAttribute('data-estado', 'false');
+            }
+        } else {
+            window.showAppToast(res.message || 'No se pudo desactivar.', 'error');
+        }
     }
 
     function cargarFecha() {
@@ -321,6 +342,68 @@
                 fila.style.display = nombre.includes(q) ? "" : "none";
             });
         });
+
+        // Modal Crear AJAX
+        const modalCrearEl = document.getElementById("modalCrear");
+        const formCrear = modalCrearEl?.querySelector("form");
+        if (formCrear) {
+            formCrear.addEventListener("submit", async function (e) {
+                e.preventDefault();
+                const res = await window.postFormAjax(formCrear.action, new FormData(formCrear));
+                if (res.success) {
+                    const modal = bootstrap.Modal.getInstance(modalCrearEl);
+                    if (modal) modal.hide();
+                    window.showAppToast(res.message || "Categoría creada con éxito.", "success");
+                    setTimeout(() => location.reload(), 700);
+                } else {
+                    window.showAppToast(res.message || "Error al crear la categoría.", "error");
+                }
+            });
+        }
+
+        // Modal Editar AJAX
+        const formEditar = document.getElementById("formEditar");
+        if (formEditar) {
+            formEditar.addEventListener("submit", async function (e) {
+                e.preventDefault();
+                const res = await window.postFormAjax(formEditar.action, new FormData(formEditar));
+                if (res.success) {
+                    const editModalEl = document.getElementById("modalEditar");
+                    const modal = bootstrap.Modal.getInstance(editModalEl);
+                    if (modal) modal.hide();
+                    window.showAppToast(res.message || "Categoría actualizada con éxito.", "success");
+
+                    const catId = document.getElementById("editarId").value;
+                    const catNombre = document.getElementById("editarNombre").value;
+                    const catDesc = document.getElementById("editarDescripcion").value;
+                    const catEstado = document.getElementById("editarEstado").checked;
+
+                    const editBtn = document.querySelector(`.btn-action-icon.edit[data-id="${catId}"]`);
+                    if (editBtn) {
+                        editBtn.setAttribute("data-nombre", catNombre);
+                        editBtn.setAttribute("data-descripcion", catDesc);
+                        editBtn.setAttribute("data-estado", catEstado ? "true" : "false");
+
+                        const fila = editBtn.closest("tr");
+                        if (fila) {
+                            const nameEl = fila.querySelector(".cell-name");
+                            if (nameEl) nameEl.textContent = catNombre;
+
+                            const descEl = fila.children[1]?.querySelector("span");
+                            if (descEl) descEl.textContent = catDesc || "—";
+
+                            const tagEl = fila.querySelector(".tag");
+                            if (tagEl) {
+                                tagEl.className = catEstado ? "tag t-active" : "tag t-unavail";
+                                tagEl.innerHTML = `<span class="tag-dot"></span> ${catEstado ? 'Activa' : 'Inactiva'}`;
+                            }
+                        }
+                    }
+                } else {
+                    window.showAppToast(res.message || "Error al actualizar la categoría.", "error");
+                }
+            });
+        }
 
         // Modal Editar — carga datos desde data-attributes
         const editModal = document.getElementById("modalEditar");

@@ -60,10 +60,14 @@ namespace Drogueria.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ActualizarStock(Guid id, int stock)
         {
+            var isAjax = Request.Headers["X-Requested-With"] == "XMLHttpRequest" || Request.Headers.Accept.ToString().Contains("application/json");
+
             var producto = await _context.Productos.FindAsync(id);
             if (producto == null)
             {
-                TempData["Error"] = "Producto no encontrado.";
+                var errorMsg = "Producto no encontrado.";
+                if (isAjax) return Json(new { success = false, message = errorMsg });
+                TempData["Error"] = errorMsg;
                 return RedirectToAction(nameof(Inventario));
             }
 
@@ -73,7 +77,13 @@ namespace Drogueria.Controllers
             _context.Productos.Update(producto);
             await _context.SaveChangesAsync();
 
-            TempData["Exito"] = $"Stock de '{producto.Nombre}' actualizado a {stock} unidades.";
+            var successMsg = $"Stock de '{producto.Nombre}' actualizado a {stock} unidades.";
+            if (isAjax)
+            {
+                return Json(new { success = true, message = successMsg, id = producto.Id, stock = producto.Stock });
+            }
+
+            TempData["Exito"] = successMsg;
             return RedirectToAction(nameof(Inventario));
         }
 
@@ -105,17 +115,23 @@ namespace Drogueria.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CambiarEstadoPedido(Guid id, string estado)
         {
+            var isAjax = Request.Headers["X-Requested-With"] == "XMLHttpRequest" || Request.Headers.Accept.ToString().Contains("application/json");
+
             var pedido = await _context.Pedidos.FindAsync(id);
             if (pedido == null)
             {
-                TempData["Error"] = "Pedido no encontrado.";
+                var errorMsg = "Pedido no encontrado.";
+                if (isAjax) return Json(new { success = false, message = errorMsg });
+                TempData["Error"] = errorMsg;
                 return RedirectToAction(nameof(Pedidos));
             }
 
             var estadosValidos = new[] { "Pendiente", "Confirmado", "En camino", "Entregado", "Cancelado" };
             if (!estadosValidos.Contains(estado))
             {
-                TempData["Error"] = "Estado no válido.";
+                var errorMsg = "Estado no válido.";
+                if (isAjax) return Json(new { success = false, message = errorMsg });
+                TempData["Error"] = errorMsg;
                 return RedirectToAction(nameof(Pedidos));
             }
 
@@ -123,7 +139,13 @@ namespace Drogueria.Controllers
             _context.Pedidos.Update(pedido);
             await _context.SaveChangesAsync();
 
-            TempData["Exito"] = $"Pedido actualizado a '{estado}'.";
+            var successMsg = $"Pedido actualizado a '{estado}'.";
+            if (isAjax)
+            {
+                return Json(new { success = true, message = successMsg, id = pedido.Id, estado = pedido.Estado });
+            }
+
+            TempData["Exito"] = successMsg;
             return RedirectToAction(nameof(Pedidos));
         }
 
@@ -132,39 +154,61 @@ namespace Drogueria.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AsignarRepartidor(Guid id, string? repartidorId)
         {
+            var isAjax = Request.Headers["X-Requested-With"] == "XMLHttpRequest" || Request.Headers.Accept.ToString().Contains("application/json");
+
             var pedido = await _context.Pedidos.FindAsync(id);
             if (pedido == null)
             {
-                TempData["Error"] = "Pedido no encontrado.";
+                var errorMsg = "Pedido no encontrado.";
+                if (isAjax) return Json(new { success = false, message = errorMsg });
+                TempData["Error"] = errorMsg;
                 return RedirectToAction(nameof(Pedidos));
             }
+
+            string successMsg;
+            string? repartidorNombre = null;
 
             if (string.IsNullOrWhiteSpace(repartidorId))
             {
                 pedido.RepartidorId = null;
-                TempData["Exito"] = "Repartidor desasignado del pedido.";
+                successMsg = "Repartidor desasignado del pedido.";
             }
             else
             {
                 var repartidor = await _context.Usuarios.FirstOrDefaultAsync(u => u.Uuid == repartidorId && u.Rol == "Repartidor");
                 if (repartidor == null)
                 {
-                    TempData["Error"] = "El repartidor seleccionado no existe o no es válido.";
+                    var errorMsg = "El repartidor seleccionado no existe o no es válido.";
+                    if (isAjax) return Json(new { success = false, message = errorMsg });
+                    TempData["Error"] = errorMsg;
                     return RedirectToAction(nameof(Pedidos));
                 }
 
                 pedido.RepartidorId = repartidor.Uuid;
-                // Si el pedido estaba Pendiente, podemos pasarlo a Confirmado o En camino automáticamente al asignar repartidor
+                repartidorNombre = $"{repartidor.Nombre} {repartidor.Apellido}".Trim();
                 if (pedido.Estado == "Pendiente")
                 {
                     pedido.Estado = "Confirmado";
                 }
-                TempData["Exito"] = $"Repartidor '{repartidor.Nombre} {repartidor.Apellido}' asignado al pedido.";
+                successMsg = $"Repartidor '{repartidorNombre}' asignado al pedido.";
             }
 
             _context.Pedidos.Update(pedido);
             await _context.SaveChangesAsync();
 
+            if (isAjax)
+            {
+                return Json(new {
+                    success = true,
+                    message = successMsg,
+                    id = pedido.Id,
+                    repartidorId = pedido.RepartidorId,
+                    repartidorNombre = repartidorNombre,
+                    estado = pedido.Estado
+                });
+            }
+
+            TempData["Exito"] = successMsg;
             return RedirectToAction(nameof(Pedidos));
         }
     }

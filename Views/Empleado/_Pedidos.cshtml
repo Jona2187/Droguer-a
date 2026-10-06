@@ -210,7 +210,6 @@ else
             const matchEstado = !estado || r.dataset.estado === estado;
             const show = matchCliente && matchEstado;
             r.style.display = show ? '' : 'none';
-            // Also hide/show the detail row below
             const nextRow = r.nextElementSibling;
             if (nextRow && nextRow.classList.contains('ped-details-row')) {
                 if (!show) {
@@ -222,4 +221,59 @@ else
             }
         });
     }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Asignar Repartidor via AJAX
+        document.querySelectorAll('form[action*="AsignarRepartidor"]').forEach(form => {
+            const select = form.querySelector('select[name="repartidorId"]');
+            if (select) {
+                // Remove inline onchange if present
+                select.removeAttribute('onchange');
+                select.addEventListener('change', async function () {
+                    const res = await window.postFormAjax(form.action, new FormData(form));
+                    if (res.success) {
+                        window.showAppToast(res.message || 'Repartidor asignado correctamente.', 'success');
+                    } else {
+                        window.showAppToast(res.message || 'Error al asignar repartidor.', 'error');
+                    }
+                });
+            }
+        });
+
+        // Cambiar Estado Pedido via AJAX
+        document.querySelectorAll('.ped-estado-form').forEach(form => {
+            form.addEventListener('submit', async function (e) {
+                e.preventDefault();
+                const btn = form.querySelector('button');
+                const origHtml = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+
+                const res = await window.postFormAjax(form.action, new FormData(form));
+                btn.disabled = false;
+                btn.innerHTML = origHtml;
+
+                if (res.success) {
+                    window.showAppToast(res.message || 'Estado del pedido actualizado.', 'success');
+                    const row = form.closest('.ped-row');
+                    const nuevoEstado = res.nuevoEstado || form.querySelector('select[name="estado"]').value;
+                    if (row) {
+                        row.dataset.estado = nuevoEstado;
+                        const badge = row.querySelector('.ped-badge');
+                        if (badge) {
+                            badge.className = 'ped-badge ' + nuevoEstado.toLowerCase().replace(/\s+/g, '-');
+                            let icon = '<i class="bi bi-x-lg"></i>';
+                            if (nuevoEstado === 'Pendiente') icon = '<i class="bi bi-clock"></i>';
+                            else if (nuevoEstado === 'Confirmado') icon = '<i class="bi bi-check2"></i>';
+                            else if (nuevoEstado === 'En camino') icon = '<i class="bi bi-truck"></i>';
+                            else if (nuevoEstado === 'Entregado') icon = '<i class="bi bi-check-all"></i>';
+                            badge.innerHTML = `${icon} ${nuevoEstado}`;
+                        }
+                    }
+                } else {
+                    window.showAppToast(res.message || 'Error al cambiar estado.', 'error');
+                }
+            });
+        });
+    });
 </script>

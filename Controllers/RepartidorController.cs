@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -17,7 +17,7 @@ namespace Drogueria.Controllers
             _context = context;
         }
 
-        // GET: /Repartidor/MisDomicilios
+        // GET: /Repartidor/MisDomicilios  — Pedidos ACTIVOS (excluye Entregado)
         public async Task<IActionResult> MisDomicilios()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -26,7 +26,7 @@ namespace Drogueria.Controllers
                 .Include(p => p.Usuario)
                 .Include(p => p.Detalles)
                     .ThenInclude(d => d.Producto)
-                .Where(p => p.RepartidorId == userId)
+                .Where(p => p.RepartidorId == userId && p.Estado != "Entregado")
                 .OrderByDescending(p => p.Fecha)
                 .ToListAsync();
 
@@ -36,24 +36,48 @@ namespace Drogueria.Controllers
             return View("~/Views/Repartidor/MisDomicilios.cshtml", pedidos);
         }
 
+        // GET: /Repartidor/Historial — Pedidos ENTREGADOS (historial completo)
+        public async Task<IActionResult> Historial()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var pedidos = await _context.Pedidos
+                .Include(p => p.Usuario)
+                .Include(p => p.Detalles)
+                    .ThenInclude(d => d.Producto)
+                .Where(p => p.RepartidorId == userId && p.Estado == "Entregado")
+                .OrderByDescending(p => p.Fecha)
+                .ToListAsync();
+
+            ViewData["Title"] = "Historial de Entregas";
+            ViewData["ActiveNav"] = "historial";
+
+            return View("~/Views/Repartidor/Historial.cshtml", pedidos);
+        }
+
         // POST: /Repartidor/CambiarEstado
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CambiarEstado(Guid id, string estado)
         {
+            var isAjax = Request.Headers["X-Requested-With"] == "XMLHttpRequest" || Request.Headers.Accept.ToString().Contains("application/json");
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var pedido = await _context.Pedidos.FirstOrDefaultAsync(p => p.Id == id && p.RepartidorId == userId);
 
             if (pedido == null)
             {
-                TempData["Error"] = "Pedido no encontrado o no asignado a tu cuenta.";
+                var errorMsg = "Pedido no encontrado o no asignado a tu cuenta.";
+                if (isAjax) return Json(new { success = false, message = errorMsg });
+                TempData["Error"] = errorMsg;
                 return RedirectToAction(nameof(MisDomicilios));
             }
 
             var estadosValidos = new[] { "En camino", "Entregado" };
             if (!estadosValidos.Contains(estado))
             {
-                TempData["Error"] = "Estado no permitido para el repartidor.";
+                var errorMsg = "Estado no permitido para el repartidor.";
+                if (isAjax) return Json(new { success = false, message = errorMsg });
+                TempData["Error"] = errorMsg;
                 return RedirectToAction(nameof(MisDomicilios));
             }
 
@@ -61,7 +85,13 @@ namespace Drogueria.Controllers
             _context.Pedidos.Update(pedido);
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = $"El pedido ha pasado a estado '{estado}'.";
+            var successMsg = $"El pedido ha pasado a estado '{estado}'.";
+            if (isAjax)
+            {
+                return Json(new { success = true, message = successMsg, id = pedido.Id, estado = pedido.Estado });
+            }
+
+            TempData["Success"] = successMsg;
             return RedirectToAction(nameof(MisDomicilios));
         }
 

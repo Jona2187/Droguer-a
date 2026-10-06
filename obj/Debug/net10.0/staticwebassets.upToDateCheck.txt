@@ -1,0 +1,169 @@
+wwwroot\css\empleado.css
+wwwroot\css\landingPages.css
+wwwroot\css\layout-publico.css
+wwwroot\css\site.css
+wwwroot\css\tienda.css
+wwwroot\favicon.ico
+wwwroot\img\1.jpeg
+wwwroot\img\2.jpeg
+wwwroot\img\3.jpeg
+wwwroot\img\logodrogueria.png
+wwwroot\img\logodrogueria.svg
+wwwroot\js\landingPages.js
+wwwroot\js\site.js
+wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
+wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map
+wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css
+wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css.map
+wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.css
+wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.css.map
+wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.min.css
+wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.min.css.map
+wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.css
+wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.css.map
+wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.min.css
+wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.min.css.map
+wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.rtl.css
+wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.rtl.css.map
+wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.rtl.min.css
+wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.rtl.min.css.map
+wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.css
+wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.css.map
+wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.min.css
+wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.min.css.map
+wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.css
+wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.css.map
+wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.min.css
+wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.min.css.map
+wwwroot\lib\bootstrap\dist\css\bootstrap.css
+wwwroot\lib\bootstrap\dist\css\bootstrap.css.map
+wwwroot\lib\bootstrap\dist\css\bootstrap.min.css
+wwwroot\lib\bootstrap\dist\css\bootstrap.min.css.map
+wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.css
+wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.css.map
+wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.min.css
+wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.min.css.map
+wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.js
+wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.js.map
+wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.min.js
+wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.min.js.map
+wwwroot\lib\bootstrap\dist\js\bootstrap.esm.js
+wwwroot\lib\bootstrap\dist\js\bootstrap.esm.js.map
+wwwroot\lib\bootstrap\dist\js\bootstrap.esm.min.js
+wwwroot\lib\bootstrap\dist\js\bootstrap.esm.min.js.map
+wwwroot\lib\bootstrap\dist\js\bootstrap.js
+wwwroot\lib\bootstrap\dist\js\bootstrap.js.map
+wwwroot\lib\bootstrap\dist\js\bootstrap.min.js
+wwwroot\lib\bootstrap\dist\js\bootstrap.min.js.map
+wwwroot\lib\bootstrap\LICENSE
+wwwroot\lib\jquery-validation-unobtrusive\dist\jquery.validate.unobtrusive.js
+wwwroot\lib\jquery-validation-unobtrusive\dist\jquery.validate.unobtrusive.min.js
+wwwroot\lib\jquery-validation-unobtrusive\LICENSE.txt
+wwwroot\lib\jquery-validation\dist\additional-methods.js
+wwwroot\lib\jquery-validation\dist\additional-methods.min.js
+wwwroot\lib\jquery-validation\dist\jquery.validate.js
+wwwroot\lib\jquery-validation\dist\jquery.validate.min.js
+wwwroot\lib\jquery-validation\LICENSE.md
+wwwroot\lib\jquery\dist\jquery.js
+wwwroot\lib\jquery\dist\jquery.min.js
+wwwroot\lib\jquery\dist\jquery.min.map
+wwwroot\lib\jquery\dist\jquery.slim.js
+wwwroot\lib\jquery\dist\jquery.slim.min.js
+wwwroot\lib\jquery\dist\jquery.slim.min.map
+wwwroot\lib\jquery\LICENSE.txt
+wwwroot\uploads\Logo\logo.jpeg
+wwwroot\uploads\productos\002f066e-59e0-42ca-965c-9ac8b4d09f31.jpg
+wwwroot\uploads\productos\0156ec2f-7089-44b6-9e50-7ec30000edb0.png
+wwwroot\uploads\productos\11183c99-b00d-4935-9d95-bdb4509c9e45.png
+wwwroot\uploads\productos\2cb8f1f8-cff2-48d4-96bb-e72295309c79.jpg
+wwwroot\uploads\productos\30d70b6e-678c-461a-9b2c-1f432a7f3703.jpg
+wwwroot\uploads\productos\31c49724-5b93-458a-8ab3-7371d47eb5d8.jpg
+wwwroot\uploads\productos\32afe7a9-a846-4a6b-9397-a38681ef1d35.jpg
+wwwroot\uploads\productos\53483b2a-e304-4ec7-937b-d7e361ff3586.jpg
+wwwroot\uploads\productos\70e6cfe0-4217-466d-8173-941c2f7f5336.jpg
+wwwroot\uploads\productos\74d7b29f-d076-4fbe-b494-2ccda60980d6.png
+wwwroot\uploads\productos\946cb7d6-e701-40b9-b2e2-3c63435fb954.jpg
+wwwroot\uploads\productos\97decfbe-e8bc-4d95-88b7-c50e8e81618a.jpg
+wwwroot\uploads\productos\9d34b892-0c71-4782-b56b-dce9f1a66323.jpg
+wwwroot\uploads\productos\a718b98e-32ee-4e9a-af88-6d264e4accfd.png
+wwwroot\uploads\productos\ace07228-1437-4442-8ac0-075aaf39f491.jpg
+wwwroot\uploads\productos\b6e35d52-71e9-4444-a1ed-b0df98751e9a.jpg
+wwwroot\uploads\productos\b7e7bfd4-5f5e-4a24-b34a-3599520d3b4c.jpg
+wwwroot\uploads\productos\b8149c4c-0c50-427c-b618-750898d2c8c6.jpg
+wwwroot\uploads\productos\b8ec5495-6a46-47b4-83d6-7da1bea7bb63.jpg
+wwwroot\uploads\productos\c0847deb-0d36-44a8-9a4d-246ded08020a.jpg
+wwwroot\uploads\productos\c0e61a66-475d-4fa6-bc78-99c375f0cbee.png
+wwwroot\uploads\productos\ce359ba8-e086-4836-bc70-c8d99580529c.jpg
+wwwroot\uploads\productos\cfe1f663-41c7-41af-9d18-2f6525f2a537.jpg
+wwwroot\uploads\productos\e4638baf-4c8d-4f23-8b03-12eab1c34b31.jpg
+wwwroot\uploads\productos\e8dd9429-a602-4cc2-8065-3995ccb1e270.jpg
+wwwroot\uploads\productos\ebb7190f-e396-41f0-b69f-b83a2c716b57.jpg
+wwwroot\uploads\productos\f9a028a7-0428-4146-bb57-19b58b517d83.jpg
+D:\Drogueria 19-09\Drogueria\wwwroot\css\landingPages.css
+D:\Drogueria 19-09\Drogueria\wwwroot\js\site.js
+D:\Drogueria 19-09\Drogueria\wwwroot\css\empleado.css
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\jquery\LICENSE.txt
+D:\Drogueria 19-09\Drogueria\wwwroot\favicon.ico
+D:\Drogueria 19-09\Drogueria\wwwroot\js\landingPages.js
+D:\Drogueria 19-09\Drogueria\wwwroot\css\layout-publico.css
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css.map
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.css
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.css.map
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.min.css
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.min.css.map
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.css
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.css.map
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.min.css
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.min.css.map
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.rtl.css
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.rtl.css.map
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.rtl.min.css
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.rtl.min.css.map
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.css
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.css.map
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.min.css
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.min.css.map
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.css
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.css.map
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.min.css
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.min.css.map
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\css\bootstrap.css
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\css\bootstrap.css.map
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\css\bootstrap.min.css
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\css\bootstrap.min.css.map
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.css
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.css.map
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.min.css
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.min.css.map
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.js
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.js.map
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.min.js
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.min.js.map
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\js\bootstrap.esm.js
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\js\bootstrap.esm.js.map
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\js\bootstrap.esm.min.js
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\js\bootstrap.esm.min.js.map
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\js\bootstrap.js
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\js\bootstrap.js.map
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\js\bootstrap.min.js
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\js\bootstrap.min.js.map
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\jquery-validation-unobtrusive\dist\jquery.validate.unobtrusive.js
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\jquery-validation-unobtrusive\dist\jquery.validate.unobtrusive.min.js
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\jquery-validation-unobtrusive\LICENSE.txt
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\jquery-validation\dist\additional-methods.js
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\jquery-validation\dist\additional-methods.min.js
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\jquery-validation\dist\jquery.validate.js
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\jquery-validation\dist\jquery.validate.min.js
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\jquery-validation\LICENSE.md
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\jquery\dist\jquery.js
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\jquery\dist\jquery.min.js
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\jquery\dist\jquery.min.map
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\jquery\dist\jquery.slim.js
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\jquery\dist\jquery.slim.min.js
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\jquery\dist\jquery.slim.min.map
+D:\Drogueria 19-09\Drogueria\wwwroot\css\site.css
+D:\Drogueria 19-09\Drogueria\wwwroot\css\tienda.css
+D:\Drogueria 19-09\Drogueria\wwwroot\img\logodrogueria.svg

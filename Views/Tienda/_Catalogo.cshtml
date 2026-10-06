@@ -74,8 +74,7 @@
 
             <!-- Filtro Stock y Botón Limpiar -->
             <div class="col-lg-2 col-md-6 d-flex align-items-center justify-content-lg-end gap-3">
-
-                <button type="button" id="btnResetearFiltros" class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1-5 d-flex align-items-center gap-1 shadow-none" style="display: none;" title="Restablecer todos los filtros">
+<button type="button" id="btnResetearFiltros" class="btn btn-sm btn-outline-secondary rounded-pill px-3 d-none align-items-center gap-1" title="Restablecer todos los filtros">
                     <i class="bi bi-arrow-counterclockwise"></i> Limpiar
                 </button>
             </div>
@@ -127,12 +126,15 @@
             <div class="producto-card"
                  data-id="@p.Id"
                  data-nombre="@p.Nombre.ToLowerInvariant()"
+                 data-miligramos="@p.Miligramos"
+                 data-unidad-medida="@(string.IsNullOrEmpty(p.UnidadMedida) ? "mg" : p.UnidadMedida)"
+                 data-limite-maximo="@(p.LimiteMaximoPorPedido?.ToString() ?? "")"
                  data-desc="@((p.Descripcion ?? "").ToLowerInvariant())"
                  data-categoria="@(p.CategoriaId)"
                  data-categoria-nombre="@(p.Categoria?.Nombre ?? "General")"
                  data-precio="@p.Precio.ToString(System.Globalization.CultureInfo.InvariantCulture)"
                  data-stock="@p.Stock"
-                 onclick="abrirModalProducto('@p.Id', '@Html.Raw(Html.Encode(p.Nombre))', '@Html.Raw(Html.Encode(p.Categoria?.Nombre ?? "General"))', '@p.Precio.ToString("N2")', '@p.Stock', '@Html.Raw(Html.Encode(p.Descripcion ?? "Sin descripción adicional disponible."))', '@imgUrl')"
+                 onclick="abrirModalProducto('@p.Id', '@Html.Raw(Html.Encode(p.Nombre))', '@p.Miligramos', '@(string.IsNullOrEmpty(p.UnidadMedida) ? "mg" : p.UnidadMedida)', '@Html.Raw(Html.Encode(p.Categoria?.Nombre ?? "General"))', '@p.Precio.ToString("N2")', '@p.Stock', '@(p.LimiteMaximoPorPedido?.ToString() ?? "")', '@Html.Raw(Html.Encode(p.Descripcion ?? "Sin descripción adicional disponible."))', '@imgUrl')"
                  role="button"
                  tabindex="0">
 
@@ -166,12 +168,20 @@
                     </button>
                 </div>
 
-                <!-- Datos abajo: Nombre y Precio -->
+                <!-- Datos abajo: Nombre, Dosis/Unidad y Precio -->
                 <div class="producto-card-body">
-                    <div class="producto-card-name" title="@p.Nombre">@p.Nombre</div>
+                    <div class="producto-card-name" title="@p.Nombre">
+                        @p.Nombre <span class="badge bg-primary-subtle text-primary border border-primary-subtle" style="font-size:10px;">@p.Miligramos @(string.IsNullOrEmpty(p.UnidadMedida) ? "mg" : p.UnidadMedida)</span>
+                    </div>
+                    @if (p.LimiteMaximoPorPedido.HasValue)
+                    {
+                        <div class="small text-danger mt-1" style="font-size: 10px;">
+                            <i class="bi bi-exclamation-circle me-1"></i>Límite: máx. @p.LimiteMaximoPorPedido pastillas/pedido
+                        </div>
+                    }
                     <div class="d-flex align-items-center justify-content-between mt-1">
                         <span class="producto-card-price">$@p.Precio.ToString("N2")</span>
-                        <span class="producto-card-stock @(p.Stock <= 5 ? "text-warning" : "text-muted")">
+                        <span class="producto-card-stock @(p.Stock <= p.StockMinimo ? "text-warning" : "text-muted")">
                             <i class="bi bi-box-seam me-1"></i> Stock: @p.Stock
                         </span>
                     </div>
@@ -268,61 +278,63 @@
 
 @section Scripts {
 <script>
-    // ── GESTIÓN DE FILTROS EN VIVO (SIN RECARGA NI SALTO DE PÁGINA) ──
-    const buscador = document.getElementById('buscadorEnVivo');
-    const btnLimpiar = document.getElementById('btnLimpiarBusqueda');
-    const filtroPrecio = document.getElementById('filtroPrecio');
-    const ordenarPor = document.getElementById('ordenarPor');
-    const filtroStock = document.getElementById('filtroSoloStock');
-    const btnResetear = document.getElementById('btnResetearFiltros');
+    // ── GESTIÓN DE FILTROS EN VIVO ──────────────────────────────
+    const buscador        = document.getElementById('buscadorEnVivo');
+    const btnLimpiar      = document.getElementById('btnLimpiarBusqueda');
+    const filtroPrecio    = document.getElementById('filtroPrecio');
+    const ordenarPor      = document.getElementById('ordenarPor');
+    const filtroStock     = document.getElementById('filtroSoloStock');
+    const btnResetear     = document.getElementById('btnResetearFiltros');
     const pillsCategorias = document.querySelectorAll('#contenedorPillsCategorias .filter-pill-btn');
-    const grid = document.getElementById('gridProductos');
-    const tarjetas = Array.from(grid ? grid.querySelectorAll('.producto-card') : []);
+    const grid            = document.getElementById('gridProductos');
+    const tarjetas        = Array.from(grid ? grid.querySelectorAll('.producto-card') : []);
     const contadorVisible = document.getElementById('contadorVisible');
+    const totalProductos  = tarjetas.length;
     const mensajeSinResultados = document.getElementById('mensajeSinResultados');
 
     let categoriaSeleccionada = "";
 
+    function actualizarBtnResetear(hayFiltros) {
+        if (!btnResetear) return;
+        if (hayFiltros) {
+            btnResetear.classList.remove('d-none');
+            btnResetear.classList.add('d-inline-flex');
+        } else {
+            btnResetear.classList.add('d-none');
+            btnResetear.classList.remove('d-inline-flex');
+        }
+    }
+
     function aplicarFiltros() {
-        const texto = (buscador.value || "").trim().toLowerCase();
-        const precioRango = filtroPrecio.value;
-        const soloStock = filtroStock.checked;
+        const texto      = (buscador?.value || "").trim().toLowerCase();
+        const precioRango = filtroPrecio?.value || "todos";
+        const soloStock  = filtroStock?.checked ?? false;
 
-        // Mostrar / ocultar botón de limpiar búsqueda
-        if (btnLimpiar) {
-            btnLimpiar.style.display = texto.length > 0 ? "block" : "none";
-        }
+        // Botón limpiar búsqueda
+        if (btnLimpiar) btnLimpiar.style.display = texto.length > 0 ? "block" : "none";
 
-        // Revisar si hay algún filtro activo para mostrar botón de resetear
-        const hayFiltrosActivos = texto !== "" || categoriaSeleccionada !== "" || precioRango !== "todos" || soloStock;
-        if (btnResetear) {
-            btnResetear.style.display = hayFiltrosActivos ? "inline-flex" : "none";
-        }
+        // Botón resetear filtros
+        const hayFiltros = texto !== "" || categoriaSeleccionada !== "" || precioRango !== "todos" || soloStock;
+        actualizarBtnResetear(hayFiltros);
 
         let visibles = 0;
 
         tarjetas.forEach(card => {
             const nombre = card.getAttribute('data-nombre') || "";
-            const desc = card.getAttribute('data-desc') || "";
-            const cat = card.getAttribute('data-categoria') || "";
+            const desc   = card.getAttribute('data-desc')   || "";
+            const cat    = card.getAttribute('data-categoria') || "";
             const precio = parseFloat(card.getAttribute('data-precio') || "0");
-            const stock = parseInt(card.getAttribute('data-stock') || "0");
+            const stock  = parseInt(card.getAttribute('data-stock')   || "0");
 
-            // 1. Filtro texto
             const coincideTexto = texto === "" || nombre.includes(texto) || desc.includes(texto);
-
-            // 2. Filtro categoría
-            const coincideCat = categoriaSeleccionada === "" || cat === categoriaSeleccionada;
-
-            // 3. Filtro precio
-            let coincidePrecio = true;
-            if (precioRango === "0-10000") coincidePrecio = precio < 10000;
-            else if (precioRango === "10000-30000") coincidePrecio = precio >= 10000 && precio <= 30000;
-            else if (precioRango === "30000-60000") coincidePrecio = precio > 30000 && precio <= 60000;
-            else if (precioRango === "60000-999999") coincidePrecio = precio > 60000;
-
-            // 4. Filtro stock
+            const coincideCat   = categoriaSeleccionada === "" || cat === categoriaSeleccionada;
             const coincideStock = !soloStock || stock > 0;
+
+            let coincidePrecio = true;
+            if      (precioRango === "0-10000")      coincidePrecio = precio < 10000;
+            else if (precioRango === "10000-30000")  coincidePrecio = precio >= 10000 && precio <= 30000;
+            else if (precioRango === "30000-60000")  coincidePrecio = precio > 30000  && precio <= 60000;
+            else if (precioRango === "60000-999999") coincidePrecio = precio > 60000;
 
             if (coincideTexto && coincideCat && coincidePrecio && coincideStock) {
                 card.classList.remove('filtrado-oculto');
@@ -332,10 +344,8 @@
             }
         });
 
-        // Aplicar ordenamiento
         ordenarTarjetas();
 
-        // Actualizar contador
         if (contadorVisible) contadorVisible.innerText = visibles;
         if (mensajeSinResultados) {
             mensajeSinResultados.style.display = visibles === 0 ? "block" : "none";
@@ -343,30 +353,28 @@
     }
 
     function ordenarTarjetas() {
+        if (!ordenarPor || !grid) return;
         const criterio = ordenarPor.value;
         const visibles = tarjetas.filter(t => !t.classList.contains('filtrado-oculto'));
 
         visibles.sort((a, b) => {
-            if (criterio === "nombre-asc") {
-                return a.getAttribute('data-nombre').localeCompare(b.getAttribute('data-nombre'));
-            } else if (criterio === "nombre-desc") {
-                return b.getAttribute('data-nombre').localeCompare(a.getAttribute('data-nombre'));
-            } else if (criterio === "precio-asc") {
-                return parseFloat(a.getAttribute('data-precio')) - parseFloat(b.getAttribute('data-precio'));
-            } else if (criterio === "precio-desc") {
-                return parseFloat(b.getAttribute('data-precio')) - parseFloat(a.getAttribute('data-precio'));
+            switch (criterio) {
+                case "nombre-asc":  return a.getAttribute('data-nombre').localeCompare(b.getAttribute('data-nombre'));
+                case "nombre-desc": return b.getAttribute('data-nombre').localeCompare(a.getAttribute('data-nombre'));
+                case "precio-asc":  return parseFloat(a.getAttribute('data-precio')) - parseFloat(b.getAttribute('data-precio'));
+                case "precio-desc": return parseFloat(b.getAttribute('data-precio')) - parseFloat(a.getAttribute('data-precio'));
+                default: return 0;
             }
-            return 0;
         });
 
         visibles.forEach(card => grid.appendChild(card));
     }
 
     function resetearTodosLosFiltros() {
-        buscador.value = "";
-        filtroPrecio.value = "todos";
-        ordenarPor.value = "nombre-asc";
-        filtroStock.checked = false;
+        if (buscador)     buscador.value = "";
+        if (filtroPrecio) filtroPrecio.value = "todos";
+        if (ordenarPor)   ordenarPor.value = "nombre-asc";
+        if (filtroStock)  filtroStock.checked = false;
         categoriaSeleccionada = "";
 
         pillsCategorias.forEach(p => {
@@ -376,21 +384,14 @@
         aplicarFiltros();
     }
 
-    // Eventos de controles de filtro
-    buscador.addEventListener('input', aplicarFiltros);
-    if (btnLimpiar) {
-        btnLimpiar.addEventListener('click', () => {
-            buscador.value = "";
-            buscador.focus();
-            aplicarFiltros();
-        });
-    }
-    filtroPrecio.addEventListener('change', aplicarFiltros);
-    ordenarPor.addEventListener('change', ordenarTarjetas);
-    filtroStock.addEventListener('change', aplicarFiltros);
-    if (btnResetear) btnResetear.addEventListener('click', resetearTodosLosFiltros);
+    // Eventos
+    buscador?.addEventListener('input', aplicarFiltros);
+    btnLimpiar?.addEventListener('click', () => { if (buscador) { buscador.value = ""; buscador.focus(); } aplicarFiltros(); });
+    filtroPrecio?.addEventListener('change', aplicarFiltros);
+    ordenarPor?.addEventListener('change', ordenarTarjetas);
+    filtroStock?.addEventListener('change', aplicarFiltros);
+    btnResetear?.addEventListener('click', resetearTodosLosFiltros);
 
-    // Click en pastillas de categorías
     pillsCategorias.forEach(pill => {
         pill.addEventListener('click', () => {
             pillsCategorias.forEach(p => p.classList.remove('active'));
@@ -447,15 +448,16 @@
     }
 
     // Modal de Detalle
-    function abrirModalProducto(id, nombre, cat, precio, stock, desc, img) {
+    function abrirModalProducto(id, nombre, mg, unidadMedida, cat, precio, stock, limiteMax, desc, img) {
         document.getElementById('modalProductoId').value = id;
-        document.getElementById('modalProductoNombre').innerText = nombre;
+        const unidad = unidadMedida || 'mg';
+        document.getElementById('modalProductoNombre').innerHTML = `${nombre} <span class="badge bg-primary-subtle text-primary border border-primary-subtle fs-6 align-middle ms-2">${mg} ${unidad}</span>`;
         document.getElementById('modalProductoCat').innerHTML = '<i class="bi bi-tag-fill me-1"></i> ' + cat;
         document.getElementById('modalProductoPrecio').innerText = '$' + precio;
         document.getElementById('modalProductoStock').innerText = stock;
         document.getElementById('modalProductoDesc').innerText = desc || 'Sin descripción adicional disponible.';
         
-        // Indicador de color para el stock (Verde = suficiente, Amarillo = poco, Rojo = agotado)
+        // Indicador de color para el stock
         const stockNum = parseInt(stock) || 0;
         const dot = document.getElementById('modalStockDot');
         if (dot) {
@@ -473,7 +475,8 @@
 
         const inputQty = document.getElementById('modalCantidad');
         inputQty.value = 1;
-        inputQty.max = stock;
+        const limiteNum = parseInt(limiteMax);
+        inputQty.max = (!isNaN(limiteNum) && limiteNum > 0) ? Math.min(stockNum, limiteNum) : stockNum;
 
         const imgEl = document.getElementById('modalProductoImg');
         const noImgEl = document.getElementById('modalProductoNoImg');

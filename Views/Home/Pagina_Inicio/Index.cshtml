@@ -186,71 +186,102 @@
 
         @{
             var productosVitrina = ViewBag.ProductosVitrina as List<Drogueria.Models.Producto> ?? new List<Drogueria.Models.Producto>();
-        }
-
-        @if (productosVitrina.Count == 0)
-        {
-            <div style="text-align:center; padding: 48px; opacity:.6;">
-                <p>Próximamente encontrarás aquí nuestro catálogo completo.</p>
-            </div>
-        }
-        else
-        {
-            <!-- Grid de tarjetas de productos -->
-            <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 24px; max-width: 1200px; margin: 48px auto 0;">
-                @foreach (var prod in productosVitrina)
+            if (productosVitrina.Count == 0)
+            {
+                productosVitrina = new List<Drogueria.Models.Producto>
                 {
-                    var imgSrc = !string.IsNullOrEmpty(prod.Imagen)
-                        ? "/" + prod.Imagen
-                        : "/img/pastilla1.jpeg";
-                    var categoria = prod.Categoria?.Nombre ?? "Medicamento";
+                    new Drogueria.Models.Producto { Nombre = "Acetaminofén 500mg", Descripcion = "Alivio rápido para el dolor de cabeza y fiebre.", Precio = 8500, Categoria = new Drogueria.Models.Categoria { Nombre = "Analgésicos" } },
+                    new Drogueria.Models.Producto { Nombre = "Ibuprofeno 400mg", Descripcion = "Antiinflamatorio y analgésico de acción prolongada.", Precio = 12000, Categoria = new Drogueria.Models.Categoria { Nombre = "Antiinflamatorios" } },
+                    new Drogueria.Models.Producto { Nombre = "Vitamina C + Zinc 1000mg", Descripcion = "Fortalece las defensas y apoya el sistema inmune.", Precio = 18500, Categoria = new Drogueria.Models.Categoria { Nombre = "Vitaminas" } },
+                    new Drogueria.Models.Producto { Nombre = "Suero Oral Rehidratante", Descripcion = "Solución de rehidratación oral con electrolitos.", Precio = 6500, Categoria = new Drogueria.Models.Categoria { Nombre = "Cuidado y Salud" } }
+                };
+            }
+        }
 
-                    <div class="pub-prod-card">
-                        <div class="pub-prod-img-wrap">
-                            <img src="@imgSrc" alt="@prod.Nombre" class="pub-prod-img" onerror="this.src='/img/pastilla1.jpeg'" />
-                            <span class="pub-prod-cat-badge">@categoria</span>
-                        </div>
-                        <div class="pub-prod-body">
-                            <h3 class="pub-prod-name">@prod.Nombre</h3>
-                            @if (!string.IsNullOrWhiteSpace(prod.Descripcion))
-                            {
-                                <p class="pub-prod-desc">@(prod.Descripcion!.Length > 70 ? prod.Descripcion.Substring(0, 70) + "…" : prod.Descripcion)</p>
-                            }
-                            <div class="pub-prod-footer">
-                                <span class="pub-prod-price">$@prod.Precio.ToString("N2")</span>
-                                <div class="pub-prod-actions">
-                                    <a href="/" class="pub-btn-cart" data-bs-toggle="modal" data-bs-target="#_LoginCliente" title="Inicia sesión para agregar al carrito">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-                                    </a>
-                                    <a href="/" class="pub-btn-buy" data-bs-toggle="modal" data-bs-target="#_LoginCliente">Comprar</a>
-                                </div>
+        <!-- Grid de tarjetas de productos -->
+        <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 24px; max-width: 1200px; margin: 48px auto 0;">
+            @foreach (var prod in productosVitrina)
+            {
+                var imgSrc = !string.IsNullOrEmpty(prod.Imagen)
+                    ? "/" + prod.Imagen
+                    : "/img/pastilla1.jpeg";
+                var categoria = prod.Categoria?.Nombre ?? "Medicamento";
+
+                <div class="pub-prod-card">
+                    <div class="pub-prod-img-wrap">
+                        <img src="@imgSrc" alt="@prod.Nombre" class="pub-prod-img" onerror="this.src='/img/pastilla1.jpeg'" />
+                        <span class="pub-prod-cat-badge">@categoria</span>
+                    </div>
+                    <div class="pub-prod-body">
+                        <h3 class="pub-prod-name">@prod.Nombre</h3>
+                        @if (!string.IsNullOrWhiteSpace(prod.Descripcion))
+                        {
+                            <p class="pub-prod-desc">@(prod.Descripcion!.Length > 70 ? prod.Descripcion.Substring(0, 70) + "…" : prod.Descripcion)</p>
+                        }
+                        <div class="pub-prod-footer">
+                            <span class="pub-prod-price">$@prod.Precio.ToString("N2")</span>
+                            <div class="pub-prod-actions">
+                                <a href="#" class="pub-btn-cart" data-bs-toggle="modal" data-bs-target="#_LoginCliente" title="Inicia sesión para agregar al carrito">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                                </a>
+                                <a href="#" class="pub-btn-buy" data-bs-toggle="modal" data-bs-target="#_LoginCliente">Comprar</a>
                             </div>
                         </div>
                     </div>
-                }
-            </div>
-        }
+                </div>
+            }
+        </div>
+
+        <!-- Botón Mostrar más productos -->
+        <div class="pub-more-products-wrap">
+            <button type="button" class="pub-btn-more-products" data-bs-toggle="modal" data-bs-target="#_LoginCliente" id="btnMostrarMasProductos">
+                <i class="bi bi-grid-3x3-gap-fill me-2"></i>
+                <span>Más productos</span>
+                <i class="bi bi-arrow-right ms-2"></i>
+            </button>
+        </div>
     </section>
 
-    <!-- QUIÉNES SOMOS -->
+    <!-- QUIÉNES SOMOS (LANDING PAGE) -->
     <section class="informacion" id="nosotros">
         <div class="informacion-contenido">
             <div class="informacion-texto">
-                <span class="etiqueta">CONÓCENOS</span>
-                <h2>¿Quiénes somos?</h2>
+                <span class="etiqueta">NUESTRO COMPROMISO</span>
+                <h2>Más de una década cuidando tu salud y bienestar</h2>
                 <p>
-                    Somos una droguería comprometida con ofrecer productos
-                    de calidad y brindar una excelente atención a nuestros clientes.
+                    En <strong>FarmaVida</strong> combinamos la calidez del servicio farmacéutico de confianza
+                    con la rapidez y comodidad de la atención digital. Nos esforzamos día a día por ofrecerte
+                    medicamentos certificados, orientación responsable y entregas ágiles directamente a tu puerta.
                 </p>
                 <p>
-                    Nuestro objetivo es ayudarte a cuidar tu salud, ofreciéndote
-                    productos confiables y una atención cercana para ti y tu familia.
+                    Nuestra misión es ser tu principal aliado de salud: brindándote precios justos, atención
+                    humana y la seguridad de que tu familia siempre recibe lo mejor.
                 </p>
-                <a asp-controller="Home" asp-action="Nosotros" class="boton-secundario">Conoce más</a>
+
+                <!-- Métricas destacadas -->
+                <div class="d-flex flex-wrap gap-4 my-4 py-2 border-top border-bottom" style="border-color: var(--border, rgba(0,0,0,0.08)) !important;">
+                    <div>
+                        <div class="fw-bolder fs-4" style="color: var(--primary, #7c3aed);">+10 Años</div>
+                        <div class="small" style="color: var(--t-muted, #64748b);">De experiencia</div>
+                    </div>
+                    <div>
+                        <div class="fw-bolder fs-4" style="color: var(--primary, #7c3aed);">+5.000</div>
+                        <div class="small" style="color: var(--t-muted, #64748b);">Clientes felices</div>
+                    </div>
+                    <div>
+                        <div class="fw-bolder fs-4" style="color: var(--primary, #7c3aed);">100%</div>
+                        <div class="small" style="color: var(--t-muted, #64748b);">Garantía de calidad</div>
+                    </div>
+                </div>
+
+                <a asp-controller="Home" asp-action="Nosotros" class="boton-secundario d-inline-flex align-items-center gap-2">
+                    <span>Conoce toda nuestra historia</span>
+                    <i class="bi bi-arrow-right"></i>
+                </a>
             </div>
 
             <div class="informacion-beneficios">
-                <!-- CALIDAD -->
+                <!-- ASESORÍA FARMACÉUTICA -->
                 <div class="beneficio">
                     <span class="icono-svg">
                         <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -258,12 +289,12 @@
                         </svg>
                     </span>
                     <div>
-                        <h3>Calidad</h3>
-                        <p>Productos seleccionados para nuestros clientes.</p>
+                        <h3>Atención y Asesoría Profesional</h3>
+                        <p>Personal capacitado dispuesto a orientarte en tus fórmulas y tratamientos.</p>
                     </div>
                 </div>
 
-                <!-- ATENCIÓN PERSONALIZADA -->
+                <!-- DOMICILIOS RÁPIDOS -->
                 <div class="beneficio">
                     <span class="icono-svg">
                         <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -273,12 +304,12 @@
                         </svg>
                     </span>
                     <div>
-                        <h3>Atención personalizada</h3>
-                        <p>Estamos disponibles para ayudarte.</p>
+                        <h3>Entregas Ágiles y Seguras</h3>
+                        <p>Llevamos tus pedidos en el menor tiempo con trazabilidad y cuidado higiénico.</p>
                     </div>
                 </div>
 
-                <!-- CONFIANZA -->
+                <!-- CERTIFICACIÓN Y CONFIANZA -->
                 <div class="beneficio">
                     <span class="icono-svg">
                         <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -289,8 +320,8 @@
                         </svg>
                     </span>
                     <div>
-                        <h3>Confianza</h3>
-                        <p>Tu bienestar es nuestra prioridad.</p>
+                        <h3>Garantía de Laboratorio</h3>
+                        <p>Productos 100% auténticos de laboratorios avalados para tu total tranquilidad.</p>
                     </div>
                 </div>
             </div>

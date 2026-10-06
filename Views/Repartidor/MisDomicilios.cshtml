@@ -1,12 +1,11 @@
-﻿@model IEnumerable<Drogueria.Models.Pedido>
+@model IEnumerable<Drogueria.Models.Pedido>
 @{
     ViewData["Title"] = "Mis Domicilios";
     ViewData["ActiveNav"] = "misdomicilios";
     Layout = "~/Views/Shared/_LayoutCliente.cshtml";
     var lista = Model ?? Enumerable.Empty<Drogueria.Models.Pedido>();
-    var totalAsignados = lista.Count();
+    var totalActivos = lista.Count();
     var enCamino = lista.Count(p => p.Estado == "En camino");
-    var entregados = lista.Count(p => p.Estado == "Entregado");
     var pendientes = lista.Count(p => p.Estado == "Pendiente" || p.Estado == "Confirmado");
 }
 
@@ -74,22 +73,24 @@
 
 <div class="mb-4">
     <h1 class="fw-bold mb-1" style="font-size: clamp(1.4rem, 4vw, 2rem);">Mis Domicilios <span>🛵</span></h1>
-    <p class="text-muted mb-0" style="font-size:14px;">Gestiona tus entregas y comparte tu ubicacion GPS en tiempo real.</p>
+    <p class="text-muted mb-0" style="font-size:14px;">Pedidos activos asignados. Comparte tu GPS en tiempo real.</p>
 </div>
 
 <div class="row g-3 mb-4">
-    <div class="col-6 col-md-3"><div class="dash-kpi-card purple p-3"><span class="dash-kpi-label">Total</span><div class="dash-kpi-val">@totalAsignados</div></div></div>
-    <div class="col-6 col-md-3"><div class="dash-kpi-card orange p-3"><span class="dash-kpi-label">Pendientes</span><div class="dash-kpi-val">@pendientes</div></div></div>
-    <div class="col-6 col-md-3"><div class="dash-kpi-card teal p-3"><span class="dash-kpi-label">En Camino</span><div class="dash-kpi-val">@enCamino</div></div></div>
-    <div class="col-6 col-md-3"><div class="dash-kpi-card blue p-3"><span class="dash-kpi-label">Entregados</span><div class="dash-kpi-val">@entregados</div></div></div>
+    <div class="col-6 col-md-4"><div class="dash-kpi-card purple p-3"><span class="dash-kpi-label">Activos</span><div class="dash-kpi-val">@totalActivos</div></div></div>
+    <div class="col-6 col-md-4"><div class="dash-kpi-card orange p-3"><span class="dash-kpi-label">Pendientes</span><div class="dash-kpi-val">@pendientes</div></div></div>
+    <div class="col-12 col-md-4"><div class="dash-kpi-card teal p-3"><span class="dash-kpi-label">En Camino</span><div class="dash-kpi-val">@enCamino</div></div></div>
 </div>
 
 @if (!lista.Any())
 {
     <div class="domicilio-card text-center p-5">
-        <i class="bi bi-geo-alt fs-1 text-muted opacity-50 d-block mb-3"></i>
-        <h5 class="fw-bold">No tienes domicilios asignados</h5>
-        <p class="text-muted small mb-0">Cuando un empleado te asigne un pedido, aparecera aqui.</p>
+        <i class="bi bi-truck fs-1 text-muted opacity-50 d-block mb-3"></i>
+        <h5 class="fw-bold">No tienes domicilios activos</h5>
+        <p class="text-muted small mb-0">Cuando un empleado te asigne un pedido pendiente, aparecerá aquí.</p>
+        <a asp-controller="Repartidor" asp-action="Historial" class="btn btn-outline-secondary rounded-pill px-4 mt-3 fw-semibold" style="font-size:13px;">
+            <i class="bi bi-clock-history me-1"></i> Ver Historial de Entregas
+        </a>
     </div>
 }
 else
@@ -125,12 +126,11 @@ else
                     }
                     @if (isEnCamino)
                     {
-                        <form asp-controller="Repartidor" asp-action="CambiarEstado" method="post">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="id" value="@p.Id" />
-                            <input type="hidden" name="estado" value="Entregado" />
-                            <button type="submit" class="btn btn-success rounded-pill px-4 fw-semibold d-inline-flex align-items-center gap-2"><i class="bi bi-check-circle-fill"></i> Marcar Entregado</button>
-                        </form>
+                        <button type="button"
+                                class="btn btn-success rounded-pill px-4 fw-semibold d-inline-flex align-items-center gap-2"
+                                onclick="abrirConfirmarEntrega('@p.Id', '@Html.Raw(clientName.Replace("'", "\'"))')">
+                            <i class="bi bi-check-circle-fill"></i> Marcar Entregado
+                        </button>
                     }
                 </div>
             </div>
@@ -212,6 +212,40 @@ else
 }
 </div>
 
+<!-- ── Modal confirmar entrega ─────────────────────────── -->
+<div class="modal fade" id="modalConfirmarEntrega" tabindex="-1" aria-labelledby="modalConfirmarEntregaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content" style="border-radius:16px; border:1px solid var(--border); background:var(--bg-card);">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" id="modalConfirmarEntregaLabel">
+                    <i class="bi bi-check-circle-fill text-success me-2"></i>Confirmar entrega
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body py-3">
+                <p class="text-muted mb-0" style="font-size:14px;">
+                    ¿Confirmas que el pedido de <strong id="confirmarClienteNombre">—</strong> fue entregado exitosamente?
+                </p>
+                <p class="text-muted mt-2 mb-0" style="font-size:12px;">
+                    <i class="bi bi-info-circle me-1"></i>Esta acción no se puede deshacer.
+                </p>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-ghost rounded-pill px-3" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success rounded-pill px-4 fw-semibold" onclick="confirmarEntregado()">
+                    <i class="bi bi-check-lg me-1"></i>Sí, entregado
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Form oculto que se envía al confirmar -->
+<form id="formConfirmarEntregado" asp-controller="Repartidor" asp-action="CambiarEstado" method="post" style="display:none;">
+    @Html.AntiForgeryToken()
+    <input type="hidden" id="confirmarPedidoId" name="id" value="" />
+    <input type="hidden" name="estado" value="Entregado" />
+</form>
 @section Scripts {
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
@@ -292,5 +326,27 @@ document.addEventListener("DOMContentLoaded", function () {
         </text>
     }
 });
+
+function abrirConfirmarEntrega(pedidoId, clienteNombre) {
+    document.getElementById('confirmarPedidoId').value = pedidoId;
+    document.getElementById('confirmarClienteNombre').textContent = clienteNombre;
+    var modal = new bootstrap.Modal(document.getElementById('modalConfirmarEntrega'));
+    modal.show();
+}
+
+async function confirmarEntregado() {
+    const form = document.getElementById('formConfirmarEntregado');
+    const modalEl = document.getElementById('modalConfirmarEntrega');
+    const modal = bootstrap.Modal.getInstance(modalEl);
+
+    const res = await window.postFormAjax(form.action, new FormData(form));
+    if (res.success) {
+        if (modal) modal.hide();
+        window.showAppToast(res.message || 'Pedido marcado como entregado.', 'success');
+        setTimeout(() => location.reload(), 600);
+    } else {
+        window.showAppToast(res.message || 'Error al actualizar el pedido.', 'error');
+    }
+}
 </script>
 }
