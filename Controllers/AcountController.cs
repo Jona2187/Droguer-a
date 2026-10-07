@@ -70,6 +70,15 @@ namespace Drogueria.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
+            if (!string.Equals(usuario.Rol?.Trim(), rolEsperado?.Trim(), StringComparison.OrdinalIgnoreCase))
+            {
+                var msg = "Esta cuenta debe ingresar por el acceso correspondiente a su rol.";
+                if (isAjax) return Json(new { success = false, message = msg });
+                TempData["Error"] = msg;
+                TempData["AbrirModal"] = ObtenerModal(rolEsperado);
+                return RedirectToAction("Index", "Home");
+            }
+
             if (!usuario.Estado)
             {
                 var msg = "Tu cuenta se encuentra desactivada. Contacta al equipo de soporte.";
