@@ -70,7 +70,8 @@ namespace Drogueria.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            if (!string.Equals(usuario.Rol?.Trim(), rolEsperado?.Trim(), StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrWhiteSpace(rolEsperado) &&
+                !string.Equals(usuario.Rol?.Trim(), rolEsperado.Trim(), StringComparison.OrdinalIgnoreCase))
             {
                 var msg = "Esta cuenta debe ingresar por el acceso correspondiente a su rol.";
                 if (isAjax) return Json(new { success = false, message = msg });
@@ -82,17 +83,6 @@ namespace Drogueria.Controllers
             if (!usuario.Estado)
             {
                 var msg = "Tu cuenta se encuentra desactivada. Contacta al equipo de soporte.";
-                if (isAjax) return Json(new { success = false, message = msg });
-                TempData["Error"] = msg;
-                TempData["AbrirModal"] = ObtenerModal(rolEsperado);
-                return RedirectToAction("Index", "Home");
-            }
-
-            // Validar que el rol del usuario coincida con el formulario utilizado
-            if (!string.IsNullOrWhiteSpace(rolEsperado) &&
-                !string.Equals(usuario.Rol, rolEsperado, StringComparison.OrdinalIgnoreCase))
-            {
-                var msg = "Las credenciales no corresponden a este tipo de acceso.";
                 if (isAjax) return Json(new { success = false, message = msg });
                 TempData["Error"] = msg;
                 TempData["AbrirModal"] = ObtenerModal(rolEsperado);
