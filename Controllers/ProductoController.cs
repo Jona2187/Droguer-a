@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -6,6 +7,7 @@ using Drogueria.Models;
 
 namespace Drogueria.Controllers
 {
+    [Authorize(Roles = "Administrador,Empleado")]
     public class ProductoController : Controller
     {
         private readonly AppDbContex _context;

@@ -79,6 +79,17 @@ namespace Drogueria.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
+            // Validar que el rol del usuario coincida con el formulario utilizado
+            if (!string.IsNullOrWhiteSpace(rolEsperado) &&
+                !string.Equals(usuario.Rol, rolEsperado, StringComparison.OrdinalIgnoreCase))
+            {
+                var msg = "Las credenciales no corresponden a este tipo de acceso.";
+                if (isAjax) return Json(new { success = false, message = msg });
+                TempData["Error"] = msg;
+                TempData["AbrirModal"] = ObtenerModal(rolEsperado);
+                return RedirectToAction("Index", "Home");
+            }
+
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, usuario.Uuid),
@@ -165,14 +176,31 @@ namespace Drogueria.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        [HttpGet]
+        [HttpGet, HttpPost]
         public IActionResult AccessDenied()
         {
-            TempData["Error"] = "No tienes permisos para acceder a esta sección.";
-            if (User.Identity?.IsAuthenticated == true && User.IsInRole("Cliente"))
-                return RedirectToAction("Catalogo", "Tienda");
-            if (User.Identity?.IsAuthenticated == true && User.IsInRole("Repartidor"))
-                return RedirectToAction("MisDomicilios", "Repartidor");
+            var isAjax = Request.Headers["X-Requested-With"] == "XMLHttpRequest" ||
+                         Request.Headers["Accept"].ToString().Contains("application/json");
+
+            var msg = "No tienes permitido ingresar por aquí.";
+
+            if (isAjax)
+            {
+                return Json(new { success = false, message = msg, accessDenied = true });
+            }
+
+            TempData["Error"] = msg;
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                if (User.IsInRole("Administrador"))
+                    return RedirectToAction("Dashboard", "Usuario");
+                if (User.IsInRole("Empleado"))
+                    return RedirectToAction("Productos", "Empleado");
+                if (User.IsInRole("Repartidor"))
+                    return RedirectToAction("MisDomicilios", "Repartidor");
+                if (User.IsInRole("Cliente"))
+                    return RedirectToAction("Catalogo", "Tienda");
+            }
             return RedirectToAction("Index", "Home");
         }
 

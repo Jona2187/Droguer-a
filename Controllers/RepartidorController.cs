@@ -7,7 +7,7 @@ using Drogueria.Models;
 
 namespace Drogueria.Controllers
 {
-    [Authorize(Roles = "Repartidor")]
+    [Authorize(Roles = "Administrador,Repartidor")]
     public class RepartidorController : Controller
     {
         private readonly AppDbContex _context;

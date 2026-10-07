@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Drogueria.Data;
@@ -5,6 +6,7 @@ using Drogueria.Models;
 
 namespace Drogueria.Controllers
 {
+    [Authorize(Roles = "Administrador,Empleado")]
     public class CategoriaController : Controller
     {
         private readonly AppDbContex _context;
