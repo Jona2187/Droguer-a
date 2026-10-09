@@ -58,7 +58,7 @@ namespace Drogueria.Controllers
         // POST: /Repartidor/CambiarEstado
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CambiarEstado(Guid id, string estado)
+        public async Task<IActionResult> CambiarEstado(Guid id, string estado, string? codigoConfirmacion)
         {
             var isAjax = Request.Headers["X-Requested-With"] == "XMLHttpRequest" || Request.Headers.Accept.ToString().Contains("application/json");
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -81,11 +81,33 @@ namespace Drogueria.Controllers
                 return RedirectToAction(nameof(MisDomicilios));
             }
 
+            // Validar código de entrega de 6 dígitos al cambiar a estado Entregado
+            if (estado == "Entregado")
+            {
+                var codigoLimpio = (codigoConfirmacion ?? "").Trim();
+                if (string.IsNullOrEmpty(codigoLimpio))
+                {
+                    var errorMsg = "Debes ingresar el código de confirmación de 6 dígitos entregado por el cliente.";
+                    if (isAjax) return Json(new { success = false, message = errorMsg });
+                    TempData["Error"] = errorMsg;
+                    return RedirectToAction(nameof(MisDomicilios));
+                }
+
+                if (!string.IsNullOrEmpty(pedido.CodigoConfirmacion) &&
+                    !string.Equals(pedido.CodigoConfirmacion.Trim(), codigoLimpio, StringComparison.OrdinalIgnoreCase))
+                {
+                    var errorMsg = "El código de confirmación es incorrecto. Pídele al cliente el código de 6 dígitos que figura en su pedido.";
+                    if (isAjax) return Json(new { success = false, message = errorMsg });
+                    TempData["Error"] = errorMsg;
+                    return RedirectToAction(nameof(MisDomicilios));
+                }
+            }
+
             pedido.Estado = estado;
             _context.Pedidos.Update(pedido);
             await _context.SaveChangesAsync();
 
-            var successMsg = $"El pedido ha pasado a estado '{estado}'.";
+            var successMsg = $"El pedido ha sido marcado como '{estado}' exitosamente.";
             if (isAjax)
             {
                 return Json(new { success = true, message = successMsg, id = pedido.Id, estado = pedido.Estado });

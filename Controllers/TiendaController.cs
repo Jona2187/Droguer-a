@@ -13,6 +13,7 @@ namespace Drogueria.Controllers
     {
         private readonly AppDbContex _context;
         private const string CarritoSessionKey = "Carrito";
+        private const string CarritoCookieKey  = "Drogueria_Carrito_Persistente";
 
         public TiendaController(AppDbContex context)
         {
@@ -274,17 +275,294 @@ namespace Drogueria.Controllers
             return RedirectToAction(nameof(Carrito));
         }
 
-        // â”€â”€ PEDIDOS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // PEDIDOS
 
-        // POST: /Tienda/RealizarPedido
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> RealizarPedido(string? direccionEntrega)
+        // GET: /Tienda/CheckoutGet  — Redireccionado desde RealizarPedido cuando hay errores de validación
+        [HttpGet]
+        public async Task<IActionResult> CheckoutGet()
+        {
+            var direccionEntrega      = TempData["DireccionEntrega"]  as string ?? "";
+            var productosSeleccionados = TempData["ProductosSeleccionados"] as string ?? "";
+
+            if (string.IsNullOrWhiteSpace(productosSeleccionados))
+            {
+                return RedirectToAction(nameof(Carrito));
+            }
+
+            var ids = productosSeleccionados
+                .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                .Select(s => Guid.TryParse(s.Trim(), out var g) ? g : Guid.Empty)
+                .Where(g => g != Guid.Empty)
+                .ToHashSet();
+
+            var carrito = ObtenerCarrito();
+            var seleccionados = carrito.Where(c => ids.Contains(c.ProductoId)).ToList();
+
+            if (!seleccionados.Any())
+            {
+                return RedirectToAction(nameof(Carrito));
+            }
+
+            var prodIds = seleccionados.Select(c => c.ProductoId).ToList();
+            var productosDb = await _context.Productos
+                .Where(p => prodIds.Contains(p.Id))
+                .ToDictionaryAsync(p => p.Id, p => p);
+
+            foreach (var item in seleccionados)
+                if (productosDb.TryGetValue(item.ProductoId, out var prod))
+                {
+                    item.StockDisponible = prod.Stock;
+                    item.LimiteMaximoPorPedido = prod.LimiteMaximoPorPedido;
+                }
+
+            // Generar código fijo de Supergiros para el usuario actual
+            var usuarioId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!string.IsNullOrEmpty(usuarioId))
+            {
+                var hashBytes = System.Security.Cryptography.MD5.HashData(System.Text.Encoding.UTF8.GetBytes(usuarioId));
+                ViewBag.SupergirosCode = "SG-" + BitConverter.ToString(hashBytes).Replace("-", "").Substring(0, 7).ToUpper();
+            }
+
+            var propinaStr = TempData["Propina"] as string;
+            if (decimal.TryParse(propinaStr, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var p) && p >= 0m)
+            {
+                ViewBag.Propina = p;
+            }
+
+            ViewBag.DireccionEntrega = direccionEntrega;
+            ViewData["Title"] = "Confirmar Pedido";
+            return View("~/Views/Tienda/_Checkout.cshtml", seleccionados);
+        }
+
+        // GET: /Tienda/Checkout — Permite recargar la página del checkout (F5) sin perder los productos ni la dirección
+        [HttpGet]
+        public async Task<IActionResult> Checkout()
         {
             var carrito = ObtenerCarrito();
             if (!carrito.Any())
             {
-                TempData["Error"] = "Tu carrito está vacío.";
+                return RedirectToAction(nameof(Carrito));
+            }
+
+            var seleccionadosStr = HttpContext.Session.GetString("Checkout_Seleccionados");
+            List<CarritoItem> seleccionados = carrito;
+
+            if (!string.IsNullOrWhiteSpace(seleccionadosStr))
+            {
+                var ids = seleccionadosStr
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(s => Guid.TryParse(s.Trim(), out var g) ? g : Guid.Empty)
+                    .Where(g => g != Guid.Empty)
+                    .ToHashSet();
+
+                var filtrados = carrito.Where(c => ids.Contains(c.ProductoId)).ToList();
+                if (filtrados.Any()) seleccionados = filtrados;
+            }
+
+            // Sincronizar stock actual
+            var prodIds = seleccionados.Select(c => c.ProductoId).ToList();
+            var productosDb = await _context.Productos
+                .Where(p => prodIds.Contains(p.Id))
+                .ToDictionaryAsync(p => p.Id, p => p);
+
+            foreach (var item in seleccionados)
+                if (productosDb.TryGetValue(item.ProductoId, out var prod))
+                {
+                    item.StockDisponible = prod.Stock;
+                    item.LimiteMaximoPorPedido = prod.LimiteMaximoPorPedido;
+                }
+
+            var direccionGuardada = HttpContext.Session.GetString("Checkout_Direccion");
+            if (string.IsNullOrWhiteSpace(direccionGuardada))
+            {
+                var usuarioId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var dir = await _context.DireccionesUsuario
+                    .Where(d => d.UsuarioId == usuarioId && d.EsPredeterminada)
+                    .FirstOrDefaultAsync();
+                if (dir != null)
+                {
+                    direccionGuardada = $"{dir.NombreContacto} | {dir.Direccion}, {dir.Ciudad}, {dir.Departamento} | Tel: {dir.Telefono}";
+                }
+            }
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!string.IsNullOrEmpty(userId))
+            {
+                var hashBytes = System.Security.Cryptography.MD5.HashData(System.Text.Encoding.UTF8.GetBytes(userId));
+                ViewBag.SupergirosCode = "SG-" + BitConverter.ToString(hashBytes).Replace("-", "").Substring(0, 7).ToUpper();
+            }
+
+            ViewBag.DireccionEntrega = direccionGuardada ?? "";
+            ViewData["Title"] = "Confirmar Pedido";
+            return View("~/Views/Tienda/_Checkout.cshtml", seleccionados);
+        }
+
+        // POST: /Tienda/Checkout
+        // Muestra la vista de confirmación con los productos seleccionados, dirección y métodos de pago.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Checkout(string? direccionEntrega, string? productosSeleccionados)
+        {
+            if (string.IsNullOrWhiteSpace(productosSeleccionados))
+            {
+                TempData["Error"] = "No seleccionaste ningún producto.";
+                return RedirectToAction(nameof(Carrito));
+            }
+
+            // Guardar en sesión para sobrevivir recargas F5
+            HttpContext.Session.SetString("Checkout_Seleccionados", productosSeleccionados);
+            HttpContext.Session.SetString("Checkout_Direccion", direccionEntrega ?? "");
+
+            var ids = productosSeleccionados
+                .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                .Select(s => Guid.TryParse(s.Trim(), out var g) ? g : Guid.Empty)
+                .Where(g => g != Guid.Empty)
+                .ToHashSet();
+
+            var carrito = ObtenerCarrito();
+            var seleccionados = carrito.Where(c => ids.Contains(c.ProductoId)).ToList();
+
+            if (!seleccionados.Any())
+            {
+                TempData["Error"] = "Los productos seleccionados no se encontraron en el carrito.";
+                return RedirectToAction(nameof(Carrito));
+            }
+
+            // Sincronizar stock actual
+            var prodIds = seleccionados.Select(c => c.ProductoId).ToList();
+            var productosDb = await _context.Productos
+                .Where(p => prodIds.Contains(p.Id))
+                .ToDictionaryAsync(p => p.Id, p => p);
+
+            foreach (var item in seleccionados)
+                if (productosDb.TryGetValue(item.ProductoId, out var prod))
+                {
+                    item.StockDisponible = prod.Stock;
+                    item.LimiteMaximoPorPedido = prod.LimiteMaximoPorPedido;
+                }
+
+            // Generar código fijo de Supergiros para el usuario actual
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!string.IsNullOrEmpty(userId))
+            {
+                var hashBytes = System.Security.Cryptography.MD5.HashData(System.Text.Encoding.UTF8.GetBytes(userId));
+                ViewBag.SupergirosCode = "SG-" + BitConverter.ToString(hashBytes).Replace("-", "").Substring(0, 7).ToUpper();
+            }
+
+            ViewBag.DireccionEntrega = direccionEntrega ?? "";
+            ViewData["Title"] = "Confirmar Pedido";
+            return View("~/Views/Tienda/_Checkout.cshtml", seleccionados);
+        }
+
+        // POST: /Tienda/RealizarPedido
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RealizarPedido(
+            string? direccionEntrega,
+            string? metodoPago,
+            List<string>? productosSeleccionados,
+            decimal? propina,
+            // Campos de tarjeta
+            string? tarjeta_numero,
+            string? tarjeta_titular,
+            string? tarjeta_vencimiento,
+            string? tarjeta_cvv,
+            string? tarjeta_tipo_documento,
+            string? tarjeta_documento,
+            string? marcaTarjeta)
+        {
+            var metodosValidos = new HashSet<string> { "tarjeta-debito", "tarjeta-credito", "supergiros", "contraentrega" };
+            if (!metodosValidos.Contains(metodoPago ?? ""))
+            {
+                TempData["Error"] = "Selecciona un método de pago válido.";
+                TempData["DireccionEntrega"] = direccionEntrega;
+                TempData["ProductosSeleccionados"] = productosSeleccionados != null
+                    ? string.Join(",", productosSeleccionados) : "";
+                TempData["Propina"] = (propina.HasValue && propina.Value >= 0m)
+                    ? propina.Value.ToString(System.Globalization.CultureInfo.InvariantCulture) : "1000";
+                return RedirectToAction(nameof(CheckoutGet));
+            }
+
+            // ── Validación backend de campos de tarjeta ──────────────────────
+            if (metodoPago!.StartsWith("tarjeta"))
+            {
+                var erroresTarjeta = new List<string>();
+
+                // Número de tarjeta
+                var numLimpio = (tarjeta_numero ?? "").Replace(" ", "").Trim();
+                if (string.IsNullOrEmpty(numLimpio))
+                    erroresTarjeta.Add("El número de tarjeta es obligatorio.");
+                else if (numLimpio.Length < 13 || numLimpio.Length > 16 || !numLimpio.All(char.IsDigit))
+                    erroresTarjeta.Add("El número de tarjeta debe tener entre 13 y 16 dígitos.");
+                else
+                {
+                    var marcaValida = numLimpio.StartsWith("4") ? "visa"
+                        : (new System.Text.RegularExpressions.Regex(@"^5[1-5]|^2[2-7]").IsMatch(numLimpio) ? "mastercard" : "");
+                    if (string.IsNullOrEmpty(marcaValida))
+                        erroresTarjeta.Add("Solo se aceptan tarjetas Visa o Mastercard.");
+                }
+
+                // Titular
+                if (string.IsNullOrWhiteSpace(tarjeta_titular) || tarjeta_titular.Trim().Length < 3)
+                    erroresTarjeta.Add("El nombre del titular es obligatorio (mínimo 3 caracteres).");
+
+                // Vencimiento MM/AA
+                var expRegex = new System.Text.RegularExpressions.Regex(@"^(0[1-9]|1[0-2])\/(\d{2})$");
+                if (string.IsNullOrWhiteSpace(tarjeta_vencimiento) || !expRegex.IsMatch(tarjeta_vencimiento.Trim()))
+                    erroresTarjeta.Add("La fecha de vencimiento debe tener formato MM/AA.");
+                else
+                {
+                    var partes = tarjeta_vencimiento.Trim().Split('/');
+                    int mes = int.Parse(partes[0]), anio = int.Parse(partes[1]) + 2000;
+                    if (new DateTime(anio, mes, 1) < new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1))
+                        erroresTarjeta.Add("La tarjeta está vencida.");
+                }
+
+                // CVV
+                if (string.IsNullOrWhiteSpace(tarjeta_cvv) || !System.Text.RegularExpressions.Regex.IsMatch(tarjeta_cvv.Trim(), @"^\d{3,4}$"))
+                    erroresTarjeta.Add("El código de seguridad (CVV) debe tener 3 o 4 dígitos.");
+
+                // Tipo de documento
+                var tiposDocValidos = new HashSet<string> { "CC", "CE", "PA", "NIT", "TI" };
+                if (string.IsNullOrWhiteSpace(tarjeta_tipo_documento) || !tiposDocValidos.Contains(tarjeta_tipo_documento.Trim()))
+                    erroresTarjeta.Add("Selecciona un tipo de documento válido.");
+
+                // Número de documento
+                if (string.IsNullOrWhiteSpace(tarjeta_documento) || tarjeta_documento.Trim().Length < 5)
+                    erroresTarjeta.Add("El número de documento es obligatorio (mínimo 5 caracteres).");
+
+                if (erroresTarjeta.Any())
+                {
+                    TempData["Error"] = string.Join(" | ", erroresTarjeta);
+                    TempData["DireccionEntrega"] = direccionEntrega;
+                    TempData["ProductosSeleccionados"] = productosSeleccionados != null
+                        ? string.Join(",", productosSeleccionados) : "";
+                    TempData["Propina"] = (propina.HasValue && propina.Value >= 0m)
+                        ? propina.Value.ToString(System.Globalization.CultureInfo.InvariantCulture) : "1000";
+                    return RedirectToAction(nameof(CheckoutGet));
+                }
+            }
+
+            var carrito = ObtenerCarrito();
+
+            // Filtrar solo los productos seleccionados en el checkout
+            List<CarritoItem> itemsPedido;
+            if (productosSeleccionados != null && productosSeleccionados.Any())
+            {
+                var ids = productosSeleccionados
+                    .Select(s => Guid.TryParse(s.Trim(), out var g) ? g : Guid.Empty)
+                    .Where(g => g != Guid.Empty)
+                    .ToHashSet();
+                itemsPedido = carrito.Where(c => ids.Contains(c.ProductoId)).ToList();
+            }
+            else
+            {
+                itemsPedido = carrito;
+            }
+
+            if (!itemsPedido.Any())
+            {
+                TempData["Error"] = "Tu carrito está vacío o no seleccionaste productos.";
                 return RedirectToAction(nameof(Carrito));
             }
 
@@ -292,13 +570,13 @@ namespace Drogueria.Controllers
             if (string.IsNullOrEmpty(usuarioId))
                 return RedirectToAction("Index", "Home");
 
-            // Validar nuevamente el stock antes de confirmar (por si cambió desde que se agregó al carrito)
-            var productosIds = carrito.Select(c => c.ProductoId).ToList();
+            // Validar stock antes de confirmar
+            var productosIds = itemsPedido.Select(c => c.ProductoId).ToList();
             var productos = await _context.Productos
                 .Where(p => productosIds.Contains(p.Id))
                 .ToListAsync();
 
-            foreach (var item in carrito)
+            foreach (var item in itemsPedido)
             {
                 var producto = productos.FirstOrDefault(p => p.Id == item.ProductoId);
                 if (producto == null || !producto.Estado)
@@ -314,17 +592,40 @@ namespace Drogueria.Controllers
                 }
             }
 
+            // Construir etiqueta de método de pago con marca si aplica
+            var etiquetaPago = metodoPago?.Trim() ?? "";
+            if (!string.IsNullOrWhiteSpace(marcaTarjeta))
+            {
+                var marcaLabel = marcaTarjeta.Trim().ToLower() == "visa" ? "Visa"
+                               : marcaTarjeta.Trim().ToLower() == "mastercard" ? "Mastercard"
+                               : marcaTarjeta.Trim();
+                etiquetaPago = $"{etiquetaPago} ({marcaLabel})";
+            }
+
+            // ── Código de entrega (6 dígitos aleatorios para TODOS los pedidos) ──
+            var codigoEntrega = new Random().Next(100000, 999999).ToString();
+
+            // ── Reglas de Envío y Propina ──
+            // Pedidos mayores o iguales a 45.000: envío gratis ($0). Menores: $8.000.
+            // Propina voluntaria: por defecto $1.000, editable incluso en $0.
+            var subtotal = itemsPedido.Sum(c => c.Subtotal);
+            var costoEnvio = subtotal >= 45000m ? 0m : 8000m;
+            var montoPropina = propina.HasValue ? Math.Clamp(Math.Round(propina.Value, 0), 0m, 500000m) : 1000m;
+            var totalFinal = subtotal + costoEnvio + montoPropina;
+
             var pedido = new Pedido
             {
                 Id = Guid.NewGuid(),
                 UsuarioId = usuarioId,
                 Fecha = DateTime.Now,
                 Estado = "Pendiente",
-                Total = carrito.Sum(c => c.Subtotal),
-                DireccionEntrega = direccionEntrega?.Trim()
+                Total = totalFinal,
+                DireccionEntrega = direccionEntrega?.Trim(),
+                MetodoPago = etiquetaPago,
+                CodigoConfirmacion = codigoEntrega
             };
 
-            foreach (var item in carrito)
+            foreach (var item in itemsPedido)
             {
                 // Descontar stock del producto
                 var producto = productos.First(p => p.Id == item.ProductoId);
@@ -371,6 +672,11 @@ namespace Drogueria.Controllers
                 : "Pedido realizado. Se asignará un repartidor pronto.";
 
             TempData["Exito"] = mensajeExito;
+
+            // Pasar código de confirmación de entrega a la vista
+            TempData["CodigoConfirmacion"] = codigoEntrega;
+            TempData["MetodoPagoInfo"] = metodoPago; // 'tarjeta' | 'supergiros' | 'contraentrega'
+
             return RedirectToAction(nameof(MisPedidos));
         }
 
@@ -396,7 +702,24 @@ namespace Drogueria.Controllers
         private List<CarritoItem> ObtenerCarrito()
         {
             var json = HttpContext.Session.GetString(CarritoSessionKey);
-            if (string.IsNullOrEmpty(json)) return new List<CarritoItem>();
+            if (string.IsNullOrEmpty(json))
+            {
+                // Fallback a Cookie persistente para que el carrito nunca se pierda al recargar la página o reiniciar
+                if (Request.Cookies.TryGetValue(CarritoCookieKey, out var cookieJson) && !string.IsNullOrEmpty(cookieJson))
+                {
+                    try
+                    {
+                        var desdeCookie = JsonSerializer.Deserialize<List<CarritoItem>>(cookieJson);
+                        if (desdeCookie != null && desdeCookie.Any())
+                        {
+                            HttpContext.Session.SetString(CarritoSessionKey, cookieJson);
+                            return desdeCookie;
+                        }
+                    }
+                    catch { }
+                }
+                return new List<CarritoItem>();
+            }
             return JsonSerializer.Deserialize<List<CarritoItem>>(json) ?? new List<CarritoItem>();
         }
 
@@ -404,6 +727,22 @@ namespace Drogueria.Controllers
         {
             var json = JsonSerializer.Serialize(carrito);
             HttpContext.Session.SetString(CarritoSessionKey, json);
+
+            // Persistir en Cookie por 30 días para que no se borre al recargar la página
+            if (carrito.Any())
+            {
+                Response.Cookies.Append(CarritoCookieKey, json, new CookieOptions
+                {
+                    Expires = DateTimeOffset.Now.AddDays(30),
+                    HttpOnly = true,
+                    IsEssential = true,
+                    SameSite = SameSiteMode.Lax
+                });
+            }
+            else
+            {
+                Response.Cookies.Delete(CarritoCookieKey);
+            }
         }
     }
 }

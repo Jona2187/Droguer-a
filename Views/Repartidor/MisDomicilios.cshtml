@@ -214,26 +214,34 @@ else
 
 <!-- ── Modal confirmar entrega ─────────────────────────── -->
 <div class="modal fade" id="modalConfirmarEntrega" tabindex="-1" aria-labelledby="modalConfirmarEntregaLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius:16px; border:1px solid var(--border); background:var(--bg-card);">
             <div class="modal-header border-0 pb-0">
                 <h5 class="modal-title fw-bold" id="modalConfirmarEntregaLabel">
-                    <i class="bi bi-check-circle-fill text-success me-2"></i>Confirmar entrega
+                    <i class="bi bi-shield-check text-success me-2"></i>Confirmar Entrega de Pedido
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body py-3">
-                <p class="text-muted mb-0" style="font-size:14px;">
-                    ¿Confirmas que el pedido de <strong id="confirmarClienteNombre">—</strong> fue entregado exitosamente?
+                <p class="text-muted mb-2" style="font-size:14px;">
+                    Solicita al cliente <strong id="confirmarClienteNombre">—</strong> su <strong>código de confirmación de 6 dígitos</strong> para validar la entrega:
                 </p>
-                <p class="text-muted mt-2 mb-0" style="font-size:12px;">
-                    <i class="bi bi-info-circle me-1"></i>Esta acción no se puede deshacer.
+                <div class="my-3">
+                    <input type="text" id="confirmarCodigoInput" name="codigoConfirmacion" maxlength="6"
+                           class="form-control form-control-lg text-center font-monospace fw-bold"
+                           style="letter-spacing: 0.25em; font-size: 24px;"
+                           placeholder="000000" inputmode="numeric"
+                           onkeypress="return /\d/.test(event.key)" />
+                    <div id="confirmarCodigoError" class="text-danger small mt-1 text-center" style="display:none;"></div>
+                </div>
+                <p class="text-muted mb-0" style="font-size:12px;">
+                    <i class="bi bi-info-circle me-1"></i>El cliente puede ver su código desde la sección "Mis Pedidos".
                 </p>
             </div>
             <div class="modal-footer border-0 pt-0">
                 <button type="button" class="btn btn-ghost rounded-pill px-3" data-bs-dismiss="modal">Cancelar</button>
                 <button type="button" class="btn btn-success rounded-pill px-4 fw-semibold" onclick="confirmarEntregado()">
-                    <i class="bi bi-check-lg me-1"></i>Sí, entregado
+                    <i class="bi bi-check-lg me-1"></i>Validar y Entregar
                 </button>
             </div>
         </div>
@@ -245,6 +253,7 @@ else
     @Html.AntiForgeryToken()
     <input type="hidden" id="confirmarPedidoId" name="id" value="" />
     <input type="hidden" name="estado" value="Entregado" />
+    <input type="hidden" id="hdnCodigoConfirmacionModal" name="codigoConfirmacion" value="" />
 </form>
 @section Scripts {
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -330,11 +339,34 @@ document.addEventListener("DOMContentLoaded", function () {
 function abrirConfirmarEntrega(pedidoId, clienteNombre) {
     document.getElementById('confirmarPedidoId').value = pedidoId;
     document.getElementById('confirmarClienteNombre').textContent = clienteNombre;
+    const inputEl = document.getElementById('confirmarCodigoInput');
+    const errEl = document.getElementById('confirmarCodigoError');
+    if (inputEl) {
+        inputEl.value = '';
+        inputEl.classList.remove('is-invalid');
+    }
+    if (errEl) errEl.style.display = 'none';
+
     var modal = new bootstrap.Modal(document.getElementById('modalConfirmarEntrega'));
     modal.show();
 }
 
 async function confirmarEntregado() {
+    const inputEl = document.getElementById('confirmarCodigoInput');
+    const errEl = document.getElementById('confirmarCodigoError');
+    const codigoVal = (inputEl ? inputEl.value : '').trim();
+
+    if (!codigoVal || codigoVal.length !== 6) {
+        if (inputEl) inputEl.classList.add('is-invalid');
+        if (errEl) {
+            errEl.textContent = 'Ingresa el código completo de 6 dígitos.';
+            errEl.style.display = 'block';
+        }
+        return;
+    }
+
+    document.getElementById('hdnCodigoConfirmacionModal').value = codigoVal;
+
     const form = document.getElementById('formConfirmarEntregado');
     const modalEl = document.getElementById('modalConfirmarEntrega');
     const modal = bootstrap.Modal.getInstance(modalEl);
@@ -345,7 +377,12 @@ async function confirmarEntregado() {
         window.showAppToast(res.message || 'Pedido marcado como entregado.', 'success');
         setTimeout(() => location.reload(), 600);
     } else {
-        window.showAppToast(res.message || 'Error al actualizar el pedido.', 'error');
+        if (inputEl) inputEl.classList.add('is-invalid');
+        if (errEl) {
+            errEl.textContent = res.message || 'El código ingresado es incorrecto.';
+            errEl.style.display = 'block';
+        }
+        window.showAppToast(res.message || 'Error al validar el código.', 'error');
     }
 }
 </script>

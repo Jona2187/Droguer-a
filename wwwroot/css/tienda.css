@@ -1188,3 +1188,29 @@
 .modal-btn-add:active {
     transform: translateY(0);
 }
+
+/* ==========================================================================
+   DARK MODE — OVERRIDES TIENDA
+   ========================================================================== */
+
+/* Punto de stock: verde más luminoso en dark para que contraste */
+[data-bs-theme="dark"] .stock-indicator-dot {
+    background: #4ade80;
+    box-shadow: 0 0 8px rgba(74, 222, 128, 0.6);
+}
+
+/* Modal imagen wrapper: sombra más fuerte en dark */
+[data-bs-theme="dark"] .modal-producto-img-wrapper {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+}
+
+/* navbar del cliente en dark: asegurar fondo correcto */
+[data-bs-theme="dark"] .cliente-navbar-wrap {
+    background-color: var(--tienda-glass);
+    border-bottom-color: var(--tienda-border);
+}
+
+/* Carrito tabla: hover row en dark */
+[data-bs-theme="dark"] .carrito-table tr:hover td {
+    background-color: var(--bg-hover);
+}

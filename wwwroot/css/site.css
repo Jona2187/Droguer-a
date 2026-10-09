@@ -2063,19 +2063,19 @@ body.modal-open .sticky-top {
 
 .dash-kpi-icon.teal {
     background: linear-gradient(135deg, rgba(20, 184, 166, 0.2), rgba(45, 212, 191, 0.1));
-    color: #0d9488;
+    color: var(--teal);
     box-shadow: 0 8px 18px rgba(20, 184, 166, 0.22);
 }
 
 .dash-kpi-icon.orange {
     background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(251, 146, 60, 0.1));
-    color: #d97706;
+    color: var(--orange);
     box-shadow: 0 8px 18px rgba(245, 158, 11, 0.22);
 }
 
 .dash-kpi-icon.blue {
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(96, 165, 250, 0.1));
-    color: #2563eb;
+    color: #3b82f6;
     box-shadow: 0 8px 18px rgba(59, 130, 246, 0.22);
 }
 
@@ -2134,8 +2134,6 @@ body.modal-open .sticky-top {
     background: rgba(59, 130, 246, 0.14);
     color: #2563eb;
 }
-
-/* Tarjetas de Gráficos y Tablas */
 .dash-chart-card {
     background: var(--bg-card);
     border: 1px solid var(--border);
@@ -2450,4 +2448,74 @@ body.modal-open .sticky-top {
     .dash-kpi-grid {
         grid-template-columns: 1fr;
     }
+}
+
+/* ==========================================================================
+   DARK MODE — OVERRIDES DASHBOARD (trend pills, kpi icons, hero)
+   ========================================================================== */
+
+/* Trend pills: colores más luminosos para contrastar sobre fondo oscuro */
+[data-bs-theme="dark"] .dash-trend-pill.green {
+    background: rgba(34, 197, 94, 0.18);
+    color: #4ade80;
+}
+
+[data-bs-theme="dark"] .dash-trend-pill.orange {
+    background: rgba(251, 146, 60, 0.18);
+    color: #fb923c;
+}
+
+[data-bs-theme="dark"] .dash-trend-pill.blue {
+    background: rgba(96, 165, 250, 0.18);
+    color: #60a5fa;
+}
+
+/* KPI icons: ajustar fondos y sombras para modo oscuro */
+[data-bs-theme="dark"] .dash-kpi-icon.teal {
+    background: linear-gradient(135deg, rgba(45, 212, 191, 0.22), rgba(20, 184, 166, 0.12));
+    color: #2dd4bf;
+    box-shadow: 0 8px 18px rgba(45, 212, 191, 0.18);
+}
+
+[data-bs-theme="dark"] .dash-kpi-icon.orange {
+    background: linear-gradient(135deg, rgba(251, 146, 60, 0.22), rgba(245, 158, 11, 0.12));
+    color: #fb923c;
+    box-shadow: 0 8px 18px rgba(251, 146, 60, 0.18);
+}
+
+[data-bs-theme="dark"] .dash-kpi-icon.blue {
+    background: linear-gradient(135deg, rgba(96, 165, 250, 0.22), rgba(59, 130, 246, 0.12));
+    color: #60a5fa;
+    box-shadow: 0 8px 18px rgba(96, 165, 250, 0.18);
+}
+
+[data-bs-theme="dark"] .dash-kpi-icon.purple {
+    background: linear-gradient(135deg, rgba(167, 139, 250, 0.22), rgba(139, 92, 246, 0.12));
+    color: var(--primary);
+    box-shadow: 0 8px 18px rgba(139, 92, 246, 0.22);
+}
+
+/* Dashboard hero: reducir brillo del gradiente en dark */
+[data-bs-theme="dark"] .dash-hero {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.18) 0%, rgba(99, 102, 241, 0.1) 45%, rgba(45, 212, 191, 0.1) 100%);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
+}
+
+[data-bs-theme="dark"] .dash-hero::before {
+    background: radial-gradient(circle, rgba(167, 139, 250, 0.2) 0%, transparent 70%);
+}
+
+/* KPI card hover en dark */
+[data-bs-theme="dark"] .dash-kpi-card:hover {
+    box-shadow: 0 16px 36px rgba(139, 92, 246, 0.22);
+}
+
+/* Action card hover en dark */
+[data-bs-theme="dark"] .dash-action-card:hover {
+    box-shadow: 0 8px 20px rgba(139, 92, 246, 0.18);
+}
+
+/* table-modern hover en dark: usar bg-hover en vez de primary-light */
+[data-bs-theme="dark"] .table-modern tr:hover td {
+    background-color: var(--bg-hover);
 }

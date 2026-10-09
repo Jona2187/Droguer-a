@@ -1098,3 +1098,52 @@
     box-shadow: 0 14px 36px rgba(139, 92, 246, 0.35);
     border: 1px solid rgba(192, 132, 252, 0.3) !important;
 }
+
+/* ==========================================================================
+   DARK MODE — OVERRIDES ADICIONALES LAYOUT PÚBLICO
+   ========================================================================== */
+
+/* Dropdown login: sombra adecuada en dark */
+[data-bs-theme="dark"] .pub-login-dropdown {
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(139, 92, 246, 0.2);
+}
+
+/* Botón login: sombra dark */
+[data-bs-theme="dark"] .pub-login-btn {
+    box-shadow: 0 3px 10px rgba(139, 92, 246, 0.38);
+}
+[data-bs-theme="dark"] .pub-login-btn:hover {
+    box-shadow: 0 6px 18px rgba(139, 92, 246, 0.5);
+}
+
+/* Navbar hamburger en dark */
+[data-bs-theme="dark"] .pub-hamburger {
+    background-color: var(--bg-muted);
+}
+
+/* Menú móvil: fondo correcto en dark */
+[data-bs-theme="dark"] .pub-mobile-menu {
+    background-color: var(--bg-card);
+    border-top-color: var(--border);
+}
+
+/* Sección servicios / consejos / informacion: bordes sutiles en dark */
+[data-bs-theme="dark"] .pagina-inicio .servicios,
+[data-bs-theme="dark"] .pagina-inicio .consejos,
+[data-bs-theme="dark"] .pagina-inicio .informacion,
+[data-bs-theme="dark"] .pagina-inicio .carrusel-pastillas {
+    border-top-color: var(--border) !important;
+    border-bottom-color: var(--border) !important;
+}
+
+/* Botón "Mostrar más productos" en dark */
+[data-bs-theme="dark"] .pub-btn-more-products {
+    border-color: rgba(167, 139, 250, 0.35);
+}
+
+/* pub-brand-logo: sin fondo ni sombra violeta en dark (imagen limpia) */
+[data-bs-theme="dark"] .pub-brand-logo,
+[data-bs-theme="dark"] .pub-footer-logo-box {
+    background: transparent;
+    box-shadow: none;
+}

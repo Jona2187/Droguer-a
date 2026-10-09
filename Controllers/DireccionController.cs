@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -20,9 +20,9 @@ namespace Drogueria.Controllers
             _httpClientFactory = httpClientFactory;
         }
 
-        // GET: /Direccion/Geocodificar?direccion=...&ciudad=...
+        // GET: /Direccion/Geocodificar
         [HttpGet]
-        public async Task<IActionResult> Geocodificar(string? direccion, string? ciudad)
+        public async Task<IActionResult> Geocodificar(string? direccion, string? ciudad, string? departamento)
         {
             if (string.IsNullOrWhiteSpace(direccion))
                 return Json(new { success = false, message = "Ingresa una dirección primero." });
@@ -32,12 +32,15 @@ namespace Drogueria.Controllers
                 .Replace("#", "")
                 .Replace("  ", " ")
                 .Trim();
-            var query = $"{dirLimpia} {ciudad} Colombia".Trim();
+            var query = $"{dirLimpia}, {ciudad}, {departamento}, Colombia".Trim(',', ' ');
             var url = $"https://nominatim.openstreetmap.org/search?q={Uri.EscapeDataString(query)}&format=json&limit=1&addressdetails=1";
 
             try
             {
                 var client = _httpClientFactory.CreateClient("Nominatim");
+                if (!client.DefaultRequestHeaders.Contains("User-Agent"))
+                    client.DefaultRequestHeaders.UserAgent.ParseAdd("DrogueriaApp/1.0");
+
                 var response = await client.GetAsync(url);
                 if (!response.IsSuccessStatusCode)
                     return Json(new { success = false, message = "No se pudo consultar el servicio de mapas." });
@@ -46,7 +49,20 @@ namespace Drogueria.Controllers
                 var resultados = JsonSerializer.Deserialize<JsonElement[]>(json);
 
                 if (resultados == null || resultados.Length == 0)
-                    return Json(new { success = false, message = "No se encontró la dirección. Verifica que sea correcta." });
+                {
+                    // Fallback solo con ciudad
+                    var query2 = $"{dirLimpia}, {ciudad}, Colombia".Trim(',', ' ');
+                    var url2 = $"https://nominatim.openstreetmap.org/search?q={Uri.EscapeDataString(query2)}&format=json&limit=1&addressdetails=1";
+                    var resp2 = await client.GetAsync(url2);
+                    if (resp2.IsSuccessStatusCode)
+                    {
+                        var json2 = await resp2.Content.ReadAsStringAsync();
+                        resultados = JsonSerializer.Deserialize<JsonElement[]>(json2);
+                    }
+                }
+
+                if (resultados == null || resultados.Length == 0)
+                    return Json(new { success = false, message = "La dirección ingresada no corresponde a una ubicación real o no fue encontrada en el mapa de Colombia." });
 
                 var r = resultados[0];
                 var lat = double.Parse(r.GetProperty("lat").GetString()!, System.Globalization.CultureInfo.InvariantCulture);
@@ -55,7 +71,7 @@ namespace Drogueria.Controllers
 
                 return Json(new { success = true, lat, lon, displayName });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return Json(new { success = false, message = "Error al conectar con el servicio de mapas." });
             }
@@ -110,12 +126,49 @@ namespace Drogueria.Controllers
                 return Json(new { success = false, message = "El nombre de contacto es obligatorio." });
             if (string.IsNullOrWhiteSpace(telefono))
                 return Json(new { success = false, message = "El teléfono es obligatorio." });
-            if (string.IsNullOrWhiteSpace(direccion))
-                return Json(new { success = false, message = "La dirección es obligatoria." });
-            if (string.IsNullOrWhiteSpace(ciudad))
-                return Json(new { success = false, message = "La ciudad es obligatoria." });
             if (string.IsNullOrWhiteSpace(departamento))
                 return Json(new { success = false, message = "El departamento es obligatorio." });
+            if (string.IsNullOrWhiteSpace(ciudad))
+                return Json(new { success = false, message = "La ciudad es obligatoria." });
+            if (string.IsNullOrWhiteSpace(direccion))
+                return Json(new { success = false, message = "La dirección es obligatoria." });
+
+            // ── Validación de ubicación geográfica real mediante Nominatim ──
+            try
+            {
+                var dirLimpia = direccion.Replace("#", "").Trim();
+                var queryGeo = $"{dirLimpia}, {ciudad}, {departamento}, Colombia".Trim(',', ' ');
+                var client = _httpClientFactory.CreateClient("Nominatim");
+                if (!client.DefaultRequestHeaders.Contains("User-Agent"))
+                    client.DefaultRequestHeaders.UserAgent.ParseAdd("DrogueriaApp/1.0");
+
+                var respGeo = await client.GetAsync($"https://nominatim.openstreetmap.org/search?q={Uri.EscapeDataString(queryGeo)}&format=json&limit=1");
+                if (respGeo.IsSuccessStatusCode)
+                {
+                    var jsonGeo = await respGeo.Content.ReadAsStringAsync();
+                    var resultadosGeo = JsonSerializer.Deserialize<JsonElement[]>(jsonGeo);
+
+                    if (resultadosGeo == null || resultadosGeo.Length == 0)
+                    {
+                        var queryFallback = $"{dirLimpia}, {ciudad}, Colombia".Trim(',', ' ');
+                        var respFallback = await client.GetAsync($"https://nominatim.openstreetmap.org/search?q={Uri.EscapeDataString(queryFallback)}&format=json&limit=1");
+                        if (respFallback.IsSuccessStatusCode)
+                        {
+                            var jsonFallback = await respFallback.Content.ReadAsStringAsync();
+                            resultadosGeo = JsonSerializer.Deserialize<JsonElement[]>(jsonFallback);
+                        }
+                    }
+
+                    if (resultadosGeo == null || resultadosGeo.Length == 0)
+                    {
+                        return Json(new { success = false, message = "La dirección ingresada no corresponde a una ubicación real o no se encontró en el mapa. Ingresa una nomenclatura válida (Ej: Calle 45 # 12-34)." });
+                    }
+                }
+            }
+            catch
+            {
+                // Si hay problemas de conexión con Nominatim, se permite guardar para no bloquear al usuario por fallas de terceros
+            }
 
             bool esNueva = id == null || id == Guid.Empty;
 

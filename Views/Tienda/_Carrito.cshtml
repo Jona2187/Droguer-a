@@ -187,6 +187,11 @@
                         <table class="carrito-table">
                             <thead>
                                 <tr>
+                                    <th style="width:40px; text-align:center;">
+                                        <input type="checkbox" id="chkTodos" title="Seleccionar todos"
+                                               onchange="toggleTodos(this)"
+                                               style="width:17px;height:17px;cursor:pointer;" />
+                                    </th>
                                     <th>Producto</th>
                                     <th>Precio</th>
                                     <th style="width: 140px; text-align: center;">Cantidad</th>
@@ -201,7 +206,12 @@
                                         ? (item.Imagen.StartsWith("http") ? item.Imagen : (item.Imagen.StartsWith("/") ? item.Imagen : "/" + item.Imagen))
                                         : "";
 
-                                    <tr data-producto-id="@item.ProductoId" data-stock="@item.StockDisponible" data-limite="@(item.LimiteMaximoPorPedido?.ToString() ?? "")">
+                                    <tr data-producto-id="@item.ProductoId" data-stock="@item.StockDisponible" data-limite="@(item.LimiteMaximoPorPedido?.ToString() ?? "")" data-subtotal="@item.Subtotal.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)">
+                                        <td style="text-align:center; vertical-align:middle;">
+                                            <input type="checkbox" class="chk-producto" value="@item.ProductoId"
+                                                   checked onchange="actualizarSeleccion()"
+                                                   style="width:17px;height:17px;cursor:pointer;" />
+                                        </td>
                                         <td>
                                             <div class="d-flex align-items-center gap-3">
                                                 @if (!string.IsNullOrEmpty(imgUrl))
@@ -297,28 +307,40 @@
                             <span class="text-muted">Subtotal</span>
                             <span class="fw-semibold" id="resumenSubtotal">$@total.ToString("N2")</span>
                         </div>
-                        <div class="d-flex justify-content-between mb-2">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
                             <span class="text-muted">Envío</span>
-                            <span class="text-success fw-semibold">Gratis</span>
+                            <span class="fw-semibold @(total >= 45000m ? "text-success" : "")" id="resumenEnvio">
+                                @(total >= 45000m ? "Gratis" : (total > 0 ? "$8,000.00" : "$0.00"))
+                            </span>
                         </div>
+                        <div id="bannerEnvioGratis" class="alert py-1 px-2 mb-2 small d-flex align-items-center gap-2"
+                             style="display:none;"></div>
                         <div class="d-flex justify-content-between mb-3">
                             <span class="text-muted">Impuestos incluidos</span>
                             <span class="text-muted">$0.00</span>
                         </div>
                         <hr />
                         <div class="d-flex justify-content-between align-items-center mb-4">
-                            <span class="fw-bold fs-5">Total a Pagar</span>
-                            <span class="carrito-total-amount" id="totalAPagar">$@total.ToString("N2")</span>
+                            <div>
+                                <span class="fw-bold fs-5 d-block">Total Estimado</span>
+                                <small class="text-muted" style="font-size:11px;">(Subtotal + Envío)</small>
+                            </div>
+                            <span class="carrito-total-amount" id="totalAPagar">$@((total + (total >= 45000m ? 0m : (total > 0 ? 8000m : 0m))).ToString("N2"))</span>
                         </div>
 
-                        <form asp-controller="Tienda" asp-action="RealizarPedido" method="post"
-                              id="formPedido" onsubmit="return validarDireccion()">
+                        <div id="sinSeleccionWarn" class="alert alert-warning py-2 small mb-3" style="display:none;">
+                            <i class="bi bi-exclamation-triangle me-1"></i>
+                            Selecciona al menos un producto para continuar.
+                        </div>
+                        <form id="formCheckout" method="post" action="/Tienda/Checkout"
+                              onsubmit="return prepararCheckout()">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="direccionEntrega" id="hdnDireccionEntrega" />
-                            <button type="submit"
+                            <input type="hidden" name="productosSeleccionados" id="hdnProductosSeleccionados" />
+                            <button type="submit" id="btnIrCheckout"
                                     class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2">
                                 <i class="bi bi-bag-check-fill fs-5"></i>
-                                <span>Confirmar y Realizar Pedido</span>
+                                <span>Realizar Pedido</span>
                             </button>
                         </form>
 
@@ -334,9 +356,8 @@
     }
 </div>
 
-<!-- ═══════════════════════════════════════════════════════
-     MODAL CREAR / EDITAR DIRECCIÓN
-═══════════════════════════════════════════════════════ -->
+<!-- MODAL CREAR / EDITAR DIRECCIÓN -->
+
 <div class="modal fade" id="modalDireccion" tabindex="-1" aria-labelledby="modalDireccionLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content modal-glass">
@@ -359,18 +380,7 @@
                         <input type="tel" class="form-control" id="mdTelefono" maxlength="20"
                                placeholder="Ej. 3001234567" />
                     </div>
-                    <div class="col-12">
-                        <label class="form-label fw-semibold small">Dirección <span class="text-danger">*</span></label>
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="mdDireccion" maxlength="300"
-                                   placeholder="Ej. Cra 15 #45-23" />
-                            <button type="button" class="btn btn-outline-primary" onclick="validarDireccionMapa()"
-                                    id="btnValidarMapa" title="Buscar en el mapa">
-                                <i class="bi bi-search me-1"></i>Validar
-                            </button>
-                        </div>
-                        <div id="mapValidacionMsg" class="form-text"></div>
-                    </div>
+                    <!-- 1. Departamento -->
                     <div class="col-sm-6">
                         <label class="form-label fw-semibold small">Departamento <span class="text-danger">*</span></label>
                         <div class="custom-select-wrap" id="wrapDepartamento">
@@ -382,8 +392,9 @@
                             <div class="custom-dropdown" id="dropDepartamento"></div>
                         </div>
                     </div>
+                    <!-- 2. Ciudad -->
                     <div class="col-sm-6">
-                        <label class="form-label fw-semibold small">Ciudad <span class="text-danger">*</span></label>
+                        <label class="form-label fw-semibold small">Ciudad / Municipio <span class="text-danger">*</span></label>
                         <div class="custom-select-wrap" id="wrapCiudad">
                             <input type="text" class="form-control" id="mdCiudad"
                                    placeholder="Selecciona primero el departamento..." autocomplete="off"
@@ -393,6 +404,19 @@
                                    onblur="ocultarDropdown('dropCiudad')" />
                             <div class="custom-dropdown" id="dropCiudad"></div>
                         </div>
+                    </div>
+                    <!-- 3. Dirección específica -->
+                    <div class="col-12">
+                        <label class="form-label fw-semibold small">Dirección Exacta (Nomenclatura) <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="mdDireccion" maxlength="300"
+                                   placeholder="Ej. Calle 45 # 12-34 / Carrera 15 # 45-23" />
+                            <button type="button" class="btn btn-outline-primary" onclick="validarDireccionMapa()"
+                                    id="btnValidarMapa" title="Validar ubicación en mapa">
+                                <i class="bi bi-geo-alt-fill me-1"></i>Validar Ubicación
+                            </button>
+                        </div>
+                        <div id="mapValidacionMsg" class="form-text"></div>
                     </div>
                     <div class="col-12">
                         <div class="form-check">
@@ -571,9 +595,8 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 
 <script>
-    // ═══════════════════════════════════════════════════════
     //  ESTADO EN MEMORIA
-    // ═══════════════════════════════════════════════════════
+
     const csrfToken = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
 
     // Mapa en memoria: id (string) -> objeto dirección
@@ -610,9 +633,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     })();
 
-    // ═══════════════════════════════════════════════════════
-    //  SELECCIONAR DIRECCIÓN
-    // ═══════════════════════════════════════════════════════
+    // SELECCIONAR DIRECCIÓN
     function seleccionarDireccion(card) {
         document.querySelectorAll('.direccion-card').forEach(c => c.classList.remove('selected'));
         card.classList.add('selected');
@@ -620,9 +641,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('errorDireccion').style.display = 'none';
     }
 
-    // ═══════════════════════════════════════════════════════
-    //  ABRIR MODAL (nueva dirección)
-    // ═══════════════════════════════════════════════════════
+    // ABRIR MODAL (nueva dirección)
     function abrirModalDireccion() {
         limpiarModal();
         document.getElementById('modalDireccionLabel').innerHTML =
@@ -631,7 +650,12 @@ document.addEventListener('DOMContentLoaded', function () {
         modal.show();
     }
 
+    let direccionValidadaOk = false;
+    let direccionValidadaTexto = "";
+
     function limpiarModal() {
+        direccionValidadaOk = false;
+        direccionValidadaTexto = "";
         document.getElementById('mdDirId').value = '';
         document.getElementById('mdNombre').value = '';
         document.getElementById('mdTelefono').value = '';
@@ -645,6 +669,13 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('mapValidacionMsg').textContent = '';
         document.getElementById('mapValidacionMsg').className = 'form-text';
         document.getElementById('mapaValidacionWrap').style.display = 'none';
+
+        const btnVal = document.getElementById('btnValidarMapa');
+        if (btnVal) {
+            btnVal.disabled = false;
+            btnVal.innerHTML = '<i class="bi bi-geo-alt-fill me-1"></i>Validar Ubicación';
+        }
+
         // Destruir mapa si existe para evitar doble inicialización
         if (mapaLeaflet) {
             mapaLeaflet.remove();
@@ -653,9 +684,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // ═══════════════════════════════════════════════════════
     //  EDITAR DIRECCIÓN
-    // ═══════════════════════════════════════════════════════
     async function editarDireccion(event, id) {
         event.stopPropagation();
 
@@ -695,9 +724,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // ═══════════════════════════════════════════════════════
-    //  GUARDAR DIRECCIÓN (crear o editar)
-    // ═══════════════════════════════════════════════════════
+    // GUARDAR DIRECCIÓN (crear o editar)
     async function guardarDireccion() {
         const id = document.getElementById('mdDirId').value?.trim();
         const nombre = document.getElementById('mdNombre').value?.trim();
@@ -710,9 +737,19 @@ document.addEventListener('DOMContentLoaded', function () {
         // Validación local
         if (!nombre) { resaltarCampo('mdNombre', 'El nombre es obligatorio.'); return; }
         if (!telefono) { resaltarCampo('mdTelefono', 'El teléfono es obligatorio.'); return; }
-        if (!direccion) { resaltarCampo('mdDireccion', 'La dirección es obligatoria.'); return; }
-        if (!ciudad) { resaltarCampo('mdCiudad', 'La ciudad es obligatoria.'); return; }
         if (!departamento) { resaltarCampo('mdDepartamento', 'El departamento es obligatorio.'); return; }
+        if (!ciudad) { resaltarCampo('mdCiudad', 'La ciudad es obligatoria.'); return; }
+        if (!direccion) { resaltarCampo('mdDireccion', 'La dirección es obligatoria.'); return; }
+
+        // Validar obligatoriamente ubicación real en mapa antes de guardar
+        const claveActual = `${direccion}|${ciudad}|${departamento}`;
+        if (!direccionValidadaOk || direccionValidadaTexto !== claveActual) {
+            const okMap = await validarDireccionMapa();
+            if (!okMap) {
+                mostrarToast('Debes ingresar una dirección real válida y verificarla en el mapa.', 'danger');
+                return;
+            }
+        }
 
         const btn = document.getElementById('btnGuardarDireccion');
         const originalHtml = btn.innerHTML;
@@ -761,9 +798,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // ═══════════════════════════════════════════════════════
-    //  ELIMINAR DIRECCIÓN
-    // ═══════════════════════════════════════════════════════
+    // ELIMINAR DIRECCIÓN
     async function eliminarDireccion(event, id, btn) {
         event.stopPropagation();
 
@@ -812,9 +847,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // ═══════════════════════════════════════════════════════
-    //  RECARGAR TARJETAS DESDE SERVIDOR
-    // ═══════════════════════════════════════════════════════
+    // RECARGAR TARJETAS DESDE SERVIDOR
     async function recargarTarjetasDirecciones() {
         try {
             const resp = await fetch('/Direccion/MisDirecciones', {
@@ -832,9 +865,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // ═══════════════════════════════════════════════════════
     //  RENDERIZAR TARJETAS EN EL DOM
-    // ═══════════════════════════════════════════════════════
     function renderizarTarjetas(dirs) {
         const contenedor = document.getElementById('listaDirecciones');
         const seleccionadaActual = document.getElementById('direccionSeleccionadaId').value;
@@ -897,46 +928,64 @@ document.addEventListener('DOMContentLoaded', function () {
     async function validarDireccionMapa() {
         const direccion = document.getElementById('mdDireccion').value?.trim();
         const ciudad = document.getElementById('mdCiudad').value?.trim();
+        const departamento = document.getElementById('mdDepartamento').value?.trim();
 
-        if (!direccion) {
-            document.getElementById('mapValidacionMsg').textContent = 'Ingresa una dirección primero.';
-            document.getElementById('mapValidacionMsg').className = 'form-text text-danger';
-            return;
+        const msgEl = document.getElementById('mapValidacionMsg');
+
+        if (!departamento) {
+            msgEl.textContent = 'Selecciona un departamento primero.';
+            msgEl.className = 'form-text text-danger';
+            resaltarCampo('mdDepartamento', 'Selecciona el departamento.');
+            return false;
+        }
+
+        if (!ciudad) {
+            msgEl.textContent = 'Selecciona una ciudad primero.';
+            msgEl.className = 'form-text text-danger';
+            resaltarCampo('mdCiudad', 'Selecciona la ciudad.');
+            return false;
+        }
+
+        if (!direccion || direccion.length < 3) {
+            msgEl.textContent = 'Ingresa una dirección o nomenclatura específica.';
+            msgEl.className = 'form-text text-danger';
+            resaltarCampo('mdDireccion', 'La dirección es obligatoria.');
+            return false;
         }
 
         const btn = document.getElementById('btnValidarMapa');
         const originalHtml = btn.innerHTML;
         btn.disabled = true;
-        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Buscando...';
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Validando en Mapa...';
 
-        const msgEl = document.getElementById('mapValidacionMsg');
         msgEl.textContent = '';
 
         try {
-            // Llamar al servidor para geocodificar (evita bloqueos CORS y User-Agent de Nominatim)
-            const params = new URLSearchParams({ direccion, ciudad: ciudad || '' });
+            // Llamar al servidor para geocodificar con departamento y ciudad
+            const params = new URLSearchParams({ direccion, ciudad, departamento });
             const resp = await fetch('/Direccion/Geocodificar?' + params.toString(), {
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             });
             const data = await resp.json();
 
             if (data.success) {
+                direccionValidadaOk = true;
+                direccionValidadaTexto = `${direccion}|${ciudad}|${departamento}`;
+
                 const lat = data.lat;
                 const lon = data.lon;
 
                 // Mostrar mensaje de éxito PRIMERO y mantenerlo
-                msgEl.innerHTML = `<i class="bi bi-check-circle-fill text-success me-1"></i>Dirección encontrada: ${data.displayName}`;
+                msgEl.innerHTML = `<i class="bi bi-check-circle-fill text-success me-1"></i><strong>Ubicación Real Confirmada:</strong> ${data.displayName}`;
                 msgEl.className = 'form-text text-success';
 
-                // Restaurar botón antes de inicializar el mapa
                 btn.disabled = false;
-                btn.innerHTML = originalHtml;
+                btn.innerHTML = '<i class="bi bi-check-circle-fill text-success me-1"></i>Ubicación Válida';
 
                 // Mostrar contenedor del mapa
                 const mapaWrap = document.getElementById('mapaValidacionWrap');
                 mapaWrap.style.display = 'block';
 
-                // Esperar a que el DOM renderice el div del mapa
                 await new Promise(r => setTimeout(r, 250));
 
                 try {
@@ -956,34 +1005,34 @@ document.addEventListener('DOMContentLoaded', function () {
                         }).addTo(mapaLeaflet);
                         mapaMarker = L.marker([lat, lon])
                             .addTo(mapaLeaflet)
-                            .bindPopup('Dirección encontrada')
+                            .bindPopup('<b>Ubicación Confirmada</b><br>' + data.displayName)
                             .openPopup();
                         setTimeout(() => mapaLeaflet.invalidateSize(), 300);
                     }
                 } catch (mapErr) {
-                    console.error('Error al inicializar mapa:', mapErr);
-                    // El mensaje verde ya está visible, el mapa falló pero la dirección es válida
-                    mapaWrap.style.display = 'none';
+                    console.error('Error mapa:', mapErr);
                 }
-                return; // salir sin ejecutar el finally que restaura el botón de nuevo
+                return true;
             } else {
-                msgEl.innerHTML = `<i class="bi bi-exclamation-circle-fill text-warning me-1"></i>${data.message}`;
-                msgEl.className = 'form-text text-warning';
-                document.getElementById('mapaValidacionWrap').style.display = 'none';
+                direccionValidadaOk = false;
+                msgEl.innerHTML = `<i class="bi bi-exclamation-triangle-fill text-danger me-1"></i><strong>Ubicación No Encontrada:</strong> ${data.message}`;
+                msgEl.className = 'form-text text-danger';
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+                return false;
             }
         } catch (e) {
-            console.error('Error al geocodificar:', e);
-            msgEl.innerHTML = `<i class="bi bi-wifi-off me-1"></i>No se pudo conectar al servicio de mapas.`;
-            msgEl.className = 'form-text text-muted';
-        } finally {
+            console.error(e);
+            direccionValidadaOk = false;
+            msgEl.textContent = 'Error al conectar con el servidor de mapas.';
+            msgEl.className = 'form-text text-danger';
             btn.disabled = false;
             btn.innerHTML = originalHtml;
+            return false;
         }
     }
 
-    // ═══════════════════════════════════════════════════════
-    //  VALIDAR ANTES DE ENVIAR EL PEDIDO
-    // ═══════════════════════════════════════════════════════
+    // VALIDAR ANTES DE ENVIAR EL PEDIDO
     function validarDireccion() {
         const id = document.getElementById('direccionSeleccionadaId').value?.trim();
         if (!id) {
@@ -1091,6 +1140,10 @@ document.addEventListener('DOMContentLoaded', function () {
             const data = await response.json();
 
             if (data.success) {
+                const fila = document.querySelector(`tr[data-producto-id="${productoId}"]`);
+                if (fila) {
+                    fila.setAttribute('data-subtotal', data.subtotalItem);
+                }
                 const subtotalCell = document.querySelector(`.carrito-subtotal[data-producto-id="${productoId}"]`);
                 if (subtotalCell)
                     subtotalCell.textContent = '$' + data.subtotalItem.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
@@ -1190,12 +1243,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function actualizarTotales(totalCarrito, totalItems) {
-        const resumenSubtotal = document.getElementById('resumenSubtotal');
-        const totalAPagar = document.getElementById('totalAPagar');
+        actualizarSeleccion();
         const totalItemsEl = document.getElementById('totalItemsCarrito');
-        const fmt = v => '$' + v.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
-        if (resumenSubtotal) resumenSubtotal.textContent = fmt(totalCarrito);
-        if (totalAPagar) totalAPagar.textContent = fmt(totalCarrito);
         if (totalItemsEl) totalItemsEl.textContent = totalItems + ' artículo(s) en total';
         if (typeof actualizarBadgeCarrito === 'function') actualizarBadgeCarrito(totalItems);
     }
@@ -1229,5 +1278,124 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         document.getElementById('mapaValidacionWrap').style.display = 'none';
     });
+
+    function toggleTodos(chk) {
+        document.querySelectorAll('.chk-producto').forEach(c => c.checked = chk.checked);
+        actualizarSeleccion();
+    }
+
+    function actualizarSeleccion() {
+        const checkboxes = document.querySelectorAll('.chk-producto');
+        const todas = Array.from(checkboxes);
+        const marcadas = todas.filter(c => c.checked);
+
+        // Sincronizar "Seleccionar todos"
+        const chkTodos = document.getElementById('chkTodos');
+        if (chkTodos) {
+            chkTodos.indeterminate = marcadas.length > 0 && marcadas.length < todas.length;
+            chkTodos.checked = marcadas.length === todas.length;
+        }
+
+        // Recalcular subtotal con productos seleccionados
+        let subtotal = 0;
+        marcadas.forEach(c => {
+            const fila = c.closest('tr');
+            if (fila) {
+                const sub = parseFloat(fila.getAttribute('data-subtotal')) || 0;
+                subtotal += sub;
+            }
+        });
+
+        // Envío: gratis si subtotal >= $45.000, si menor $8.000 (o $0 si nada seleccionado)
+        const costoEnvio = (marcadas.length === 0) ? 0 : (subtotal >= 45000 ? 0 : 8000);
+        const totalEstimado = subtotal + costoEnvio;
+
+        const fmt = v => '$' + v.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+        const resumenSubtotal = document.getElementById('resumenSubtotal');
+        const resumenEnvio    = document.getElementById('resumenEnvio');
+        const totalAPagar     = document.getElementById('totalAPagar');
+        const bannerEnvio     = document.getElementById('bannerEnvioGratis');
+
+        if (resumenSubtotal) resumenSubtotal.textContent = fmt(subtotal);
+
+        if (resumenEnvio) {
+            if (marcadas.length === 0) {
+                resumenEnvio.className = 'text-muted fw-semibold';
+                resumenEnvio.textContent = '$0.00';
+            } else if (costoEnvio === 0) {
+                resumenEnvio.className = 'text-success fw-semibold';
+                resumenEnvio.textContent = 'Gratis';
+            } else {
+                resumenEnvio.className = 'fw-semibold';
+                resumenEnvio.textContent = fmt(costoEnvio);
+            }
+        }
+
+        if (bannerEnvio) {
+            if (marcadas.length === 0) {
+                bannerEnvio.style.display = 'none';
+            } else if (subtotal >= 45000) {
+                bannerEnvio.style.display = 'flex';
+                bannerEnvio.className = 'alert alert-success py-1 px-2 mb-2 d-flex align-items-center gap-2 small';
+                bannerEnvio.innerHTML = '<i class="bi bi-truck text-success fs-6"></i><div><strong>¡Envío Gratis aplicado!</strong> Compra mayor a $45.000.</div>';
+            } else {
+                const falta = 45000 - subtotal;
+                bannerEnvio.style.display = 'flex';
+                bannerEnvio.className = 'alert alert-warning py-1 px-2 mb-2 d-flex align-items-center gap-2 small';
+                bannerEnvio.innerHTML = `<i class="bi bi-info-circle-fill text-warning fs-6"></i><div>Envío $8.000. ¡Agrega <strong>${fmt(falta)}</strong> más para tener <strong>Envío Gratis</strong>!</div>`;
+            }
+        }
+
+        if (totalAPagar) totalAPagar.textContent = fmt(totalEstimado);
+
+        // Ocultar advertencia si hay selección
+        const warn = document.getElementById('sinSeleccionWarn');
+        if (warn) warn.style.display = marcadas.length === 0 ? 'block' : 'none';
+    }
+
+    function prepararCheckout() {
+        // Validar que haya al menos un producto seleccionado
+        const seleccionados = Array.from(document.querySelectorAll('.chk-producto:checked'))
+            .map(c => c.value);
+
+        if (seleccionados.length === 0) {
+            const warn = document.getElementById('sinSeleccionWarn');
+            if (warn) { warn.style.display = 'block'; warn.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+            return false;
+        }
+
+        // Validar que haya dirección seleccionada
+        const id = document.getElementById('direccionSeleccionadaId').value?.trim();
+        if (!id) {
+            const errEl = document.getElementById('errorDireccion');
+            if (errEl) { errEl.style.display = 'block'; errEl.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+            return false;
+        }
+
+        // Construir string de dirección
+        const dir = direccionesData[id] || direccionesData[Object.keys(direccionesData).find(k => k.toLowerCase() === id.toLowerCase())];
+        if (dir) {
+            document.getElementById('hdnDireccionEntrega').value =
+                `${dir.nombreContacto} | ${dir.direccion}, ${dir.ciudad}, ${dir.departamento} | Tel: ${dir.telefono} | GEO: ${dir.direccion} ${dir.ciudad} ${dir.departamento}`;
+        } else {
+            const card = document.querySelector('.direccion-card.selected');
+            if (card) {
+                const paras = card.querySelectorAll('p.text-muted');
+                const nombre = card.querySelector('span.fw-bold')?.textContent?.trim() || '';
+                const dirText = paras[0]?.textContent?.trim() || '';
+                const ciudadDepto = paras[1]?.textContent?.trim() || '';
+                const tel = paras[2]?.textContent?.trim().replace(/[^\d\+\-\s\(\)]/g, '').trim() || '';
+                document.getElementById('hdnDireccionEntrega').value = `${nombre} | ${dirText}, ${ciudadDepto} | Tel: ${tel}`;
+            }
+        }
+
+        // Guardar IDs seleccionados (separados por coma)
+        document.getElementById('hdnProductosSeleccionados').value = seleccionados.join(',');
+
+        return true;
+    }
+
+    // Inicializar totales al cargar
+    document.addEventListener('DOMContentLoaded', () => actualizarSeleccion());
 </script>
 }
