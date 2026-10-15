@@ -66,9 +66,8 @@ public class AppDbContex : DbContext
 
         modelBuilder.Entity<Pedido>()
             .HasOne(p => p.Usuario)
-            .WithMany()
+            .WithMany(u => u.Pedidos)
             .HasForeignKey(p => p.UsuarioId)
-            .HasPrincipalKey(u => u.Uuid)
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Pedido>()
@@ -78,9 +77,8 @@ public class AppDbContex : DbContext
 
         modelBuilder.Entity<Pedido>()
             .HasOne(p => p.Repartidor)
-            .WithMany()
+            .WithMany(u => u.PedidosAsignados)
             .HasForeignKey(p => p.RepartidorId)
-            .HasPrincipalKey(u => u.Uuid)
             .OnDelete(DeleteBehavior.SetNull);
 
         modelBuilder.Entity<Pedido>()
@@ -122,9 +120,8 @@ public class AppDbContex : DbContext
 
         modelBuilder.Entity<DireccionUsuario>()
             .HasOne(d => d.Usuario)
-            .WithMany()
+            .WithMany(u => u.Direcciones)
             .HasForeignKey(d => d.UsuarioId)
-            .HasPrincipalKey(u => u.Uuid)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

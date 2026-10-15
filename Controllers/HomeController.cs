@@ -76,6 +76,12 @@ namespace Drogueria.Controllers
             return View("~/Views/Home/Pagina_Inicio/_Nosotros.cshtml");
         }
 
+        [HttpGet]
+        public IActionResult Trabaja()
+        {
+            return View("~/Views/Home/Pagina_Inicio/Trabaja.cshtml");
+        }
+
         // Manejador centralizado de errores de estado HTTP (404, 403, 500, etc.)
         [HttpGet]
         [Route("/Home/ErrorStatus")]

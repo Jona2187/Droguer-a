@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Globalization;
 using Drogueria.Data;
@@ -37,9 +37,8 @@ builder.Services.AddSession(options =>
 builder.Services.AddDbContext<AppDbContex>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
-        ServerVersion.AutoDetect(
-            builder.Configuration.GetConnectionString("DefaultConnection")
-        )
+        new MySqlServerVersion(new Version(8, 0, 30)),
+        mySqlOptions => mySqlOptions.EnableRetryOnFailure()
     )
 );
 

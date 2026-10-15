@@ -9,10 +9,10 @@ public class Producto
     public Guid Id { get; set; } = Guid.NewGuid();
 
     [Required(ErrorMessage = "El nombre es obligatorio")]
-    [StringLength(150, ErrorMessage = "El nombre no puede superar 150 caracteres")]
+    [StringLength(100, ErrorMessage = "El nombre no puede superar 100 caracteres")]
     public string Nombre { get; set; } = "";
 
-    [StringLength(500, ErrorMessage = "La descripción no puede superar 500 caracteres")]
+    [StringLength(255, ErrorMessage = "La descripción no puede superar 255 caracteres")]
     public string? Descripcion { get; set; }
 
     [Required(ErrorMessage = "El precio es obligatorio")]

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Drogueria.Models;
@@ -33,9 +33,15 @@ public class Pedido
     [StringLength(300)]
     public string? DireccionEntrega { get; set; }
 
+    [StringLength(50)]
+    public string? MetodoPago { get; set; }
+
+    [StringLength(100)]
+    public string? ReferenciaPago { get; set; }
+
     public double? LatitudRepartidor { get; set; }
     public double? LongitudRepartidor { get; set; }
     public DateTime? UltimaUbicacionFecha { get; set; }
 
-    public List<DetallePedido> Detalles { get; set; } = new();
+    public ICollection<DetallePedido> Detalles { get; set; } = new List<DetallePedido>();
 }

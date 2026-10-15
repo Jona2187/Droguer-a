@@ -66,7 +66,7 @@
 <div class="inv-search-bar">
     <div class="inv-search-wrap">
         <i class="bi bi-search"></i>
-        <input type="text" class="inv-search-input" id="invBuscar" placeholder="Buscar producto..." oninput="filtrarInventario()">
+        <input type="text" class="inv-search-input" id="invBuscar" placeholder="Buscar producto..." oninput="filtrarInventario()" maxlength="100">
     </div>
     <select class="inv-filter-select" id="invCatFilter" onchange="filtrarInventario()">
         <option value="">Todas las categorías</option>
@@ -121,7 +121,7 @@ else
                     <form asp-controller="Empleado" asp-action="ActualizarStock" method="post" class="inv-stock-form">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="id" value="@p.Id" />
-                        <input type="number" name="stock" class="inv-stock-input" value="@p.Stock" min="0" />
+                        <input type="number" name="stock" class="inv-stock-input" value="@p.Stock" min="0" max="999999" />
                         <button type="submit" class="inv-btn-update" title="Guardar stock">
                             <i class="bi bi-check-lg"></i> Guardar
                         </button>

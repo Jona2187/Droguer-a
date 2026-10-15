@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -257,7 +257,7 @@ namespace Drogueria.Controllers
         // POST: /Tienda/RealizarPedido
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> RealizarPedido(string? direccionEntrega)
+        public async Task<IActionResult> RealizarPedido(string? direccionEntrega, string? metodoPago, string? referenciaPago)
         {
             var carrito = ObtenerCarrito();
             if (!carrito.Any())
@@ -299,7 +299,9 @@ namespace Drogueria.Controllers
                 Fecha = DateTime.Now,
                 Estado = "Pendiente",
                 Total = carrito.Sum(c => c.Subtotal),
-                DireccionEntrega = direccionEntrega?.Trim()
+                DireccionEntrega = direccionEntrega?.Trim(),
+                MetodoPago = string.IsNullOrWhiteSpace(metodoPago) ? "Tarjeta" : metodoPago.Trim(),
+                ReferenciaPago = referenciaPago?.Trim()
             };
 
             foreach (var item in carrito)

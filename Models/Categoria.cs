@@ -8,7 +8,7 @@ public class Categoria
     public Guid Id { get; set; } = Guid.NewGuid();
 
     [Required(ErrorMessage = "El nombre es obligatorio")]
-    [StringLength(100, ErrorMessage = "El nombre no puede superar 100 caracteres")]
+    [StringLength(50, ErrorMessage = "El nombre no puede superar 50 caracteres")]
     public string Nombre { get; set; } = "";
 
     [StringLength(255, ErrorMessage = "La descripción no puede superar 255 caracteres")]

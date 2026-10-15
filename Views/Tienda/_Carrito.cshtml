@@ -1,4 +1,4 @@
-﻿@model List<Drogueria.Models.CarritoItem>
+@model List<Drogueria.Models.CarritoItem>
 <style>
 /* Permitir que el modal no corte el dropdown */
 #modalDireccion .modal-body { overflow: visible !important; }
@@ -304,13 +304,15 @@
                         </div>
 
                         <form asp-controller="Tienda" asp-action="RealizarPedido" method="post"
-                              id="formPedido" onsubmit="return validarDireccion()">
+                              id="formPedido" onsubmit="return false;">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="direccionEntrega" id="hdnDireccionEntrega" />
-                            <button type="submit"
+                            <input type="hidden" name="metodoPago" id="hdnMetodoPago" value="Tarjeta" />
+                            <input type="hidden" name="referenciaPago" id="hdnReferenciaPago" value="" />
+                            <button type="button" onclick="iniciarPasarelaPago()"
                                     class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2">
-                                <i class="bi bi-bag-check-fill fs-5"></i>
-                                <span>Confirmar y Realizar Pedido</span>
+                                <i class="bi bi-credit-card-2-front-fill fs-5"></i>
+                                <span>Proceder al Pago Seguro</span>
                             </button>
                         </form>
 
@@ -343,19 +345,19 @@
                 <div class="row g-3">
                     <div class="col-sm-6">
                         <label class="form-label fw-semibold small">Nombre de contacto <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="mdNombre" maxlength="100"
-                               placeholder="Ej. Juan Pérez" />
+                        <input type="text" class="form-control" id="mdNombre" maxlength="50"
+                               placeholder="Ej. Juan Pérez" required />
                     </div>
                     <div class="col-sm-6">
                         <label class="form-label fw-semibold small">Teléfono <span class="text-danger">*</span></label>
-                        <input type="tel" class="form-control" id="mdTelefono" maxlength="20"
-                               placeholder="Ej. 3001234567" />
+                        <input type="tel" class="form-control" id="mdTelefono" maxlength="10"
+                               placeholder="Ej. 3001234567" required oninput="this.value=this.value.replace(/[^0-9]/g,'')" />
                     </div>
                     <div class="col-12">
                         <label class="form-label fw-semibold small">Dirección <span class="text-danger">*</span></label>
                         <div class="input-group">
-                            <input type="text" class="form-control" id="mdDireccion" maxlength="300"
-                                   placeholder="Ej. Cra 15 #45-23" />
+                            <input type="text" class="form-control" id="mdDireccion" maxlength="150"
+                                   placeholder="Ej. Cra 15 #45-23" required />
                             <button type="button" class="btn btn-outline-primary" onclick="validarDireccionMapa()"
                                     id="btnValidarMapa" title="Buscar en el mapa">
                                 <i class="bi bi-search me-1"></i>Validar
@@ -366,8 +368,8 @@
                     <div class="col-sm-6">
                         <label class="form-label fw-semibold small">Departamento <span class="text-danger">*</span></label>
                         <div class="custom-select-wrap" id="wrapDepartamento">
-                            <input type="text" class="form-control" id="mdDepartamento"
-                                   placeholder="Buscar departamento..." autocomplete="off"
+                            <input type="text" class="form-control" id="mdDepartamento" maxlength="50"
+                                   placeholder="Buscar departamento..." autocomplete="off" required
                                    oninput="filtrarOpciones('mdDepartamento', 'dropDepartamento')"
                                    onfocus="mostrarDropdown('dropDepartamento')"
                                    onblur="ocultarDropdown('dropDepartamento')" />
@@ -377,8 +379,8 @@
                     <div class="col-sm-6">
                         <label class="form-label fw-semibold small">Ciudad <span class="text-danger">*</span></label>
                         <div class="custom-select-wrap" id="wrapCiudad">
-                            <input type="text" class="form-control" id="mdCiudad"
-                                   placeholder="Selecciona primero el departamento..." autocomplete="off"
+                            <input type="text" class="form-control" id="mdCiudad" maxlength="50"
+                                   placeholder="Selecciona primero el departamento..." autocomplete="off" required
                                    disabled
                                    oninput="filtrarOpciones('mdCiudad', 'dropCiudad')"
                                    onfocus="mostrarDropdown('dropCiudad')"
@@ -406,6 +408,30 @@
                         onclick="guardarDireccion()" id="btnGuardarDireccion">
                     <i class="bi bi-check-lg me-1"></i>Guardar Dirección
                 </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     MODAL PASARELA DE PAGO SEGURO
+═══════════════════════════════════════════════════════ -->
+<div class="modal fade" id="modalPasarelaPago" tabindex="-1" aria-labelledby="modalPasarelaPagoLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content modal-glass border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+            <div class="modal-header border-0 pb-0 pt-4 px-4">
+                <div>
+                    <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2 fw-semibold" style="font-size: 0.78rem;">
+                        🔒 PAGO 100% SEGURO • CONEXIÓN CIFRADA 256-BIT
+                    </span>
+                    <h4 class="modal-title fw-extrabold mt-2 text-primary" id="modalPasarelaPagoLabel">
+                        <i class="bi bi-credit-card-2-front-fill me-2"></i>Pasarela de Pago Seguro Droguería
+                    </h4>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body p-4" id="pasarelaModalBody">
+                <!-- Se llena dinámicamente -->
             </div>
         </div>
     </div>
@@ -701,10 +727,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Validación local
         if (!nombre) { resaltarCampo('mdNombre', 'El nombre es obligatorio.'); return; }
+        if (nombre.length > 50) { resaltarCampo('mdNombre', 'El nombre no puede superar los 50 caracteres.'); return; }
         if (!telefono) { resaltarCampo('mdTelefono', 'El teléfono es obligatorio.'); return; }
+        if (telefono.length > 10 || !/^\d+$/.test(telefono)) { resaltarCampo('mdTelefono', 'El teléfono debe ser numérico de máximo 10 dígitos.'); return; }
         if (!direccion) { resaltarCampo('mdDireccion', 'La dirección es obligatoria.'); return; }
+        if (direccion.length > 150) { resaltarCampo('mdDireccion', 'La dirección no puede superar los 150 caracteres.'); return; }
         if (!ciudad) { resaltarCampo('mdCiudad', 'La ciudad es obligatoria.'); return; }
+        if (ciudad.length > 50) { resaltarCampo('mdCiudad', 'La ciudad no puede superar los 50 caracteres.'); return; }
         if (!departamento) { resaltarCampo('mdDepartamento', 'El departamento es obligatorio.'); return; }
+        if (departamento.length > 50) { resaltarCampo('mdDepartamento', 'El departamento no puede superar los 50 caracteres.'); return; }
 
         const btn = document.getElementById('btnGuardarDireccion');
         const originalHtml = btn.innerHTML;
@@ -1188,5 +1219,350 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         document.getElementById('mapaValidacionWrap').style.display = 'none';
     });
+
+    // ═══════════════════════════════════════════════════════
+    //  PASARELA DE PAGO INTERACTIVA Y RECIBO DIGITAL (ESTILO GALLOLETE Adaptado a Droguería)
+    // ═══════════════════════════════════════════════════════
+    function iniciarPasarelaPago() {
+        if (!validarDireccion()) return;
+        abrirModalPasarelaDrogueria();
+    }
+
+    function obtenerMontoTotalCarrito() {
+        const totalEl = document.getElementById('totalAPagar');
+        if (!totalEl) return 0;
+        const txt = totalEl.textContent.replace('$', '').replace(/\,/g, '').trim();
+        return parseFloat(txt) || 0;
+    }
+
+    function abrirModalPasarelaDrogueria() {
+        const totalMonto = obtenerMontoTotalCarrito();
+        const clienteNombre = "@Html.Raw(User.Identity?.Name ?? "Cliente Registrado")";
+        const dirTexto = document.getElementById('hdnDireccionEntrega')?.value || 'Dirección seleccionada';
+
+        const modalBody = document.getElementById('pasarelaModalBody');
+        if (!modalBody) return;
+
+        modalBody.innerHTML = `
+            <div class="text-center mb-4">
+                <h5 class="fw-bold mb-1" style="color: var(--tienda-text);">Resumen del Pedido a Cancelar</h5>
+                <p class="mb-1 text-muted small"><i class="bi bi-geo-alt-fill text-danger me-1"></i>${escapeHtml(dirTexto)}</p>
+                <div class="display-6 fw-black text-primary my-2" style="font-weight: 900;">
+                    $${totalMonto.toLocaleString('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} COP
+                </div>
+            </div>
+
+            <!-- Pestañas Métodos de Pago -->
+            <div class="d-flex gap-2 mb-4 flex-wrap">
+                <button type="button" id="btnPagoTabCard" class="btn btn-primary pasarela-tab-btn" onclick="seleccionarMetodoPagoDrogueria('tarjeta')">
+                    <i class="bi bi-credit-card-fill fs-6"></i> Tarjeta
+                </button>
+                <button type="button" id="btnPagoTabNequi" class="btn btn-outline-primary pasarela-tab-btn" onclick="seleccionarMetodoPagoDrogueria('nequi')">
+                    <i class="bi bi-qr-code-scan fs-6"></i> Nequi / QR
+                </button>
+                <button type="button" id="btnPagoTabPSE" class="btn btn-outline-primary pasarela-tab-btn" onclick="seleccionarMetodoPagoDrogueria('pse')">
+                    <i class="bi bi-bank fs-6"></i> PSE
+                </button>
+                <button type="button" id="btnPagoTabEfectivo" class="btn btn-outline-primary pasarela-tab-btn" onclick="seleccionarMetodoPagoDrogueria('efectivo')">
+                    <i class="bi bi-cash-stack fs-6"></i> Efectivo
+                </button>
+            </div>
+
+            <!-- FORMULARIO TARJETA -->
+            <div id="formMetodoTarjeta">
+                <div class="pasarela-card-preview">
+                    <div class="pasarela-card-header">
+                        <span class="fw-bold tracking-wider" style="letter-spacing: 1.5px; font-size: 0.88rem;">DROGUERÍA CARD</span>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="pasarela-card-chip"></div>
+                            <span class="fw-bold" style="font-size: 1.1rem;"><i class="bi bi-credit-card-2-front"></i> VISA / MC</span>
+                        </div>
+                    </div>
+                    <div id="cardPreviewNum" class="pasarela-card-number">
+                        •••• •••• •••• 8492
+                    </div>
+                    <div class="pasarela-card-footer">
+                        <div>
+                            <div style="opacity: 0.75; font-size: 0.65rem;">TITULAR</div>
+                            <strong id="cardPreviewName">${escapeHtml(clienteNombre.toUpperCase())}</strong>
+                        </div>
+                        <div>
+                            <div style="opacity: 0.75; font-size: 0.65rem;">VENCIMIENTO</div>
+                            <strong id="cardPreviewExp">12/28</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <form onsubmit="procesarPagoPasarelaDrogueria(event, 'Tarjeta')">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small">Número de Tarjeta (16 dígitos) *</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-transparent border-end-0"><i class="bi bi-credit-card text-primary"></i></span>
+                            <input type="text" id="pagoCardNumber" class="form-control border-start-0" placeholder="4532 8901 2345 8492" maxlength="19" required oninput="actualizarPreviewTarjetaDrogueria()">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small">Nombre del Titular en la Tarjeta *</label>
+                        <input type="text" id="pagoCardName" class="form-control" placeholder="Ej: CARLOS MENDOZA" value="${escapeHtml(clienteNombre.toUpperCase())}" required oninput="actualizarPreviewTarjetaDrogueria()">
+                    </div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-6">
+                            <label class="form-label fw-semibold small">Fecha Exp. (MM/AA) *</label>
+                            <input type="text" id="pagoCardExp" class="form-control" placeholder="12/28" maxlength="5" required oninput="actualizarPreviewTarjetaDrogueria()">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-semibold small">CVV / CVC *</label>
+                            <input type="password" id="pagoCardCvv" class="form-control" placeholder="•••" maxlength="4" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow-sm" style="font-size: 1.05rem;">
+                        🚀 Pagar $${totalMonto.toLocaleString('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} COP y Confirmar Pedido
+                    </button>
+                </form>
+            </div>
+
+            <!-- FORMULARIO NEQUI / QR -->
+            <div id="formMetodoNequi" class="d-none text-center">
+                <div class="p-4 rounded-4 mb-3 border text-center" style="background: var(--tienda-muted-bg);">
+                    <div class="d-inline-block p-3 bg-white rounded-3 shadow-sm mb-3">
+                        <i class="bi bi-qr-code text-primary" style="font-size: 5rem;"></i>
+                    </div>
+                    <h5 class="fw-bold mb-1" style="color: var(--tienda-text);">Transferencia Nequi / Daviplata</h5>
+                    <p class="fs-5 fw-extrabold text-primary mb-1">📱 300 987 6543</p>
+                    <small class="text-muted">Escanea el código QR o transfiere al número de nuestra cuenta oficial.</small>
+                </div>
+                <form onsubmit="procesarPagoPasarelaDrogueria(event, 'Nequi / Daviplata')">
+                    <div class="mb-3 text-start">
+                        <label class="form-label fw-semibold small">Número de Comprobante / Referencia Nequi *</label>
+                        <input type="text" id="pagoNequiRef" class="form-control" placeholder="Ej: M8927402" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow-sm">
+                        ✅ Confirmar Transferencia Nequi
+                    </button>
+                </form>
+            </div>
+
+            <!-- FORMULARIO PSE -->
+            <div id="formMetodoPSE" class="d-none">
+                <form onsubmit="procesarPagoPasarelaDrogueria(event, 'PSE (Pagos Seguros)')">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small">Seleccionar Entidad Bancaria *</label>
+                        <select id="pagoPseBanco" class="form-select" required>
+                            <option value="Bancolombia">Bancolombia</option>
+                            <option value="Nequi / Daviplata">Nequi / Daviplata</option>
+                            <option value="Davivienda">Davivienda</option>
+                            <option value="Banco de Bogotá">Banco de Bogotá</option>
+                            <option value="BBVA Colombia">BBVA Colombia</option>
+                            <option value="Scotiabank Colpatria">Scotiabank Colpatria</option>
+                            <option value="Banco de Occidente">Banco de Occidente</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold small">Número de Documento de Identidad del Titular *</label>
+                        <input type="text" id="pagoPseDoc" class="form-control" placeholder="Ej: 1092837465" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow-sm">
+                        🏦 Ir a la Plataforma Segura PSE
+                    </button>
+                </form>
+            </div>
+
+            <!-- FORMULARIO EFECTIVO -->
+            <div id="formMetodoEfectivo" class="d-none text-center">
+                <div class="p-4 rounded-4 mb-3 border text-center" style="background: var(--tienda-muted-bg);">
+                    <div class="fs-1 text-primary mb-2"><i class="bi bi-truck-front-fill"></i></div>
+                    <h5 class="fw-bold mb-2" style="color: var(--tienda-text);">Pago Contra Entrega en Efectivo</h5>
+                    <p class="small text-muted mb-0">
+                        Pagas en efectivo al repartidor al momento de recibir tu pedido en la puerta de tu domicilio.
+                    </p>
+                </div>
+                <form onsubmit="procesarPagoPasarelaDrogueria(event, 'Efectivo Contra Entrega')">
+                    <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow-sm">
+                        🎟️ Confirmar Pedido Contra Entrega
+                    </button>
+                </form>
+            </div>
+        `;
+
+        const modalEl = document.getElementById('modalPasarelaPago');
+        const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
+        modalInstance.show();
+    }
+
+    function seleccionarMetodoPagoDrogueria(metodo) {
+        const metodos = [
+            { key: 'tarjeta', btn: 'btnPagoTabCard', form: 'formMetodoTarjeta' },
+            { key: 'nequi', btn: 'btnPagoTabNequi', form: 'formMetodoNequi' },
+            { key: 'pse', btn: 'btnPagoTabPSE', form: 'formMetodoPSE' },
+            { key: 'efectivo', btn: 'btnPagoTabEfectivo', form: 'formMetodoEfectivo' }
+        ];
+
+        metodos.forEach(m => {
+            const btn = document.getElementById(m.btn);
+            const form = document.getElementById(m.form);
+            const activo = m.key === metodo;
+            if (btn) {
+                btn.className = activo ? 'btn btn-primary pasarela-tab-btn' : 'btn btn-outline-primary pasarela-tab-btn';
+            }
+            if (form) {
+                form.classList.toggle('d-none', !activo);
+            }
+        });
+    }
+
+    function actualizarPreviewTarjetaDrogueria() {
+        const num = document.getElementById('pagoCardNumber')?.value || '';
+        const name = document.getElementById('pagoCardName')?.value || '';
+        const exp = document.getElementById('pagoCardExp')?.value || '';
+
+        const elNum = document.getElementById('cardPreviewNum');
+        const elName = document.getElementById('cardPreviewName');
+        const elExp = document.getElementById('cardPreviewExp');
+
+        if (elNum) elNum.innerText = num ? num.replace(/\d{4}(?=.)/g, '$& ') : '•••• •••• •••• 8492';
+        if (elName) elName.innerText = name ? name.toUpperCase() : 'TITULAR DE LA TARJETA';
+        if (elExp) elExp.innerText = exp || '12/28';
+    }
+
+    async function procesarPagoPasarelaDrogueria(e, metodo) {
+        e.preventDefault();
+
+        let refNumber = `DRG-2026-${Math.floor(10000 + Math.random() * 90000)}`;
+        if (metodo.includes('Nequi')) {
+            const inputNequi = document.getElementById('pagoNequiRef')?.value;
+            if (inputNequi) refNumber = inputNequi.toUpperCase();
+        }
+
+        const totalMonto = obtenerMontoTotalCarrito();
+        const modalBody = document.getElementById('pasarelaModalBody');
+        if (modalBody) {
+            modalBody.innerHTML = `
+                <div class="text-center py-5">
+                    <div class="pasarela-spinner"></div>
+                    <h4 class="fw-bold mb-2 text-primary">Procesando pago seguro...</h4>
+                    <p class="text-muted small mb-0 px-3">
+                        Validando tu pago de <strong>$${totalMonto.toLocaleString('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} COP</strong> mediante ${escapeHtml(metodo)}. Por favor no cierres esta ventana.
+                    </p>
+                </div>
+            `;
+        }
+
+        await new Promise(r => setTimeout(r, 1400));
+
+        // Asignar a los campos hidden
+        document.getElementById('hdnMetodoPago').value = metodo;
+        document.getElementById('hdnReferenciaPago').value = refNumber;
+
+        // Generar y mostrar comprobante digital
+        generarComprobanteDigitalDrogueria(metodo, refNumber);
+    }
+
+    function generarComprobanteDigitalDrogueria(metodo, refNumber) {
+        const totalMonto = obtenerMontoTotalCarrito();
+        const clienteNombre = "@Html.Raw(User.Identity?.Name ?? "Cliente Registrado")";
+        const dirTexto = document.getElementById('hdnDireccionEntrega')?.value || 'Dirección seleccionada';
+        const fechaHora = new Date().toLocaleString('es-CO');
+
+        // Recopilar items del carrito para el detalle del comprobante
+        const trs = document.querySelectorAll('.carrito-table tbody tr');
+        let itemsHtml = '';
+        trs.forEach(tr => {
+            const name = tr.querySelector('.carrito-item-name')?.textContent.trim() || 'Producto';
+            const qty = tr.querySelector('.item-cantidad-input')?.value || '1';
+            const subtotal = tr.querySelector('.carrito-subtotal')?.textContent.trim() || '$0.00';
+            itemsHtml += `
+                <tr>
+                    <td style="padding: 0.6rem 0.5rem; border-bottom: 1px solid var(--tienda-border);">${escapeHtml(name)} (x${qty})</td>
+                    <td style="padding: 0.6rem 0.5rem; border-bottom: 1px solid var(--tienda-border); text-align: right; font-weight: 600;">${escapeHtml(subtotal)}</td>
+                </tr>
+            `;
+        });
+
+        const modalTitle = document.getElementById('modalPasarelaPagoLabel');
+        if (modalTitle) modalTitle.innerHTML = '<i class="bi bi-receipt-cutoff me-2"></i>Comprobante Digital de Pago';
+
+        const modalBody = document.getElementById('pasarelaModalBody');
+        if (modalBody) {
+            modalBody.innerHTML = `
+                <div id="seccionReciboDigital" class="comprobante-digital-box mb-4">
+                    <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="btn btn-primary btn-sm rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                <i class="bi bi-capsule fs-4"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-extrabold mb-0 text-primary">Droguería Tienda Online</h5>
+                                <small class="text-muted">NIT 900.784.921-1 • Factura Digital</small>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge bg-success text-white rounded-pill px-3 py-1 mb-1">🟢 PAGADO & APROBADO</span>
+                            <div class="small text-muted font-monospace">${escapeHtml(refNumber)}</div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 small mb-3">
+                        <div class="col-6">
+                            <span class="text-muted d-block">CLIENTE / TITULAR:</span>
+                            <strong>${escapeHtml(clienteNombre)}</strong>
+                        </div>
+                        <div class="col-6 text-end">
+                            <span class="text-muted d-block">FECHA Y HORA:</span>
+                            <strong>${escapeHtml(fechaHora)}</strong>
+                        </div>
+                        <div class="col-6">
+                            <span class="text-muted d-block">MÉTODO DE PAGO:</span>
+                            <strong class="text-primary">${escapeHtml(metodo)}</strong>
+                        </div>
+                        <div class="col-6 text-end">
+                            <span class="text-muted d-block">DIRECCIÓN DE ENTREGA:</span>
+                            <strong>${escapeHtml(dirTexto)}</strong>
+                        </div>
+                    </div>
+
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 1.2rem; font-size: 0.88rem;">
+                        <thead>
+                            <tr style="background: var(--tienda-muted-bg);">
+                                <th style="padding: 0.6rem 0.5rem; text-align: left; color: var(--tienda-text);">Producto</th>
+                                <th style="padding: 0.6rem 0.5rem; text-align: right; color: var(--tienda-text);">Monto</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${itemsHtml}
+                        </tbody>
+                    </table>
+
+                    <div class="d-flex justify-content-between align-items-center p-3 rounded-3" style="background: var(--tienda-primary-soft);">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-qr-code text-primary fs-2"></i>
+                            <small class="text-muted">Código de Verificación Seguro</small>
+                        </div>
+                        <div class="text-end">
+                            <small class="text-muted d-block">TOTAL CANCELADO:</small>
+                            <span class="fs-4 fw-black text-primary" style="font-weight: 900;">$${totalMonto.toLocaleString('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} COP</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-outline-secondary flex-grow-1 py-2.5 rounded-pill" onclick="imprimirComprobanteDigitalDrogueria()">
+                        🖨️ Imprimir / Guardar PDF
+                    </button>
+                    <button type="button" class="btn btn-primary flex-grow-1 py-2.5 rounded-pill fw-bold shadow-sm" onclick="confirmarYEnviarPedido()">
+                        ✅ Finalizar y Guardar Pedido
+                    </button>
+                </div>
+            `;
+        }
+    }
+
+    function imprimirComprobanteDigitalDrogueria() {
+        window.print();
+    }
+
+    function confirmarYEnviarPedido() {
+        const form = document.getElementById('formPedido');
+        if (form) form.submit();
+    }
 </script>
 }

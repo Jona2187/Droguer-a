@@ -114,7 +114,7 @@
                     <circle cx="11" cy="11" r="8" />
                     <path d="m21 21-4.3-4.3" />
                 </svg>
-                <input type="text" id="filtroUsuarios" placeholder="Buscar por nombre, correo o rol..." autocomplete="off" />
+                <input type="text" id="filtroUsuarios" placeholder="Buscar por nombre, correo o rol..." autocomplete="off" maxlength="100" />
             </div>
 
             <!-- Filtro por Rol -->
@@ -293,17 +293,17 @@
                     <div class="row g-3">
                         <div class="col-sm-6">
                             <label class="form-label" for="nombreUsuario">Nombre</label>
-                            <input type="text" class="form-control" id="nombreUsuario" name="Nombre" placeholder="Ej. Juan" required />
+                            <input type="text" class="form-control" id="nombreUsuario" name="Nombre" placeholder="Ej. Juan" required maxlength="25" />
                         </div>
 
                         <div class="col-sm-6">
                             <label class="form-label" for="apellidoUsuario">Apellido</label>
-                            <input type="text" class="form-control" id="apellidoUsuario" name="Apellido" placeholder="Ej. Pérez" required />
+                            <input type="text" class="form-control" id="apellidoUsuario" name="Apellido" placeholder="Ej. Pérez" required maxlength="25" />
                         </div>
 
                         <div class="col-12">
                             <label class="form-label" for="emailUsuario">Correo Electrónico</label>
-                            <input type="email" class="form-control" id="emailUsuario" name="Email" placeholder="juan.perez@drogueria.com" required />
+                            <input type="email" class="form-control" id="emailUsuario" name="Email" placeholder="juan.perez@drogueria.com" required maxlength="60" />
                         </div>
 
                         <div class="col-sm-6">
@@ -320,7 +320,7 @@
                         <div class="col-sm-6">
                             <label class="form-label" for="passwordUsuario">Contraseña</label>
                             <div class="position-relative">
-                                <input type="password" class="form-control pe-5" id="passwordUsuario" name="Password" placeholder="••••••••" required autocomplete="new-password" />
+                                <input type="password" class="form-control pe-5" id="passwordUsuario" name="Password" placeholder="••••••••" required minlength="8" maxlength="25" autocomplete="new-password" />
                                 <button type="button" class="btn btn-sm position-absolute top-50 end-0 translate-middle-y me-2 border-0 bg-transparent text-muted" onclick="togglePass('passwordUsuario', this)" title="Ver contraseña">
                                     <i class="bi bi-eye"></i>
                                 </button>
@@ -369,18 +369,18 @@
                 <div class="modal-body">
                     <div class="row g-3">
                         <div class="col-sm-6">
-                            <label class="form-label" for="nombreUsuario">Nombre</label>
-                            <input type="text" class="form-control" id="nombreEditar" name="Nombre" placeholder="Ej. Juan" required />
+                            <label class="form-label" for="nombreEditar">Nombre</label>
+                            <input type="text" class="form-control" id="nombreEditar" name="Nombre" placeholder="Ej. Juan" required maxlength="25" />
                         </div>
 
                         <div class="col-sm-6">
-                            <label class="form-label" for="apellidoUsuario">Apellido</label>
-                            <input type="text" class="form-control" id="apellidoEditar" name="Apellido" placeholder="Ej. Pérez" required />
+                            <label class="form-label" for="apellidoEditar">Apellido</label>
+                            <input type="text" class="form-control" id="apellidoEditar" name="Apellido" placeholder="Ej. Pérez" required maxlength="25" />
                         </div>
 
                         <div class="col-12">
                             <label class="form-label" for="emailEditar">Correo Electrónico</label>
-                            <input type="email" class="form-control" id="emailEditar" name="Email" placeholder="juan.perez@drogueria.com" required />
+                            <input type="email" class="form-control" id="emailEditar" name="Email" placeholder="juan.perez@drogueria.com" required maxlength="60" />
                         </div>
 
                         <div class="col-sm-6">
@@ -397,7 +397,7 @@
                         <div class="col-sm-6">
                             <label class="form-label" for="passwordEditar">Contraseña</label>
                             <div class="position-relative">
-                                <input type="password" class="form-control pe-5" id="passwordEditar" name="Password" placeholder="Dejar en blanco para no cambiarla" autocomplete="new-password" />
+                                <input type="password" class="form-control pe-5" id="passwordEditar" name="Password" placeholder="Dejar en blanco para no cambiarla" minlength="8" maxlength="25" autocomplete="new-password" />
                                 <button type="button" class="btn btn-sm position-absolute top-50 end-0 translate-middle-y me-2 border-0 bg-transparent text-muted" onclick="togglePass('passwordEditar', this)" title="Ver contraseña">
                                     <i class="bi bi-eye"></i>
                                 </button>
