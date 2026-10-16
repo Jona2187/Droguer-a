@@ -104,7 +104,8 @@
                                 <span style="color: var(--t-muted); font-size: 13px;">@cat.FechaCreacion.ToString("dd/MM/yyyy")</span>
                             </td>
                             <td style="text-align: right;">
-                                <div class="d-inline-flex align-items-center gap-1">
+                                <!-- Acciones Desktop -->
+                                <div class="d-none d-md-inline-flex align-items-center gap-1">
                                     <!-- Botón Editar -->
                                     <button class="btn-action-icon edit"
                                             data-bs-toggle="modal"
@@ -131,6 +132,41 @@
                                             <i class="bi bi-person-x-fill"></i>
                                         </button>
                                     </form>
+                                </div>
+
+                                <!-- Acciones Móvil (Desplegable 3 puntos a la derecha) -->
+                                <div class="dropdown d-inline-block d-md-none position-relative">
+                                    <button class="btn-action-icon" type="button" data-bs-toggle="dropdown" data-bs-boundary="viewport" aria-expanded="false" title="Más opciones">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 py-2 mobile-action-dropdown" style="min-width: 170px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border) !important; z-index: 1060;">
+                                        <li>
+                                            <button type="button" class="dropdown-item d-flex align-items-center gap-2 py-2 edit"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#modalEditar"
+                                                    data-id="@cat.Id"
+                                                    data-nombre="@cat.Nombre"
+                                                    data-descripcion="@(cat.Descripcion ?? "")"
+                                                    data-estado="@cat.Estado.ToString().ToLowerInvariant()"
+                                                    data-fecha="@cat.FechaCreacion.ToString("o")"
+                                                    style="color: var(--t-base); font-size: 13.5px;">
+                                                <i class="bi bi-pencil-square text-primary"></i>
+                                                <span>Editar</span>
+                                            </button>
+                                        </li>
+                                        <li><hr class="dropdown-divider my-1" style="border-color: var(--border-soft);"></li>
+                                        <li>
+                                            <button type="button" class="dropdown-item d-flex align-items-center gap-2 py-2 text-danger"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#glassConfirmModal"
+                                                    data-id="@cat.Id"
+                                                    data-nombre="@cat.Nombre"
+                                                    style="font-size: 13.5px;">
+                                                <i class="bi bi-person-x-fill text-danger"></i>
+                                                <span>Desactivar</span>
+                                            </button>
+                                        </li>
+                                    </ul>
                                 </div>
                             </td>
                         </tr>

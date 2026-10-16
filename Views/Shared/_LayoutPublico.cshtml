@@ -111,9 +111,7 @@
 <body>
 <div style="display:flex; flex-direction:column; min-height:100vh;">
 
-    <!-- ====================================================
-         NAVBAR PUBLICA
-    ===================================================== -->
+    <!-- NAVBAR PUBLICA -->
     <nav class="pub-navbar" id="pubNavbar" role="navigation" aria-label="Navegacion principal">
         <div class="pub-navbar-inner">
 
@@ -141,12 +139,57 @@
             <ul class="pub-nav-links" id="pubNavLinks">
                 @{
                     var activeNav = ViewData["ActiveNav"] as string ?? "";
+                    var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+                    var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+                    bool isHome = string.Equals(currentController, "Home", StringComparison.OrdinalIgnoreCase)
+                                  && (string.Equals(currentAction, "Index", StringComparison.OrdinalIgnoreCase)
+                                      || string.Equals(currentAction, "Pagina_Inicio", StringComparison.OrdinalIgnoreCase)
+                                      || string.IsNullOrEmpty(currentAction));
+                    string GetNavUrl(string anchor) => isHome ? anchor : (Url.Action("Index", "Home") + anchor);
                 }
-                <li><a href="#inicio" class="@(activeNav == "inicio" ? "active" : "")"><i class="bi bi-house"></i> Inicio</a></li>
-                <li><a href="#servicios" class="@(activeNav == "servicios" ? "active" : "")"><i class="bi bi-grid-3x3-gap"></i> Servicios</a></li>
-                <li><a href="#productos" class="@(activeNav == "productos" ? "active" : "")"><i class="bi bi-box-seam"></i> Productos</a></li>
-                <li><a href="#nosotros" class="@(activeNav == "nosotros" ? "active" : "")"><i class="bi bi-info-circle"></i> Nosotros</a></li>
-                <li><a href="#contacto" class="@(activeNav == "contacto" ? "active" : "")"><i class="bi bi-envelope"></i> Contacto</a></li>
+                <li><a href="@GetNavUrl("#inicio")" class="@(activeNav == "inicio" ? "active" : "")"><i class="bi bi-house"></i> Inicio</a></li>
+                <li><a href="@GetNavUrl("#servicios")" class="@(activeNav == "servicios" ? "active" : "")"><i class="bi bi-grid-3x3-gap"></i> Servicios</a></li>
+                <li><a href="@GetNavUrl("#productos")" class="@(activeNav == "productos" ? "active" : "")"><i class="bi bi-box-seam"></i> Productos</a></li>
+                
+                <!-- Dropdown Nosotros / Trabaja -->
+                <li class="pub-nav-dropdown-wrapper" id="pubNosotrosDropdownWrapper">
+                    <button type="button" class="pub-nav-dropdown-btn @(activeNav == "nosotros" || activeNav == "trabaja" ? "active" : "")" id="pubNosotrosBtn" aria-haspopup="true" aria-expanded="false">
+                        <i class="bi bi-people"></i>
+                        <span>Nosotros</span>
+                        <i class="bi bi-chevron-down pub-nav-chevron"></i>
+                    </button>
+                    <div class="pub-nav-dropdown-menu" id="pubNosotrosDropdown" role="menu">
+                        <a href="@GetNavUrl("#nosotros")" class="pub-nav-dropdown-item @(activeNav == "nosotros" ? "active" : "")" role="menuitem">
+                            <div class="pub-nav-dropdown-icon">
+                                <i class="bi bi-info-circle"></i>
+                            </div>
+                            <div class="pub-nav-dropdown-label">
+                                <span class="pub-nav-dropdown-title">Quiénes Somos</span>
+                                <span class="pub-nav-dropdown-sub">Visión general y compromiso</span>
+                            </div>
+                        </a>
+                        <a asp-controller="Home" asp-action="Nosotros" class="pub-nav-dropdown-item @(activeNav == "nosotros" ? "active" : "")" role="menuitem">
+                            <div class="pub-nav-dropdown-icon">
+                                <i class="bi bi-clock-history"></i>
+                            </div>
+                            <div class="pub-nav-dropdown-label">
+                                <span class="pub-nav-dropdown-title">Nuestra Historia</span>
+                                <span class="pub-nav-dropdown-sub">Trayectoria, misión y valores</span>
+                            </div>
+                        </a>
+                        <a asp-controller="Home" asp-action="Trabaja" class="pub-nav-dropdown-item @(activeNav == "trabaja" ? "active" : "")" role="menuitem">
+                            <div class="pub-nav-dropdown-icon">
+                                <i class="bi bi-person-workspace"></i>
+                            </div>
+                            <div class="pub-nav-dropdown-label">
+                                <span class="pub-nav-dropdown-title">Trabaja con nosotros</span>
+                                <span class="pub-nav-dropdown-sub">Convocatorias y postulaciones</span>
+                            </div>
+                        </a>
+                    </div>
+                </li>
+
+                <li><a href="@GetNavUrl("#contacto")" class="@(activeNav == "contacto" ? "active" : "")"><i class="bi bi-envelope"></i> Contacto</a></li>
             </ul>
 
             <!-- Acciones derechas -->
@@ -202,19 +245,25 @@
 
     <!-- Menu Movil -->
     <div class="pub-mobile-menu" id="pubMobileMenu" role="dialog" aria-label="Menu movil">
-        <a href="#inicio" class="@(activeNav == "inicio" ? "active" : "")" id="mobileNavInicio">
+        <a href="@GetNavUrl("#inicio")" class="@(activeNav == "inicio" ? "active" : "")" id="mobileNavInicio">
             <i class="bi bi-house-fill"></i> Inicio
         </a>
-        <a href="#servicios" class="@(activeNav == "servicios" ? "active" : "")" id="mobileNavServicios">
+        <a href="@GetNavUrl("#servicios")" class="@(activeNav == "servicios" ? "active" : "")" id="mobileNavServicios">
             <i class="bi bi-grid-3x3-gap-fill"></i> Servicios
         </a>
-        <a href="#productos" class="@(activeNav == "productos" ? "active" : "")" id="mobileNavProductos">
+        <a href="@GetNavUrl("#productos")" class="@(activeNav == "productos" ? "active" : "")" id="mobileNavProductos">
             <i class="bi bi-box-seam-fill"></i> Productos
         </a>
-        <a href="#nosotros" class="@(activeNav == "nosotros" ? "active" : "")" id="mobileNavNosotros">
-            <i class="bi bi-info-circle-fill"></i> Nosotros
+        <a href="@GetNavUrl("#nosotros")" class="@(activeNav == "nosotros" ? "active" : "")" id="mobileNavNosotros">
+            <i class="bi bi-info-circle-fill"></i> Quiénes Somos
         </a>
-        <a href="#contacto" class="@(activeNav == "contacto" ? "active" : "")" id="mobileNavContacto">
+        <a asp-controller="Home" asp-action="Nosotros" class="@(activeNav == "nosotros" ? "active" : "")" id="mobileNavHistoria">
+            <i class="bi bi-clock-history"></i> Nuestra Historia
+        </a>
+        <a asp-controller="Home" asp-action="Trabaja" class="@(activeNav == "trabaja" ? "active" : "")" id="mobileNavTrabaja">
+            <i class="bi bi-person-workspace"></i> Trabaja con nosotros
+        </a>
+        <a href="@GetNavUrl("#contacto")" class="@(activeNav == "contacto" ? "active" : "")" id="mobileNavContacto">
             <i class="bi bi-envelope-fill"></i> Contacto
         </a>
         <div class="pub-mobile-divider"></div>
@@ -297,11 +346,11 @@
             <div>
                 <div class="pub-footer-col-title">Navegacion</div>
                 <ul class="pub-footer-links">
-                    <li><a href="#inicio"><i class="bi bi-chevron-right"></i> Inicio</a></li>
-                    <li><a href="#nosotros"><i class="bi bi-chevron-right"></i> Nosotros</a></li>
-                    <li><a href="#servicios"><i class="bi bi-chevron-right"></i> Servicios</a></li>
-                    <li><a href="#productos"><i class="bi bi-chevron-right"></i> Productos</a></li>
-                    <li><a href="#contacto"><i class="bi bi-chevron-right"></i> Contacto</a></li>
+                    <li><a href="@GetNavUrl("#inicio")"><i class="bi bi-chevron-right"></i> Inicio</a></li>
+                    <li><a href="@GetNavUrl("#nosotros")"><i class="bi bi-chevron-right"></i> Nosotros</a></li>
+                    <li><a href="@GetNavUrl("#servicios")"><i class="bi bi-chevron-right"></i> Servicios</a></li>
+                    <li><a href="@GetNavUrl("#productos")"><i class="bi bi-chevron-right"></i> Productos</a></li>
+                    <li><a href="@GetNavUrl("#contacto")"><i class="bi bi-chevron-right"></i> Contacto</a></li>
                     <li><a asp-controller="Home" asp-action="Trabaja"><i class="bi bi-chevron-right"></i> Crezcamos juntos</a></li>
                 </ul>
             </div>
@@ -421,12 +470,54 @@
         }
     })();
 
+    // Dropdown Nosotros en Nav
+    (function () {
+        var btn = document.getElementById('pubNosotrosBtn');
+        var dropdown = document.getElementById('pubNosotrosDropdown');
+
+        if (btn && dropdown) {
+            btn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                var isOpen = dropdown.classList.toggle('show');
+                btn.setAttribute('aria-expanded', String(isOpen));
+            });
+
+            // Cerrar al hacer clic en cualquier opción dentro del dropdown
+            dropdown.querySelectorAll('.pub-nav-dropdown-item').forEach(function (item) {
+                item.addEventListener('click', function () {
+                    dropdown.classList.remove('show');
+                    btn.setAttribute('aria-expanded', 'false');
+                });
+            });
+
+            document.addEventListener('click', function () {
+                dropdown.classList.remove('show');
+                btn.setAttribute('aria-expanded', 'false');
+            });
+        }
+    })();
+
     // Scroll effect navbar
     (function () {
         var navbar = document.getElementById('pubNavbar');
         window.addEventListener('scroll', function () {
             if (navbar) navbar.classList.toggle('scrolled', window.scrollY > 20);
         }, { passive: true });
+    })();
+
+    // Desplazamiento suave si se entra con un hash desde otra página
+    (function () {
+        if (window.location.hash) {
+            window.addEventListener('load', function () {
+                var hash = window.location.hash;
+                var target = document.querySelector(hash);
+                if (target) {
+                    setTimeout(function () {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 150);
+                }
+            });
+        }
     })();
 </script>
 

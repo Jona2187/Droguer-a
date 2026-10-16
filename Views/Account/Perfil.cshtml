@@ -77,10 +77,11 @@
     align-items: center;
     gap: 6px;
 }
-.vehicle-card-label i {
+.vehicle-card-label i, .vehicle-card-label svg {
     font-size: 24px;
     color: var(--t-muted);
-    transition: color .2s;
+    transition: color .2s, fill .2s;
+    fill: currentColor;
 }
 .vehicle-card-label span {
     font-size: 13px;
@@ -95,8 +96,10 @@
     background: rgba(245,158,11,.1);
     box-shadow: 0 4px 14px rgba(245,158,11,.2);
 }
-.vehicle-card-input:checked + .vehicle-card-label i {
+.vehicle-card-input:checked + .vehicle-card-label i,
+.vehicle-card-input:checked + .vehicle-card-label svg {
     color: #d97706;
+    fill: #d97706;
 }
 .vehicle-card-input:checked + .vehicle-card-label span {
     color: #d97706;
@@ -159,7 +162,18 @@
                         @if (!string.IsNullOrEmpty(Model.TipoVehiculo))
                         {
                             <span class="badge bg-light text-dark border px-3 py-1 rounded-pill ms-1 font-monospace">
-                                <i class="bi @(Model.TipoVehiculo == "Bicicleta" ? "bi-bicycle" : Model.TipoVehiculo == "Carro" ? "bi-car-front-fill" : Model.TipoVehiculo == "A pie" ? "bi-person-walking" : "bi-truck") me-1"></i>
+                                @if (Model.TipoVehiculo == "Moto")
+                                {
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 24 24" class="me-1 d-inline-block align-text-bottom"><path d="M19.44 13c-.22 0-.45.07-.67.12l-.9-2.73A3.99 3.99 0 0 0 14.07 7.5H12V6h2a1 1 0 1 0 0-2h-3a1 1 0 0 0-1 1v2.5H7.83a4 4 0 0 0-3.8 2.89L3.2 13.12c-.22-.05-.45-.12-.67-.12a3.5 3.5 0 1 0 3.44 4.14c.34-.09.68-.21 1-.36l.93.93a1 1 0 0 0 1.41-1.41l-.9-.9c.47-.38.86-.85 1.14-1.4h4.88c.28.55.67 1.02 1.14 1.4l-.9.9a1 1 0 0 0 1.41 1.41l.93-.93c.32.15.66.27 1 .36A3.5 3.5 0 1 0 19.44 13zm-15.94 3.5a1.5 1.5 0 1 1 1.5-1.5 1.5 1.5 0 0 1-1.5 1.5zm1.94-3.5.76-2.31A2 2 0 0 1 8 9.5h1.56l.89 3.5H5.44zm14 3.5a1.5 1.5 0 1 1 1.5-1.5 1.5 1.5 0 0 1-1.5 1.5zm-2.88-3.5.89-3.5H14a2 2 0 0 1 1.9 1.19l.76 2.31h-4.1z"/></svg>
+                                }
+                                else if (Model.TipoVehiculo == "Bicicleta")
+                                {
+                                    <i class="bi bi-bicycle me-1"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-car-front-fill me-1"></i>
+                                }
                                 @Model.TipoVehiculo @(!string.IsNullOrEmpty(Model.Placa) ? $"[{Model.Placa}]" : "")
                             </span>
                         }
@@ -315,7 +329,7 @@
                                 <input type="radio" class="vehicle-card-input" name="tipoVehiculo" id="vehiculoMoto" value="Moto"
                                        @(string.IsNullOrEmpty(Model.TipoVehiculo) || Model.TipoVehiculo == "Moto" ? "checked" : "") onchange="actualizarRequisitoPlaca()" />
                                 <label class="vehicle-card-label" for="vehiculoMoto">
-                                    <i class="bi bi-truck"></i>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" viewBox="0 0 24 24" class="vehicle-svg-icon"><path d="M19.44 13c-.22 0-.45.07-.67.12l-.9-2.73A3.99 3.99 0 0 0 14.07 7.5H12V6h2a1 1 0 1 0 0-2h-3a1 1 0 0 0-1 1v2.5H7.83a4 4 0 0 0-3.8 2.89L3.2 13.12c-.22-.05-.45-.12-.67-.12a3.5 3.5 0 1 0 3.44 4.14c.34-.09.68-.21 1-.36l.93.93a1 1 0 0 0 1.41-1.41l-.9-.9c.47-.38.86-.85 1.14-1.4h4.88c.28.55.67 1.02 1.14 1.4l-.9.9a1 1 0 0 0 1.41 1.41l.93-.93c.32.15.66.27 1 .36A3.5 3.5 0 1 0 19.44 13zm-15.94 3.5a1.5 1.5 0 1 1 1.5-1.5 1.5 1.5 0 0 1-1.5 1.5zm1.94-3.5.76-2.31A2 2 0 0 1 8 9.5h1.56l.89 3.5H5.44zm14 3.5a1.5 1.5 0 1 1 1.5-1.5 1.5 1.5 0 0 1-1.5 1.5zm-2.88-3.5.89-3.5H14a2 2 0 0 1 1.9 1.19l.76 2.31h-4.1z"/></svg>
                                     <span>Moto</span>
                                 </label>
 
@@ -331,13 +345,6 @@
                                 <label class="vehicle-card-label" for="vehiculoCarro">
                                     <i class="bi bi-car-front-fill"></i>
                                     <span>Carro</span>
-                                </label>
-
-                                <input type="radio" class="vehicle-card-input" name="tipoVehiculo" id="vehiculoPie" value="A pie"
-                                       @(Model.TipoVehiculo == "A pie" ? "checked" : "") onchange="actualizarRequisitoPlaca()" />
-                                <label class="vehicle-card-label" for="vehiculoPie">
-                                    <i class="bi bi-person-walking"></i>
-                                    <span>A pie</span>
                                 </label>
                             </div>
 
@@ -474,7 +481,7 @@ function actualizarRequisitoPlaca() {
         placaHelp.textContent = 'Ingresa la placa del vehículo (ej: ABC-123) para que el cliente te identifique.';
         if (placaContainer) placaContainer.style.opacity = '1';
     } else {
-        // Bicicleta o A pie
+        // Bicicleta
         placaInput.required = false;
         placaInput.value = '';
         placaInput.disabled = true;

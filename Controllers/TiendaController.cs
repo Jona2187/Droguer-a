@@ -689,8 +689,10 @@ namespace Drogueria.Controllers
                 .Include(p => p.Repartidor)
                 .Include(p => p.Detalles)
                     .ThenInclude(d => d.Producto)
+                        .ThenInclude(prod => prod.Categoria)
                 .Where(p => p.UsuarioId == usuarioId)
-                .OrderByDescending(p => p.Fecha)
+                .OrderByDescending(p => p.Estado == "En camino" || p.Estado == "Confirmado" || p.Estado == "Pendiente")
+                .ThenByDescending(p => p.Fecha)
                 .ToListAsync();
 
             ViewData["Title"] = "Mis Pedidos";
@@ -698,7 +700,29 @@ namespace Drogueria.Controllers
             return View("~/Views/Tienda/_MisPedidos.cshtml", pedidos);
         }
 
-        // â”€â”€ HELPERS SESIÃ“N â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // GET: /Tienda/DetallePedido/{id}
+        public async Task<IActionResult> DetallePedido(Guid id)
+        {
+            var usuarioId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var pedido = await _context.Pedidos
+                .Include(p => p.Repartidor)
+                .Include(p => p.Usuario)
+                .Include(p => p.Detalles)
+                    .ThenInclude(d => d.Producto)
+                        .ThenInclude(prod => prod.Categoria)
+                .FirstOrDefaultAsync(p => p.Id == id && p.UsuarioId == usuarioId);
+
+            if (pedido == null)
+            {
+                TempData["Error"] = "Pedido no encontrado o no tienes permiso para visualizarlo.";
+                return RedirectToAction(nameof(MisPedidos));
+            }
+
+            ViewData["Title"] = $"Detalle del Pedido #{pedido.Id.ToString().Substring(0, 8).ToUpper()}";
+            ViewData["ActiveNav"] = "pedidos";
+            return View("~/Views/Tienda/_DetallePedido.cshtml", pedido);
+        }
 
         private List<CarritoItem> ObtenerCarrito()
         {

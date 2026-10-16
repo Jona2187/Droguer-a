@@ -36,7 +36,7 @@ namespace Drogueria.Controllers
 
             ViewBag.ProductosStockBajo = await _context.Productos
                 .Include(p => p.Categoria)
-                .Where(p => p.Stock <= 10)
+                .Where(p => p.Stock <= p.StockMinimo && p.Estado)
                 .OrderBy(p => p.Stock)
                 .Take(5)
                 .ToListAsync();

@@ -92,7 +92,7 @@
 }
 
 <div class="mb-4">
-    <h1 class="fw-bold mb-1" style="font-size: clamp(1.4rem, 4vw, 2rem);">Mis Domicilios <span>🛵</span></h1>
+    <h1 class="fw-bold mb-1" style="font-size: clamp(1.4rem, 4vw, 2rem);">Mis Domicilios</h1>
     <p class="text-muted mb-0" style="font-size:14px;">Pedidos activos asignados. Visualiza la ruta óptima al cliente y el tiempo aproximado de llegada.</p>
 </div>
 
@@ -152,14 +152,26 @@ else
                 <div class="d-flex gap-2 flex-wrap">
                     @if (!isEntregado && !isEnCamino)
                     {
-                        <form asp-controller="Repartidor" asp-action="CambiarEstado" method="post">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="id" value="@p.Id" />
-                            <input type="hidden" name="estado" value="En camino" />
-                            <button type="submit" class="btn btn-warning rounded-pill px-4 fw-semibold d-inline-flex align-items-center gap-2">
-                                <i class="bi bi-play-circle-fill"></i> Iniciar Entrega
+                        var tieneOtroEnCamino = lista.Any(o => o.Estado == "En camino");
+                        if (tieneOtroEnCamino)
+                        {
+                            <button type="button" class="btn btn-secondary rounded-pill px-4 fw-semibold d-inline-flex align-items-center gap-2 opacity-75"
+                                    title="Ya tienes una entrega en camino. Termina y entrega el pedido activo antes de iniciar otro."
+                                    onclick="alert('Ya tienes una entrega en curso. Debes finalizar y entregar ese pedido antes de iniciar uno nuevo.');">
+                                <i class="bi bi-lock-fill"></i> Iniciar Entrega
                             </button>
-                        </form>
+                        }
+                        else
+                        {
+                            <form asp-controller="Repartidor" asp-action="CambiarEstado" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@p.Id" />
+                                <input type="hidden" name="estado" value="En camino" />
+                                <button type="submit" class="btn btn-warning rounded-pill px-4 fw-semibold d-inline-flex align-items-center gap-2">
+                                    <i class="bi bi-play-circle-fill"></i> Iniciar Entrega
+                                </button>
+                            </form>
+                        }
                     }
                     @if (isEnCamino)
                     {
@@ -167,6 +179,11 @@ else
                                 class="btn btn-success rounded-pill px-4 fw-semibold d-inline-flex align-items-center gap-2"
                                 onclick="abrirConfirmarEntrega('@p.Id', '@Html.Raw(clientName.Replace("'", "\'"))')">
                             <i class="bi bi-check-circle-fill"></i> Marcar Entregado
+                        </button>
+                        <button type="button"
+                                class="btn btn-primary rounded-pill px-3 fw-semibold d-inline-flex align-items-center gap-2"
+                                onclick="abrirChatRepartidor('@p.Id', '@Html.Raw(clientName.Replace("'", "\'"))')">
+                            <i class="bi bi-chat-dots-fill"></i> Chatear
                         </button>
                     }
                 </div>
@@ -375,6 +392,44 @@ else
     <input type="hidden" id="hdnCodigoConfirmacionModal" name="codigoConfirmacion" value="" />
 </form>
 
+<!-- Modal Chat Repartidor -->
+<div class="modal fade" id="chatRepartidorModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:420px;">
+        <div class="modal-content border-0 shadow-lg" style="border-radius:20px; overflow:hidden;">
+            <div class="modal-header border-0 px-4 pt-4 pb-2" style="background:linear-gradient(135deg,#f59e0b,#d97706);">
+                <div class="d-flex align-items-center gap-3">
+                    <div style="background:rgba(255,255,255,.2);border-radius:50%;width:42px;height:42px;display:flex;align-items:center;justify-content:center;">
+                        <i class="bi bi-chat-dots-fill text-white fs-5"></i>
+                    </div>
+                    <div>
+                        <h6 class="modal-title text-white fw-bold mb-0">Chat con el Cliente</h6>
+                        <small class="text-white-50" id="chatRepartidorClienteNombre"></small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div id="chatRepartidorMensajes" style="height:320px;overflow-y:auto;padding:16px;background:#f8fafc;display:flex;flex-direction:column;gap:10px;">
+                <div class="text-center text-muted small py-4" id="chatRepartidorVacio">
+                    <i class="bi bi-chat-square-dots fs-3 d-block mb-2 opacity-50"></i>
+                    Inicia la conversación con el cliente
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-3" style="background:#fff;">
+                <div class="d-flex gap-2 w-100">
+                    <input type="text" id="chatRepartidorInput" class="form-control rounded-pill"
+                           placeholder="Escribe un mensaje..."
+                           style="border:1.5px solid #e2e8f0;font-size:14px;" maxlength="300"
+                           onkeydown="if(event.key==='Enter') enviarMensajeChatRepartidor();" />
+                    <button class="btn btn-warning rounded-circle fw-bold" style="width:42px;height:42px;padding:0;flex-shrink:0;"
+                            onclick="enviarMensajeChatRepartidor()">
+                        <i class="bi bi-send-fill" style="font-size:16px;"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
@@ -382,12 +437,13 @@ else
 // Almacena controladores de mapas para cada pedido
 const orderTrackers = {};
 
-document.addEventListener("DOMContentLoaded", function () {
-    const connection = new signalR.HubConnectionBuilder()
-        .withUrl("/hubs/ubicacion")
-        .withAutomaticReconnect()
-        .build();
+// Instancia global de SignalR
+const connection = new signalR.HubConnectionBuilder()
+    .withUrl("/hubs/ubicacion")
+    .withAutomaticReconnect()
+    .build();
 
+document.addEventListener("DOMContentLoaded", function () {
     connection.start().catch(err => console.error("SignalR:", err));
 
     @foreach (var p in lista.Where(p => p.Estado == "En camino"))
@@ -700,5 +756,82 @@ async function confirmarEntregado() {
         window.showAppToast(res.message || 'Error al validar el código.', 'error');
     }
 }
+// ── CHAT REPARTIDOR ──────────────────────────────────────
+let chatRepartidorModal = null;
+let chatPedidoActivo = null;
+let nombreRepartidor = '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(User.Identity?.Name ?? "Repartidor"))';
+
+function abrirChatRepartidor(pedidoId, clienteNombre) {
+    chatPedidoActivo = pedidoId;
+    document.getElementById('chatRepartidorClienteNombre').textContent = clienteNombre;
+    
+    // Limpiar caja y cargar historial permanente
+    const caja = document.getElementById('chatRepartidorMensajes');
+    caja.innerHTML = `
+        <div class="text-center text-muted small py-4" id="chatRepartidorVacio">
+            <i class="bi bi-chat-square-dots fs-3 d-block mb-2 opacity-50"></i>
+            Inicia la conversación con el cliente
+        </div>`;
+
+    if (connection && connection.state === signalR.HubConnectionState.Connected) {
+        connection.invoke('JoinOrderGroup', pedidoId).catch(console.error);
+        connection.invoke('ObtenerHistorialChat', pedidoId)
+            .then(mensajes => {
+                if (mensajes && mensajes.length > 0) {
+                    caja.innerHTML = '';
+                    mensajes.forEach(m => {
+                        const esPropio = m.remitente === nombreRepartidor;
+                        agregarBurbujaRepartidor(m.remitente, m.mensaje, m.hora, esPropio);
+                    });
+                }
+            })
+            .catch(err => console.warn('Historial repartidor:', err));
+    }
+
+    chatRepartidorModal = chatRepartidorModal || new bootstrap.Modal(document.getElementById('chatRepartidorModal'));
+    chatRepartidorModal.show();
+    setTimeout(() => document.getElementById('chatRepartidorInput').focus(), 300);
+}
+
+function agregarBurbujaRepartidor(remitente, mensaje, hora, esPropio) {
+    const vacio = document.getElementById('chatRepartidorVacio');
+    if (vacio) vacio.remove();
+    const caja = document.getElementById('chatRepartidorMensajes');
+    const burbuja = document.createElement('div');
+    burbuja.style.cssText = `display:flex;flex-direction:column;align-items:${esPropio ? 'flex-end' : 'flex-start'};`;
+    const globo = document.createElement('div');
+    globo.style.cssText = `max-width:78%;padding:9px 13px;border-radius:${esPropio ? '16px 16px 4px 16px' : '16px 16px 16px 4px'};
+        background:${esPropio ? 'linear-gradient(135deg,#f59e0b,#d97706)' : '#fff'};
+        color:${esPropio ? '#fff' : '#1e293b'};font-size:13.5px;line-height:1.45;
+        box-shadow:0 2px 8px rgba(0,0,0,.08);border:${esPropio ? 'none' : '1px solid #e2e8f0'};`;
+    globo.textContent = mensaje;
+    const meta = document.createElement('div');
+    meta.style.cssText = 'font-size:10px;color:#94a3b8;margin-top:3px;';
+    meta.textContent = `${esPropio ? 'Tú' : remitente} · ${hora}`;
+    burbuja.appendChild(globo);
+    burbuja.appendChild(meta);
+    caja.appendChild(burbuja);
+    caja.scrollTop = caja.scrollHeight;
+}
+
+function enviarMensajeChatRepartidor() {
+    if (!chatPedidoActivo) return;
+    const input = document.getElementById('chatRepartidorInput');
+    const msg = input.value.trim();
+    if (!msg) return;
+    connection.invoke('EnviarMensajeChat', chatPedidoActivo, nombreRepartidor, msg)
+        .then(() => { input.value = ''; input.focus(); })
+        .catch(err => console.error('Chat repartidor:', err));
+}
+
+connection.on('RecibirMensajeChat', function (pid, remitente, mensaje, hora) {
+    const esPropio = remitente === nombreRepartidor;
+    if (chatPedidoActivo === pid) {
+        agregarBurbujaRepartidor(remitente, mensaje, hora, esPropio);
+    } else if (!esPropio) {
+        // Mensaje de otro pedido: notificar con toast si es posible
+        if (window.showAppToast) window.showAppToast(`Mensaje del cliente: "${mensaje.substring(0,40)}"`, 'info');
+    }
+});
 </script>
 }

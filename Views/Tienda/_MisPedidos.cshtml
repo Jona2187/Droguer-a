@@ -5,9 +5,6 @@
     ViewData["ActiveNav"] = "pedidos";
 }
 
-<!-- Leaflet CSS -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-
 <div class="container-fluid px-3 px-lg-5">
 
     <!-- Encabezado de Página -->
@@ -82,162 +79,166 @@
     }
     else
     {
-        <div class="row">
+        <div class="row g-3">
             <div class="col-12">
+
+                <style>
+                .order-list-card {
+                    background: var(--bg-card, #fff);
+                    border: 1px solid var(--border, #e2e8f0);
+                    border-radius: 16px;
+                    display: flex;
+                    align-items: center;
+                    gap: 0;
+                    overflow: hidden;
+                    transition: box-shadow .18s, transform .18s;
+                    text-decoration: none;
+                    color: inherit;
+                }
+                .order-list-card:hover {
+                    box-shadow: 0 6px 24px rgba(0,0,0,.09);
+                    transform: translateY(-2px);
+                }
+                .order-list-card.activo {
+                    border-left: 4px solid var(--primary, #7c3aed);
+                }
+                .order-list-card.en-camino {
+                    border-left: 4px solid #f59e0b;
+                }
+                .order-list-card.entregado {
+                    border-left: 4px solid #22c55e;
+                }
+                .order-list-card.cancelado {
+                    border-left: 4px solid #ef4444;
+                    opacity: .78;
+                }
+                .olc-img {
+                    width: 90px;
+                    height: 90px;
+                    object-fit: cover;
+                    flex-shrink: 0;
+                    background: var(--bg-muted, #f8fafc);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+                .olc-img img { width: 90px; height: 90px; object-fit: cover; }
+                .olc-body {
+                    flex: 1;
+                    padding: 14px 18px;
+                    min-width: 0;
+                }
+                .olc-actions {
+                    padding: 14px 18px;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 8px;
+                    flex-shrink: 0;
+                    border-left: 1px solid var(--border, #e2e8f0);
+                }
+                @@media (max-width: 600px) {
+                    .order-list-card { flex-direction: column; align-items: stretch; }
+                    .olc-img { width: 100%; height: 140px; }
+                    .olc-img img { width: 100%; height: 140px; }
+                    .olc-actions { border-left: none; border-top: 1px solid var(--border, #e2e8f0); flex-direction: row; }
+                }
+                </style>
+
                 @foreach (var pedido in Model)
                 {
                     var isEnCamino = pedido.Estado == "En camino";
                     var isEntregado = pedido.Estado == "Entregado";
                     var isCancelado = pedido.Estado == "Cancelado";
-                    var estadoClase = pedido.Estado.ToLower() switch
+                    var isActivo = !isEntregado && !isCancelado;
+
+                    var cardClass = isEnCamino ? "en-camino" : isEntregado ? "entregado" : isCancelado ? "cancelado" : "activo";
+
+                    var estadoBadge = pedido.Estado.ToLower() switch
                     {
-                        "confirmado" => "confirmado",
-                        "en camino" => "confirmado",
-                        "entregado" => "entregado",
-                        "cancelado" => "cancelado",
-                        _ => "pendiente"
+                        "confirmado"  => ("bg-primary", "bi-circle-fill"),
+                        "en camino"   => ("bg-warning text-dark", "bi-truck"),
+                        "entregado"   => ("bg-success", "bi-check-circle-fill"),
+                        "cancelado"   => ("bg-danger", "bi-x-circle-fill"),
+                        _             => ("bg-secondary", "bi-hourglass-split")
                     };
 
-                    var partesDir = (pedido.DireccionEntrega ?? "").Split('|');
-                    var geoQuery = "";
-                    var popupCalle = partesDir.Length > 1 ? partesDir[1].Trim() : (pedido.DireccionEntrega ?? "");
-                    var geoSeg = partesDir.FirstOrDefault(s => s.TrimStart().StartsWith("GEO:"));
-                    if (geoSeg != null)
-                        geoQuery = geoSeg.Replace("GEO:", "").Trim();
-                    else
-                        geoQuery = popupCalle;
+                    // Thumbnail: primer producto con imagen
+                    var primerDetalle = pedido.Detalles.FirstOrDefault();
+                    var primerProd = primerDetalle?.Producto;
+                    var imgUrl = !string.IsNullOrEmpty(primerProd?.Imagen)
+                        ? (primerProd.Imagen.StartsWith("http") ? primerProd.Imagen
+                           : (primerProd.Imagen.StartsWith("/") ? primerProd.Imagen : "/" + primerProd.Imagen))
+                        : "";
 
-                    <div class="pedido-card mb-4 @(isEnCamino ? "border-warning" : "")" style="@(isEnCamino ? "border: 2px solid #f59e0b;" : "")">
-                        <!-- Cabecera del pedido -->
-                        <div class="pedido-card-header">
-                            <div class="d-flex flex-wrap align-items-center gap-3">
-                                <div>
-                                    <span class="text-muted small d-block">Número de Pedido</span>
-                                    <span class="pedido-id">#@pedido.Id.ToString().Substring(0, 8).ToUpper()</span>
-                                </div>
-                                <div class="border-start ps-3 d-none d-sm-block" style="border-color: var(--border) !important;">
-                                    <span class="text-muted small d-block">Fecha de Compra</span>
-                                    <span class="pedido-fecha fw-medium">@pedido.Fecha.ToString("dd/MM/yyyy HH:mm")</span>
-                                </div>
-                                @if (!string.IsNullOrEmpty(pedido.CodigoConfirmacion))
+                    // Nombre del pedido: primero producto + "y X más"
+                    var nombrePedido = primerProd?.Nombre ?? "Medicamentos";
+                    var extras = pedido.Detalles.Count - 1;
+                    if (extras > 0) nombrePedido += $" y {extras} más";
+
+                    // Producto para "Comprar otra vez"
+                    var productoRecompraId = primerProd?.Id;
+
+                    <div class="order-list-card @cardClass mb-3">
+
+                        <!-- Imagen -->
+                        <div class="olc-img">
+                            @if (!string.IsNullOrEmpty(imgUrl))
+                            {
+                                <img src="@imgUrl" alt="@(primerProd?.Nombre ?? "Producto")"
+                                     onerror="this.style.display='none';this.parentElement.innerHTML='<i class=\'bi bi-capsule text-muted\' style=\'font-size:2rem;\'></i>';" />
+                            }
+                            else
+                            {
+                                <i class="bi bi-capsule text-muted" style="font-size:2rem;"></i>
+                            }
+                        </div>
+
+                        <!-- Cuerpo -->
+                        <div class="olc-body">
+                            <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                                <span class="badge @estadoBadge.Item1 rounded-pill px-2 py-1" style="font-size:11px;">
+                                    <i class="bi @estadoBadge.Item2 me-1" style="font-size:9px;"></i>@pedido.Estado
+                                </span>
+                                @if (isEnCamino && !string.IsNullOrEmpty(pedido.CodigoConfirmacion))
                                 {
-                                    <div class="border-start ps-3" style="border-color: var(--border) !important;">
-                                        <span class="text-muted small d-block">Código de Entrega (Repartidor)</span>
-                                        <span class="badge bg-primary-subtle text-primary font-monospace fs-6 border border-primary border-opacity-25 px-2 py-1">
-                                            <i class="bi bi-key-fill me-1"></i>@pedido.CodigoConfirmacion
-                                        </span>
-                                    </div>
+                                    <span class="badge bg-primary-subtle text-primary border border-primary border-opacity-25 font-monospace px-2" style="font-size:11px;">
+                                        <i class="bi bi-key-fill me-1"></i>@pedido.CodigoConfirmacion
+                                    </span>
+                                }
+                                <span class="text-muted small ms-auto">@pedido.Fecha.ToString("dd/MM/yyyy · HH:mm")</span>
+                            </div>
+
+                            <div class="fw-bold text-dark mb-1" style="font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:340px;">
+                                @nombrePedido
+                            </div>
+
+                            <div class="d-flex align-items-center gap-3 flex-wrap">
+                                <span class="text-muted small">
+                                    <i class="bi bi-hash me-1"></i>#@pedido.Id.ToString().Substring(0, 8).ToUpper()
+                                </span>
+                                <span class="fw-bold text-primary">$@pedido.Total.ToString("N2")</span>
+                                @if (pedido.Detalles.Count > 0)
+                                {
+                                    <span class="text-muted small">@pedido.Detalles.Sum(d => d.Cantidad) unidades · @pedido.Detalles.Count producto(s)</span>
                                 }
                             </div>
-
-                            <div class="d-flex align-items-center gap-3">
-                                <span class="pedido-estado @estadoClase" style="@(isEnCamino ? "background: rgba(245, 158, 11, 0.15); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.3);" : "")">
-                                    <i class="bi @(isEnCamino ? "bi-truck" : "bi-circle-fill")" style="font-size: 10px;"></i>
-                                    @pedido.Estado
-                                </span>
-                                <span class="fs-5 fw-bold text-primary">$@pedido.Total.ToString("N2")</span>
-                            </div>
                         </div>
 
-                        <!-- 1) SI NO HA INICIADO EL REPARTIDOR (Pendiente / Confirmado): Mensaje de entrega máximo 2 horas -->
-                        @if (!isEnCamino && !isEntregado && !isCancelado)
-                        {
-                            <div class="p-3 border-bottom d-flex align-items-center justify-content-between flex-wrap gap-2" style="background: rgba(124, 58, 237, 0.06); border-color: rgba(124, 58, 237, 0.18) !important;">
-                                <div class="d-flex align-items-center gap-3">
-                                    <div style="background: rgba(124, 58, 237, 0.15); color: var(--primary); width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;">
-                                        <i class="bi bi-clock-history"></i>
-                                    </div>
-                                    <div>
-                                        <div class="fw-bold" style="font-size: 15px; color: var(--primary);">
-                                            El pedido llegará en un máximo de 2 horas ⏱️
-                                        </div>
-                                        <div class="text-muted" style="font-size: 12px;">
-                                            Estamos preparando tu orden en droguería. En cuanto el repartidor inicie el recorrido, verás aquí su ubicación GPS en vivo y el tiempo estimado exacto de llegada.
-                                        </div>
-                                    </div>
-                                </div>
-                                <span class="badge rounded-pill px-3 py-2 fw-semibold" style="background: rgba(124, 58, 237, 0.15); color: var(--primary); font-size: 12px;">
-                                    <i class="bi bi-hourglass-split me-1"></i> Máximo en 2 hrs
-                                </span>
-                            </div>
-                        }
-
-                        <!-- 2) SI ESTÁ EN CAMINO: Repartidor inició el recorrido, mostrar tiempo aproximado de llegada y mapa -->
-                        @if (isEnCamino)
-                        {
-                            <div class="p-3 border-bottom" style="background: rgba(245, 158, 11, 0.08); border-color: rgba(245, 158, 11, 0.25) !important;">
-                                <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div style="background: rgba(245, 158, 11, 0.2); color: #d97706; width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;">
-                                            <i class="bi bi-truck animate-pulse"></i>
-                                        </div>
-                                        <div>
-                                            <div class="fw-bold text-dark" style="font-size: 15px;">
-                                                ¡El repartidor ha iniciado el recorrido hacia tu destino! 🛵
-                                            </div>
-                                            @if (pedido.Repartidor != null)
-                                            {
-                                                <div class="fw-semibold text-primary" style="font-size: 13px;">
-                                                    <i class="bi bi-person-badge me-1"></i>Repartidor: @pedido.Repartidor.Nombre @pedido.Repartidor.Apellido
-                                                    @if (!string.IsNullOrEmpty(pedido.Repartidor.TipoVehiculo))
-                                                    {
-                                                        <span class="badge bg-light text-dark border ms-2">
-                                                            <i class="bi @(pedido.Repartidor.TipoVehiculo == "Bicicleta" ? "bi-bicycle" : pedido.Repartidor.TipoVehiculo == "Carro" ? "bi-car-front-fill" : pedido.Repartidor.TipoVehiculo == "A pie" ? "bi-person-walking" : "bi-truck") me-1"></i>
-                                                            @pedido.Repartidor.TipoVehiculo
-                                                            @if (!string.IsNullOrEmpty(pedido.Repartidor.Placa))
-                                                            {
-                                                                <span class="fw-bold text-primary ms-1 font-monospace">(@pedido.Repartidor.Placa)</span>
-                                                            }
-                                                        </span>
-                                                    }
-                                                </div>
-                                            }
-                                            <div class="text-muted" style="font-size: 12px;" id="clientEtaSub-@pedido.Id">
-                                                Calculando tiempo estimado de llegada...
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex align-items-center gap-2 flex-wrap">
-                                        <span class="badge bg-warning text-dark font-monospace px-3 py-2 shadow-sm" id="clientGpsStatus-@pedido.Id" style="font-size: 13px; font-weight: 700;">
-                                            <i class="bi bi-stopwatch me-1"></i> Calculando tiempo aproximado...
-                                        </span>
-                                    </div>
-                                </div>
-                                <div id="client-map-@pedido.Id" style="height: 280px; width: 100%; border-radius: 14px;" class="shadow-sm border"></div>
-                            </div>
-                        }
-
-                        <!-- Detalles del pedido -->
-                        <div class="pedido-card-body">
-                            <div class="table-responsive">
-                                <table class="pedido-detail-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Medicamento</th>
-                                            <th style="text-align: center;">Cantidad</th>
-                                            <th style="text-align: right;">Precio Unitario</th>
-                                            <th style="text-align: right;">Total</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var det in pedido.Detalles)
-                                        {
-                                            <tr>
-                                                <td>
-                                                    <div class="d-flex align-items-center gap-2">
-                                                        <i class="bi bi-capsule text-muted"></i>
-                                                        <span class="fw-semibold">@(det.Producto?.Nombre ?? "Producto no disponible")</span>
-                                                    </div>
-                                                </td>
-                                                <td style="text-align: center;">@det.Cantidad</td>
-                                                <td style="text-align: right;">$@det.PrecioUnitario.ToString("N2")</td>
-                                                <td style="text-align: right;" class="fw-bold">$@det.Subtotal.ToString("N2")</td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
+                        <!-- Botones -->
+                        <div class="olc-actions">
+                            <a asp-controller="Tienda" asp-action="DetallePedido" asp-route-id="@pedido.Id"
+                               class="btn btn-primary btn-sm rounded-pill px-3 fw-semibold d-inline-flex align-items-center gap-1" style="white-space:nowrap;">
+                                <i class="bi bi-eye-fill"></i> Ver compra
+                            </a>
+                            @if (productoRecompraId.HasValue)
+                            {
+                                <a asp-controller="Tienda" asp-action="Catalogo" asp-route-abrirProducto="@productoRecompraId"
+                                   class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-semibold d-inline-flex align-items-center gap-1" style="white-space:nowrap;">
+                                    <i class="bi bi-arrow-repeat"></i> Comprar otra vez
+                                </a>
+                            }
                         </div>
+
                     </div>
                 }
             </div>
@@ -245,165 +246,3 @@
     }
 </div>
 
-@section Scripts {
-    <!-- Leaflet JS & SignalR JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const connection = new signalR.HubConnectionBuilder()
-                .withUrl("/hubs/ubicacion")
-                .withAutomaticReconnect()
-                .build();
-
-            connection.start().then(() => {
-                console.log("Cliente conectado a SignalR Hub");
-                // Suscribirse a grupos de todos los pedidos activos para recibir actualizaciones
-                @foreach (var p in Model.Where(p => p.Estado != "Entregado" && p.Estado != "Cancelado"))
-                {
-                    <text>
-                    connection.invoke("JoinOrderGroup", "@p.Id").catch(err => console.error(err));
-                    </text>
-                }
-            }).catch(err => console.error(err));
-
-            const clientMarkers = {};
-            const clientMaps = {};
-            const clientRoutes = {};
-
-            @foreach (var p in Model.Where(p => p.Estado == "En camino"))
-            {
-                var partesDirP = (p.DireccionEntrega ?? "").Split('|');
-                var geoQueryP = "";
-                var popupCalleP  = partesDirP.Length > 1 ? partesDirP[1].Trim() : (p.DireccionEntrega ?? "");
-                var geoSegP = partesDirP.FirstOrDefault(s => s.TrimStart().StartsWith("GEO:"));
-                if (geoSegP != null)
-                    geoQueryP = geoSegP.Replace("GEO:", "").Trim();
-                else
-                    geoQueryP = popupCalleP;
-
-                <text>
-                (function() {
-                    const pedidoId = "@p.Id";
-                    const initialLat = @(p.LatitudRepartidor.HasValue ? p.LatitudRepartidor.Value.ToString(System.Globalization.CultureInfo.InvariantCulture) : "4.60971");
-                    const initialLng = @(p.LongitudRepartidor.HasValue ? p.LongitudRepartidor.Value.ToString(System.Globalization.CultureInfo.InvariantCulture) : "-74.08175");
-                    const geoQuery = "@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(geoQueryP))";
-
-                    const map = L.map('client-map-' + pedidoId).setView([initialLat, initialLng], 15);
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        attribution: '&copy; OpenStreetMap'
-                    }).addTo(map);
-
-                    const deliveryIcon = L.divIcon({
-                        className: 'custom-repartidor-marker',
-                        html: '<div style="background:#f59e0b; color:white; border-radius:50%; width:38px; height:38px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(245,158,11,0.4); border:2px solid white;"><i class="bi bi-truck fs-5"></i></div>',
-                        iconSize: [38, 38],
-                        iconAnchor: [19, 19]
-                    });
-
-                    const marker = L.marker([initialLat, initialLng], { icon: deliveryIcon }).addTo(map)
-                        .bindPopup("<b>Repartidor</b><br>Tu pedido viene en camino.")
-                        .openPopup();
-
-                    clientMaps[pedidoId] = map;
-                    clientMarkers[pedidoId] = marker;
-
-                    // Geocodificar destino del cliente y calcular tiempo inicial de llegada
-                    if (geoQuery && geoQuery.trim() !== '') {
-                        fetch('/Direccion/Geocodificar?' + new URLSearchParams({ direccion: geoQuery, ciudad: '' }), {
-                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                        })
-                        .then(r => r.json())
-                        .then(data => {
-                            if (data.success) {
-                                const homeIcon = L.divIcon({
-                                    className: '',
-                                    html: '<div style="background:#ef4444; color:white; border-radius:50%; width:34px; height:34px; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 10px rgba(239,68,68,0.4); border:2px solid white;"><i class="bi bi-house-fill" style="font-size:16px;"></i></div>',
-                                    iconSize: [34, 34],
-                                    iconAnchor: [17, 17]
-                                });
-
-                                L.marker([data.lat, data.lon], { icon: homeIcon })
-                                    .addTo(map)
-                                    .bindPopup("<b>Tu Dirección de Entrega</b>");
-
-                                // Calcular ruta y tiempo estimado de llegada inicial
-                                fetch(`/Direccion/CalcularRuta?origenLat=${initialLat}&origenLng=${initialLng}&destinoLat=${data.lat}&destinoLng=${data.lon}`, {
-                                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                                })
-                                .then(r => r.json())
-                                .then(routeData => {
-                                    if (routeData.success) {
-                                        if (clientRoutes[pedidoId]) map.removeLayer(clientRoutes[pedidoId]);
-                                        clientRoutes[pedidoId] = L.geoJSON(routeData.geometry, {
-                                            style: { color: '#2563eb', weight: 5, opacity: 0.85, lineJoin: 'round' }
-                                        }).addTo(map);
-
-                                        map.fitBounds(clientRoutes[pedidoId].getBounds(), { padding: [35, 35], maxZoom: 16 });
-
-                                        const statusElem = document.getElementById('clientGpsStatus-' + pedidoId);
-                                        const subElem = document.getElementById('clientEtaSub-' + pedidoId);
-                                        if (statusElem) {
-                                            statusElem.innerHTML = `<i class="bi bi-stopwatch-fill me-1"></i>Llegada aprox: <strong>${routeData.tiempoTexto}</strong> (${routeData.distanciaTexto})`;
-                                            statusElem.className = "badge bg-success text-white font-monospace px-3 py-2 shadow-sm";
-                                        }
-                                        if (subElem) {
-                                            subElem.textContent = `Tiempo estimado: ${routeData.tiempoTexto} • Distancia restante: ${routeData.distanciaTexto} • Hora aprox: ${routeData.horaEstimadaLlegada}`;
-                                        }
-                                    }
-                                })
-                                .catch(err => console.error("Error ruta cliente:", err));
-                            }
-                        })
-                        .catch(err => console.error("Error geocodificando destino cliente:", err));
-                    }
-                })();
-                </text>
-            }
-
-            // Escuchar cuando el repartidor inicia el pedido ("En camino") en tiempo real
-            connection.on("EstadoCambiado", function (pedidoId, nuevoEstado) {
-                if (nuevoEstado === "En camino" || nuevoEstado === "Entregado") {
-                    location.reload();
-                }
-            });
-
-            // Escuchar actualizaciones con ruta y tiempo estimado del repartidor
-            connection.on("ReceiveLocationWithRoute", function (pedidoId, lat, lng, tiempoEstimado, distancia) {
-                const marker = clientMarkers[pedidoId];
-                const map = clientMaps[pedidoId];
-                const statusElem = document.getElementById('clientGpsStatus-' + pedidoId);
-                const subElem = document.getElementById('clientEtaSub-' + pedidoId);
-
-                if (marker && map) {
-                    marker.setLatLng([lat, lng]);
-                    map.panTo([lat, lng]);
-                }
-                if (statusElem) {
-                    statusElem.innerHTML = `<i class="bi bi-stopwatch-fill me-1"></i>Llegada aprox: <strong>${tiempoEstimado}</strong> (${distancia})`;
-                    statusElem.className = "badge bg-success text-white font-monospace px-3 py-2 shadow-sm";
-                }
-                if (subElem) {
-                    subElem.textContent = `Tiempo estimado: ${tiempoEstimado} • Distancia restante: ${distancia}`;
-                }
-            });
-
-            // Escuchar actualizaciones de ubicación enviadas por el repartidor
-            connection.on("ReceiveLocation", function (pedidoId, lat, lng) {
-                const marker = clientMarkers[pedidoId];
-                const map = clientMaps[pedidoId];
-                const statusElem = document.getElementById('clientGpsStatus-' + pedidoId);
-
-                if (marker && map) {
-                    marker.setLatLng([lat, lng]);
-                    map.panTo([lat, lng]);
-                    if (statusElem && !statusElem.innerHTML.includes("Llegada aprox")) {
-                        statusElem.textContent = `Repartidor en movimiento (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
-                        statusElem.className = "badge bg-success text-white font-monospace px-3 py-2 shadow-sm";
-                    }
-                }
-            });
-        });
-    </script>
-}

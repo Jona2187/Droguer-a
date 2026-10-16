@@ -24,7 +24,7 @@
     var total = Model.Count();
     var activos = Model.Count(p => p.Estado);
     var inactivos = total - activos;
-    var lowStock = Model.Count(p => p.Stock <= 5 && p.Estado);
+    var lowStock = Model.Count(p => p.Stock <= p.StockMinimo && p.Estado);
 }
 
 <div class="emp-page-header">
@@ -58,7 +58,7 @@
         <div class="emp-stat-icon amber"><i class="bi bi-exclamation-triangle"></i></div>
         <div>
             <div class="emp-stat-value">@lowStock</div>
-            <div class="emp-stat-label">Stock bajo (≤5)</div>
+            <div class="emp-stat-label">Stock bajo (≤ mín.)</div>
         </div>
     </div>
 </div>
@@ -99,7 +99,7 @@
                     <th>Producto</th>
                     <th>Categoría</th>
                     <th>Precio</th>
-                    <th>Stock</th>
+                    <th>Existencia</th>
                     <th>Estado</th>
                     <th>Fecha</th>
                 </tr>
@@ -128,9 +128,9 @@
                         <td><span class="text-muted">@(p.Categoria?.Nombre ?? "—")</span></td>
                         <td class="fw-semibold">$@p.Precio.ToString("N2")</td>
                         <td>
-                            @if (p.Stock <= 5 && p.Estado)
+                            @if (p.Stock <= p.StockMinimo && p.Estado)
                             {
-                                <span class="emp-badge low-stock">@p.Stock uds</span>
+                                <span class="emp-badge low-stock" title="Mínimo configurado: @p.StockMinimo">@p.Stock uds (Bajo)</span>
                             }
                             else
                             {

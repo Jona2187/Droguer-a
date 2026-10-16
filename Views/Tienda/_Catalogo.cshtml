@@ -234,7 +234,7 @@
 
                             <div class="modal-producto-stock-badge mb-3">
                                 <span class="stock-indicator-dot" id="modalStockDot"></span>
-                                <span>Stock disponible: <strong id="modalProductoStock">0</strong> unidades</span>
+                                <span>Existencia: <strong id="modalProductoStock">0</strong> unidades</span>
                             </div>
 
                             <div class="modal-producto-desc-box">
@@ -550,5 +550,18 @@
         const modalEl = document.getElementById('modalDetalleProducto');
         bootstrap.Modal.getInstance(modalEl)?.hide();
     }
+
+    // Auto-abrir modal si viene con parámetro de URL (ej: /Tienda/Catalogo?abrirProducto=guid)
+    document.addEventListener('DOMContentLoaded', function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const productoIdParam = urlParams.get('abrirProducto') || urlParams.get('productoId');
+        if (productoIdParam) {
+            const card = document.querySelector(`.producto-card[data-id="${productoIdParam}"]`);
+            if (card) {
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                card.click();
+            }
+        }
+    });
 </script>
 }

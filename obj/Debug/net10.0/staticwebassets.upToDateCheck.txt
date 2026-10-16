@@ -1,8 +1,9 @@
 wwwroot\css\empleado.css
 wwwroot\css\landingPages.css
 wwwroot\css\layout-publico.css
-wwwroot\css\site.css
+wwwroot\css\nosotros.css
 wwwroot\css\tienda.css
+wwwroot\css\trabaja.css
 wwwroot\favicon.ico
 wwwroot\img\1.jpeg
 wwwroot\img\2.jpeg
@@ -99,13 +100,17 @@ wwwroot\uploads\productos\e4638baf-4c8d-4f23-8b03-12eab1c34b31.jpg
 wwwroot\uploads\productos\e8dd9429-a602-4cc2-8065-3995ccb1e270.jpg
 wwwroot\uploads\productos\ebb7190f-e396-41f0-b69f-b83a2c716b57.jpg
 wwwroot\uploads\productos\f9a028a7-0428-4146-bb57-19b58b517d83.jpg
-D:\Drogueria 19-09\Drogueria\wwwroot\css\landingPages.css
-D:\Drogueria 19-09\Drogueria\wwwroot\js\site.js
+wwwroot\css\site.css
 D:\Drogueria 19-09\Drogueria\wwwroot\css\empleado.css
-D:\Drogueria 19-09\Drogueria\wwwroot\lib\jquery\LICENSE.txt
-D:\Drogueria 19-09\Drogueria\wwwroot\favicon.ico
-D:\Drogueria 19-09\Drogueria\wwwroot\js\landingPages.js
+D:\Drogueria 19-09\Drogueria\wwwroot\css\landingPages.css
+D:\Drogueria 19-09\Drogueria\wwwroot\css\layout-publico.css
+D:\Drogueria 19-09\Drogueria\wwwroot\css\nosotros.css
 D:\Drogueria 19-09\Drogueria\wwwroot\css\tienda.css
+D:\Drogueria 19-09\Drogueria\wwwroot\css\trabaja.css
+D:\Drogueria 19-09\Drogueria\wwwroot\favicon.ico
+D:\Drogueria 19-09\Drogueria\wwwroot\img\logodrogueria.svg
+D:\Drogueria 19-09\Drogueria\wwwroot\js\landingPages.js
+D:\Drogueria 19-09\Drogueria\wwwroot\js\site.js
 D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
 D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map
 D:\Drogueria 19-09\Drogueria\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css
@@ -164,6 +169,5 @@ D:\Drogueria 19-09\Drogueria\wwwroot\lib\jquery\dist\jquery.min.map
 D:\Drogueria 19-09\Drogueria\wwwroot\lib\jquery\dist\jquery.slim.js
 D:\Drogueria 19-09\Drogueria\wwwroot\lib\jquery\dist\jquery.slim.min.js
 D:\Drogueria 19-09\Drogueria\wwwroot\lib\jquery\dist\jquery.slim.min.map
+D:\Drogueria 19-09\Drogueria\wwwroot\lib\jquery\LICENSE.txt
 D:\Drogueria 19-09\Drogueria\wwwroot\css\site.css
-D:\Drogueria 19-09\Drogueria\wwwroot\css\layout-publico.css
-D:\Drogueria 19-09\Drogueria\wwwroot\img\logodrogueria.svg

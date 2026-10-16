@@ -154,6 +154,172 @@
     background-color: var(--primary-soft);
 }
 
+/* ── Dropdown Nosotros en Navbar Desktop ── */
+.pub-nav-dropdown-wrapper {
+    position: relative;
+}
+
+.pub-nav-dropdown-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--t-muted);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    position: relative;
+    font-family: inherit;
+    line-height: inherit;
+}
+
+.pub-nav-dropdown-btn::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 14px;
+    right: 14px;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--primary-gradient);
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 0.22s ease;
+}
+
+.pub-nav-dropdown-btn:hover {
+    color: var(--primary);
+    background-color: var(--primary-subtle);
+}
+
+.pub-nav-dropdown-btn:hover::after,
+.pub-nav-dropdown-btn.active::after {
+    transform: scaleX(1);
+}
+
+.pub-nav-dropdown-btn.active {
+    color: var(--primary);
+    font-weight: 600;
+    background-color: var(--primary-soft);
+}
+
+.pub-nav-dropdown-btn .pub-nav-chevron {
+    font-size: 11px;
+    opacity: 0.7;
+    transition: transform 0.2s ease;
+}
+
+.pub-nav-dropdown-wrapper:hover .pub-nav-dropdown-btn .pub-nav-chevron,
+.pub-nav-dropdown-btn[aria-expanded="true"] .pub-nav-chevron {
+    transform: rotate(180deg);
+}
+
+.pub-nav-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 270px;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow-lg);
+    padding: 8px;
+    z-index: 1060;
+    animation: pubDropDown 0.18s ease-out;
+}
+
+/* Puente invisible para evitar que el hover se pierda entre botón y menú */
+.pub-nav-dropdown-menu::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 0;
+    right: 0;
+    height: 12px;
+}
+
+@media (min-width: 992px) {
+    .pub-nav-dropdown-wrapper:hover .pub-nav-dropdown-menu {
+        display: block;
+    }
+}
+
+.pub-nav-dropdown-menu.show {
+    display: block;
+}
+
+.pub-nav-dropdown-item {
+    display: flex !important;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px !important;
+    border-radius: 10px !important;
+    color: var(--t-muted) !important;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    background: transparent !important;
+}
+
+.pub-nav-dropdown-item::after {
+    display: none !important;
+}
+
+.pub-nav-dropdown-item:hover,
+.pub-nav-dropdown-item.active {
+    background-color: var(--primary-soft) !important;
+    color: var(--primary) !important;
+}
+
+.pub-nav-dropdown-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    background-color: var(--bg-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    color: var(--primary);
+    flex-shrink: 0;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.pub-nav-dropdown-item:hover .pub-nav-dropdown-icon,
+.pub-nav-dropdown-item.active .pub-nav-dropdown-icon {
+    background: var(--primary-gradient);
+    color: #fff;
+}
+
+.pub-nav-dropdown-label {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.25;
+}
+
+.pub-nav-dropdown-title {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--t-base);
+    transition: color 0.15s ease;
+}
+
+.pub-nav-dropdown-item:hover .pub-nav-dropdown-title,
+.pub-nav-dropdown-item.active .pub-nav-dropdown-title {
+    color: var(--primary);
+}
+
+.pub-nav-dropdown-sub {
+    font-size: 11px;
+    color: var(--t-light);
+}
+
 /* ── Acciones del navbar (derecha) ── */
 .pub-nav-actions {
     display: flex;

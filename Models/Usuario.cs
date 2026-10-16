@@ -39,7 +39,7 @@ public class Usuario
     public string? Telefono { get; set; }
 
     /// <summary>
-    /// Tipo de vehículo usado por el repartidor (ej: Moto, Bicicleta, Carro, A pie).
+    /// Tipo de vehículo usado por el repartidor (ej: Moto, Bicicleta, Carro).
     /// </summary>
     [StringLength(50)]
     public string? TipoVehiculo { get; set; }

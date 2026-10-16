@@ -85,6 +85,21 @@ namespace Drogueria.Controllers
                 return RedirectToAction(nameof(MisDomicilios));
             }
 
+            // Validar que el repartidor no pueda iniciar un pedido si ya tiene otro en camino
+            if (estado == "En camino")
+            {
+                var pedidoEnCaminoActivo = await _context.Pedidos
+                    .AnyAsync(p => p.RepartidorId == userId && p.Estado == "En camino" && p.Id != id);
+
+                if (pedidoEnCaminoActivo)
+                {
+                    var errorMsg = "Ya tienes un pedido en curso ('En camino'). Debes finalizar y entregar ese pedido antes de iniciar uno nuevo.";
+                    if (isAjax) return Json(new { success = false, message = errorMsg });
+                    TempData["Error"] = errorMsg;
+                    return RedirectToAction(nameof(MisDomicilios));
+                }
+            }
+
             // Validar código de entrega de 6 dígitos al cambiar a estado Entregado
             if (estado == "Entregado")
             {

@@ -16,6 +16,7 @@ public class AppDbContex : DbContext
     public DbSet<Pedido> Pedidos { get; set; } = null!;
     public DbSet<DetallePedido> DetallesPedido { get; set; } = null!;
     public DbSet<DireccionUsuario> DireccionesUsuario { get; set; } = null!;
+    public DbSet<MensajeChat> MensajesChat { get; set; } = null!;
 
 
 
@@ -130,6 +131,22 @@ public class AppDbContex : DbContext
             .HasOne(d => d.Usuario)
             .WithMany(u => u.Direcciones)
             .HasForeignKey(d => d.UsuarioId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // MensajeChat — PK como char(36) UUID en MySQL
+        modelBuilder.Entity<MensajeChat>()
+            .Property(m => m.Id)
+            .HasColumnType("char(36)")
+            .ValueGeneratedNever();
+
+        modelBuilder.Entity<MensajeChat>()
+            .Property(m => m.PedidoId)
+            .HasColumnType("char(36)");
+
+        modelBuilder.Entity<MensajeChat>()
+            .HasOne(m => m.Pedido)
+            .WithMany()
+            .HasForeignKey(m => m.PedidoId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

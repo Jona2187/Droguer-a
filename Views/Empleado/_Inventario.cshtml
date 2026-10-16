@@ -23,7 +23,7 @@
 @{
     var totalUnidades = Model.Sum(p => p.Stock);
     var productosSinStock = Model.Count(p => p.Stock == 0 && p.Estado);
-    var productosStockBajo = Model.Count(p => p.Stock > 0 && p.Stock <= 10 && p.Estado);
+    var productosStockBajo = Model.Count(p => p.Stock > 0 && p.Stock <= p.StockMinimo && p.Estado);
     var valorInventario = Model.Where(p => p.Estado).Sum(p => p.Stock * p.Precio);
 }
 
@@ -52,7 +52,7 @@
             <div class="inv-summary-icon amber"><i class="bi bi-exclamation-triangle"></i></div>
         </div>
         <div class="inv-summary-value">@productosStockBajo</div>
-        <div class="inv-summary-label">Stock bajo (≤ 10)</div>
+        <div class="inv-summary-label">Stock bajo (≤ mín.)</div>
     </div>
     <div class="inv-summary-card">
         <div class="inv-summary-top">
@@ -78,8 +78,8 @@
     <select class="inv-filter-select" id="invStockFilter" onchange="filtrarInventario()">
         <option value="">Todo el stock</option>
         <option value="sin">Sin stock (0)</option>
-        <option value="bajo">Stock bajo (1-10)</option>
-        <option value="normal">Stock normal (> 10)</option>
+        <option value="bajo">Stock bajo (≤ mín.)</option>
+        <option value="normal">Stock normal (> mín.)</option>
     </select>
 </div>
 
@@ -95,8 +95,8 @@ else
     <div class="inv-grid" id="invGrid">
         @foreach (var p in Model.Where(p => p.Estado).OrderBy(p => p.Stock))
         {
-            var stockClass = p.Stock == 0 ? "out" : p.Stock <= 10 ? "low" : "ok";
-            <div class="inv-card inv-item" data-nombre="@p.Nombre.ToLower()" data-cat="@(p.Categoria?.Nombre ?? "")" data-stock="@p.Stock">
+            var stockClass = p.Stock == 0 ? "out" : p.Stock <= p.StockMinimo ? "low" : "ok";
+            <div class="inv-card inv-item" data-nombre="@p.Nombre.ToLower()" data-cat="@(p.Categoria?.Nombre ?? "")" data-stock="@p.Stock" data-stock-minimo="@p.StockMinimo">
                 <div class="inv-card-header">
                     @if (!string.IsNullOrEmpty(p.Imagen))
                     {
@@ -108,16 +108,17 @@ else
                     }
                     <div class="inv-card-info">
                         <div class="inv-card-name">@p.Nombre</div>
-                        <div class="inv-card-cat">@(p.Categoria?.Nombre ?? "Sin categoría")</div>
+                        <div class="inv-card-cat">@(p.Categoria?.Nombre ?? "Sin categoría") · Mín: @p.StockMinimo</div>
                     </div>
                     <div class="inv-card-price">$@p.Precio.ToString("N2")</div>
                 </div>
 
                 <div class="inv-stock-section">
                     <div>
-                        <div class="inv-stock-label">Stock actual</div>
+                        <div class="inv-stock-label">Existencia</div>
                         <div class="inv-stock-current @stockClass">@p.Stock</div>
                     </div>
+                    
                     <form asp-controller="Empleado" asp-action="ActualizarStock" method="post" class="inv-stock-form">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="id" value="@p.Id" />
@@ -142,11 +143,12 @@ else
         items.forEach(item => {
             const matchNombre = item.dataset.nombre.includes(buscar);
             const matchCat = !cat || item.dataset.cat === cat;
-            const stock = parseInt(item.dataset.stock);
+            const stock = parseInt(item.dataset.stock) || 0;
+            const stockMinimo = parseInt(item.dataset.stockMinimo) || 5;
             let matchStock = true;
             if (stockF === 'sin') matchStock = stock === 0;
-            else if (stockF === 'bajo') matchStock = stock >= 1 && stock <= 10;
-            else if (stockF === 'normal') matchStock = stock > 10;
+            else if (stockF === 'bajo') matchStock = stock >= 1 && stock <= stockMinimo;
+            else if (stockF === 'normal') matchStock = stock > stockMinimo;
             item.style.display = (matchNombre && matchCat && matchStock) ? '' : 'none';
         });
     }

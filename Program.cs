@@ -88,6 +88,22 @@ using (var scope = app.Services.CreateScope())
         try { db.Database.ExecuteSqlRaw("ALTER TABLE Usuarios ADD COLUMN Telefono VARCHAR(20) NULL;"); } catch { }
         try { db.Database.ExecuteSqlRaw("ALTER TABLE Usuarios ADD COLUMN TipoVehiculo VARCHAR(50) NULL;"); } catch { }
         try { db.Database.ExecuteSqlRaw("ALTER TABLE Usuarios ADD COLUMN Placa VARCHAR(20) NULL;"); } catch { }
+
+        // Asegurar tabla persistente de Mensajes de Chat
+        try
+        {
+            db.Database.ExecuteSqlRaw(@"
+                CREATE TABLE IF NOT EXISTS MensajesChat (
+                    Id CHAR(36) NOT NULL PRIMARY KEY,
+                    PedidoId CHAR(36) NOT NULL,
+                    Remitente VARCHAR(150) NOT NULL,
+                    Mensaje TEXT NOT NULL,
+                    Fecha DATETIME NOT NULL,
+                    INDEX idx_chat_pedido (PedidoId)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+            ");
+        }
+        catch { }
     }
     catch { }
 }

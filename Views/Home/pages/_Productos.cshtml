@@ -76,7 +76,7 @@
                     <th>Producto</th>
                     <th>Categoría</th>
                     <th>Precio</th>
-                    <th>Stock</th>
+                    <th>Existencia</th>
                     <th>Estado</th>
                     <th style="text-align: right;">Acciones</th>
                 </tr>
@@ -164,7 +164,8 @@
 
                             <!-- Acciones -->
                             <td style="text-align: right;">
-                                <div class="d-inline-flex align-items-center gap-1">
+                                <!-- Acciones Desktop -->
+                                <div class="d-none d-md-inline-flex align-items-center gap-1">
                                     <!-- Editar -->
                                     <button class="btn-action-icon edit"
                                             data-bs-toggle="modal"
@@ -199,6 +200,49 @@
                                             <i class="bi bi-person-x-fill"></i>
                                         </button>
                                     </form>
+                                </div>
+
+                                <!-- Acciones Móvil (Desplegable 3 puntos a la derecha) -->
+                                <div class="dropdown d-inline-block d-md-none position-relative">
+                                    <button class="btn-action-icon" type="button" data-bs-toggle="dropdown" data-bs-boundary="viewport" aria-expanded="false" title="Más opciones">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 py-2 mobile-action-dropdown" style="min-width: 170px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border) !important; z-index: 1060;">
+                                        <li>
+                                            <button type="button" class="dropdown-item d-flex align-items-center gap-2 py-2 edit"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#modalEditar"
+                                                    data-id="@p.Id"
+                                                    data-nombre="@p.Nombre"
+                                                    data-descripcion="@(p.Descripcion ?? "")"
+                                                    data-miligramos="@p.Miligramos"
+                                                    data-unidad-medida="@(string.IsNullOrEmpty(p.UnidadMedida) ? "mg" : p.UnidadMedida)"
+                                                    data-precio="@p.Precio.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)"
+                                                    data-categoria-id="@p.CategoriaId"
+                                                    data-stock="@p.Stock"
+                                                    data-stock-minimo="@p.StockMinimo"
+                                                    data-limite-maximo="@(p.LimiteMaximoPorPedido?.ToString() ?? "")"
+                                                    data-estado="@p.Estado.ToString().ToLowerInvariant()"
+                                                    data-fecha="@p.FechaCreacion.ToString("o")"
+                                                    data-imagen="@(p.Imagen ?? "")"
+                                                    style="color: var(--t-base); font-size: 13.5px;">
+                                                <i class="bi bi-pencil-square text-primary"></i>
+                                                <span>Editar</span>
+                                            </button>
+                                        </li>
+                                        <li><hr class="dropdown-divider my-1" style="border-color: var(--border-soft);"></li>
+                                        <li>
+                                            <button type="button" class="dropdown-item d-flex align-items-center gap-2 py-2 text-danger"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#glassConfirmModal"
+                                                    data-id="@p.Id"
+                                                    data-nombre="@p.Nombre"
+                                                    style="font-size: 13.5px;">
+                                                <i class="bi bi-person-x-fill text-danger"></i>
+                                                <span>Desactivar</span>
+                                            </button>
+                                        </li>
+                                    </ul>
                                 </div>
                             </td>
                         </tr>
@@ -296,7 +340,7 @@
 
                         <!-- Stock Actual -->
                         <div class="col-sm-4">
-                            <label class="form-label" for="crearStock">Stock Actual <span class="text-danger">*</span></label>
+                            <label class="form-label" for="crearStock">Existencia <span class="text-danger">*</span></label>
                             <input type="number" class="form-control" id="crearStock" name="Stock"
                                    placeholder="0" min="0" max="50000" value="0" required />
                         </div>
@@ -423,14 +467,14 @@
 
                         <!-- Stock Actual -->
                         <div class="col-sm-4">
-                            <label class="form-label" for="editarStock">Stock Actual <span class="text-danger">*</span></label>
+                            <label class="form-label" for="editarStock">Existencia <span class="text-danger">*</span></label>
                             <input type="number" class="form-control" id="editarStock" name="Stock"
                                    placeholder="0" min="0" max="50000" required />
                         </div>
 
                         <!-- Stock Mínimo (Límite Alerta) -->
                         <div class="col-sm-4">
-                            <label class="form-label" for="editarStockMinimo">Límite Stock Alerta <span class="text-danger">*</span></label>
+                            <label class="form-label" for="editarStockMinimo">Límite Alerta <span class="text-danger">*</span></label>
                             <input type="number" class="form-control" id="editarStockMinimo" name="StockMinimo"
                                    placeholder="5" min="0" max="5000" required />
                         </div>

@@ -332,12 +332,12 @@ namespace Drogueria.Controllers
             // Validaciones específicas para Repartidor
             if (usuario.Rol == "Repartidor")
             {
-                var vehiculosValidos = new[] { "Moto", "Bicicleta", "Carro", "A pie" };
+                var vehiculosValidos = new[] { "Moto", "Bicicleta", "Carro" };
                 tipoVehiculo = tipoVehiculo?.Trim();
 
                 if (!string.IsNullOrEmpty(tipoVehiculo) && !vehiculosValidos.Contains(tipoVehiculo))
                 {
-                    var msg = "Selecciona un tipo de vehículo válido (Moto, Bicicleta, Carro o A pie).";
+                    var msg = "Selecciona un tipo de vehículo válido (Moto, Bicicleta o Carro).";
                     if (isAjax) return Json(new { success = false, message = msg });
                     TempData["Error"] = msg;
                     return RedirectToAction(nameof(Perfil));
@@ -358,7 +358,7 @@ namespace Drogueria.Controllers
                 }
                 else
                 {
-                    // Para Bicicleta o A pie, la placa no se necesita
+                    // Para Bicicleta, la placa no se necesita
                     usuario.Placa = null;
                 }
 

@@ -58,9 +58,7 @@
 </head>
 <body class="cliente-body">
 
-    <!-- ====================================================
-         TOPBAR NAVBAR EXCLUSIVO CLIENTE (SIN SIDEBAR)
-    ===================================================== -->
+    <!-- TOPBAR NAVBAR EXCLUSIVO CLIENTE (SIN SIDEBAR) -->
     <header class="cliente-navbar-wrap">
         <nav class="cliente-navbar container-fluid px-3 px-lg-5">
             <!-- Brand Logo -->
@@ -165,11 +163,6 @@
                             <li>
                                 <a class="dropdown-item rounded-3 py-2 d-flex align-items-center gap-2" asp-controller="Tienda" asp-action="MisPedidos">
                                     <i class="bi bi-bag-check text-primary"></i> Mis Pedidos
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item rounded-3 py-2 d-flex align-items-center gap-2 @(activeNav == "trabaja" ? "active text-primary fw-semibold" : "")" asp-controller="Home" asp-action="Trabaja">
-                                    <i class="bi bi-people text-primary"></i> Crezcamos juntos
                                 </a>
                             </li>
                         }
