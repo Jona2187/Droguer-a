@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Globalization;
 using Drogueria.Data;
@@ -13,6 +13,12 @@ builder.Services.AddHttpClient("Nominatim", client =>
     client.BaseAddress = new Uri("https://nominatim.openstreetmap.org");
     client.DefaultRequestHeaders.Add("User-Agent", "DrogueriaApp/1.0 (contacto@drogueria.com)");
     client.DefaultRequestHeaders.Add("Accept-Language", "es");
+    client.Timeout = TimeSpan.FromSeconds(10);
+});
+builder.Services.AddHttpClient("OSRM", client =>
+{
+    client.BaseAddress = new Uri("https://router.project-osrm.org");
+    client.DefaultRequestHeaders.Add("User-Agent", "DrogueriaApp/1.0 (contacto@drogueria.com)");
     client.Timeout = TimeSpan.FromSeconds(10);
 });
 builder.Services.AddSignalR();
@@ -73,6 +79,19 @@ app.MapControllerRoute(
 );
 
 app.MapHub<UbicacionHub>("/hubs/ubicacion");
+
+// Asegurar columnas de perfil y vehículo en la tabla Usuarios
+using (var scope = app.Services.CreateScope())
+{
+    try
+    {
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContex>();
+        try { db.Database.ExecuteSqlRaw("ALTER TABLE Usuarios ADD COLUMN Telefono VARCHAR(20) NULL;"); } catch { }
+        try { db.Database.ExecuteSqlRaw("ALTER TABLE Usuarios ADD COLUMN TipoVehiculo VARCHAR(50) NULL;"); } catch { }
+        try { db.Database.ExecuteSqlRaw("ALTER TABLE Usuarios ADD COLUMN Placa VARCHAR(20) NULL;"); } catch { }
+    }
+    catch { }
+}
 
 app.Run();
 

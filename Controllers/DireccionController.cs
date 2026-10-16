@@ -77,6 +77,109 @@ namespace Drogueria.Controllers
             }
         }
 
+        // GET: /Direccion/CalcularRuta
+        [HttpGet]
+        public async Task<IActionResult> CalcularRuta(double origenLat, double origenLng, double destinoLat, double destinoLng)
+        {
+            if (Math.Abs(origenLat) < 0.0001 || Math.Abs(origenLng) < 0.0001 ||
+                Math.Abs(destinoLat) < 0.0001 || Math.Abs(destinoLng) < 0.0001)
+            {
+                return Json(new { success = false, message = "Coordenadas no válidas para calcular la ruta." });
+            }
+
+            try
+            {
+                var oLng = origenLng.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                var oLat = origenLat.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                var dLng = destinoLng.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                var dLat = destinoLat.ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+                var url = $"https://router.project-osrm.org/route/v1/driving/{oLng},{oLat};{dLng},{dLat}?overview=full&geometries=geojson";
+                var client = _httpClientFactory.CreateClient("OSRM");
+                if (!client.DefaultRequestHeaders.Contains("User-Agent"))
+                {
+                    client.DefaultRequestHeaders.UserAgent.ParseAdd("DrogueriaApp/1.0");
+                }
+
+                var response = await client.GetAsync(url);
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    using var doc = JsonDocument.Parse(json);
+                    var root = doc.RootElement;
+                    if (root.TryGetProperty("code", out var code) && code.GetString() == "Ok" &&
+                        root.TryGetProperty("routes", out var routes) && routes.GetArrayLength() > 0)
+                    {
+                        var route = routes[0];
+                        var duration = route.GetProperty("duration").GetDouble(); // Segundos
+                        var distance = route.GetProperty("distance").GetDouble(); // Metros
+                        var geometry = route.GetProperty("geometry");
+
+                        var durMin = Math.Max(1, (int)Math.Round(duration / 60.0));
+                        var distKm = Math.Round(distance / 1000.0, 1);
+                        var horaLlegada = DateTime.Now.AddSeconds(duration).ToString("hh:mm tt", System.Globalization.CultureInfo.InvariantCulture);
+
+                        return Json(new
+                        {
+                            success = true,
+                            duracionSegundos = duration,
+                            duracionMinutos = durMin,
+                            distanciaMetros = distance,
+                            distanciaKm = distKm,
+                            horaEstimadaLlegada = horaLlegada,
+                            tiempoTexto = durMin < 60 ? $"{durMin} min" : $"{durMin / 60} h {durMin % 60} min",
+                            distanciaTexto = $"{distKm} km",
+                            geometry = JsonSerializer.Deserialize<object>(geometry.GetRawText())
+                        });
+                    }
+                }
+            }
+            catch
+            {
+                // Fallback a cálculo local
+            }
+
+            // Fallback con fórmula Haversine + velocidad promedio urbana de 25 km/h + curvatura de vías (1.35)
+            var dKm = CalcularDistanciaHaversine(origenLat, origenLng, destinoLat, destinoLng) * 1.35;
+            var fallbackDistKm = Math.Max(0.1, Math.Round(dKm, 1));
+            var fallbackMin = Math.Max(2, (int)Math.Round((fallbackDistKm / 25.0) * 60));
+            var fallbackHora = DateTime.Now.AddMinutes(fallbackMin).ToString("hh:mm tt", System.Globalization.CultureInfo.InvariantCulture);
+
+            return Json(new
+            {
+                success = true,
+                isFallback = true,
+                duracionSegundos = fallbackMin * 60,
+                duracionMinutos = fallbackMin,
+                distanciaMetros = fallbackDistKm * 1000,
+                distanciaKm = fallbackDistKm,
+                horaEstimadaLlegada = fallbackHora,
+                tiempoTexto = $"~{fallbackMin} min",
+                distanciaTexto = $"~{fallbackDistKm} km",
+                geometry = new
+                {
+                    type = "LineString",
+                    coordinates = new[]
+                    {
+                        new[] { origenLng, origenLat },
+                        new[] { destinoLng, destinoLat }
+                    }
+                }
+            });
+        }
+
+        private static double CalcularDistanciaHaversine(double lat1, double lon1, double lat2, double lon2)
+        {
+            var r = 6371.0; // Radio terrestre en km
+            var dLat = (lat2 - lat1) * (Math.PI / 180.0);
+            var dLon = (lon2 - lon1) * (Math.PI / 180.0);
+            var a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
+                    Math.Cos(lat1 * (Math.PI / 180.0)) * Math.Cos(lat2 * (Math.PI / 180.0)) *
+                    Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
+            var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+            return r * c;
+        }
+
         // GET: /Direccion/MisDirecciones
         [HttpGet]
         public async Task<IActionResult> MisDirecciones()

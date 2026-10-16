@@ -686,6 +686,7 @@ namespace Drogueria.Controllers
             var usuarioId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             var pedidos = await _context.Pedidos
+                .Include(p => p.Repartidor)
                 .Include(p => p.Detalles)
                     .ThenInclude(d => d.Producto)
                 .Where(p => p.UsuarioId == usuarioId)

@@ -2,8 +2,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using Microsoft.AspNetCore.SignalR;
 using Drogueria.Data;
 using Drogueria.Models;
+using Drogueria.Hubs;
 
 namespace Drogueria.Controllers
 {
@@ -11,10 +13,12 @@ namespace Drogueria.Controllers
     public class RepartidorController : Controller
     {
         private readonly AppDbContex _context;
+        private readonly IHubContext<UbicacionHub> _hubContext;
 
-        public RepartidorController(AppDbContex context)
+        public RepartidorController(AppDbContex context, IHubContext<UbicacionHub> hubContext)
         {
             _context = context;
+            _hubContext = hubContext;
         }
 
         // GET: /Repartidor/MisDomicilios  — Pedidos ACTIVOS (excluye Entregado)
@@ -106,6 +110,9 @@ namespace Drogueria.Controllers
             pedido.Estado = estado;
             _context.Pedidos.Update(pedido);
             await _context.SaveChangesAsync();
+
+            // Notificar a los clientes suscritos al pedido sobre el cambio de estado (ej: "En camino")
+            await _hubContext.Clients.Group(pedido.Id.ToString()).SendAsync("EstadoCambiado", pedido.Id.ToString(), estado);
 
             var successMsg = $"El pedido ha sido marcado como '{estado}' exitosamente.";
             if (isAjax)

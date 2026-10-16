@@ -8,7 +8,6 @@
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-
 <div class="container-fluid px-3 px-lg-5">
 
     <!-- Encabezado de Página -->
@@ -18,7 +17,7 @@
                 <i class="bi bi-clock-history text-primary"></i>
                 <span>Historial de Mis Pedidos</span>
             </h1>
-            <p class="text-muted small mb-0">Consulta el estado y realiza seguimiento en tiempo real de tus pedidos en camino</p>
+            <p class="text-muted small mb-0">Consulta el estado, tiempo estimado de entrega y realiza seguimiento en tiempo real de tus pedidos en camino</p>
         </div>
 
         <a asp-controller="Tienda" asp-action="Catalogo" class="tienda-back-btn">
@@ -48,6 +47,9 @@
             <p class="mb-1 small">
                 <strong>Importante:</strong> Guarda este código de 6 dígitos. Cuando el repartidor llegue a entregarte el pedido, debés darle este código para que él pueda confirmar la entrega en el sistema.
             </p>
+            <div class="mt-2 pt-2 border-top border-info border-opacity-25 small fw-semibold text-primary">
+                <i class="bi bi-clock-history me-1"></i> Tiempo estimado de entrega: <strong>Máximo en 2 horas</strong>. Te notificaremos cuando el repartidor inicie el recorrido.
+            </div>
             @if (metInfo == "supergiros")
             {
                 <div class="mt-2 pt-2 border-top border-info border-opacity-25 small">
@@ -85,6 +87,8 @@
                 @foreach (var pedido in Model)
                 {
                     var isEnCamino = pedido.Estado == "En camino";
+                    var isEntregado = pedido.Estado == "Entregado";
+                    var isCancelado = pedido.Estado == "Cancelado";
                     var estadoClase = pedido.Estado.ToLower() switch
                     {
                         "confirmado" => "confirmado",
@@ -93,6 +97,15 @@
                         "cancelado" => "cancelado",
                         _ => "pendiente"
                     };
+
+                    var partesDir = (pedido.DireccionEntrega ?? "").Split('|');
+                    var geoQuery = "";
+                    var popupCalle = partesDir.Length > 1 ? partesDir[1].Trim() : (pedido.DireccionEntrega ?? "");
+                    var geoSeg = partesDir.FirstOrDefault(s => s.TrimStart().StartsWith("GEO:"));
+                    if (geoSeg != null)
+                        geoQuery = geoSeg.Replace("GEO:", "").Trim();
+                    else
+                        geoQuery = popupCalle;
 
                     <div class="pedido-card mb-4 @(isEnCamino ? "border-warning" : "")" style="@(isEnCamino ? "border: 2px solid #f59e0b;" : "")">
                         <!-- Cabecera del pedido -->
@@ -126,18 +139,71 @@
                             </div>
                         </div>
 
-                        <!-- Si está EN CAMINO: mostrar mapa de seguimiento en tiempo real -->
+                        <!-- 1) SI NO HA INICIADO EL REPARTIDOR (Pendiente / Confirmado): Mensaje de entrega máximo 2 horas -->
+                        @if (!isEnCamino && !isEntregado && !isCancelado)
+                        {
+                            <div class="p-3 border-bottom d-flex align-items-center justify-content-between flex-wrap gap-2" style="background: rgba(124, 58, 237, 0.06); border-color: rgba(124, 58, 237, 0.18) !important;">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div style="background: rgba(124, 58, 237, 0.15); color: var(--primary); width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;">
+                                        <i class="bi bi-clock-history"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold" style="font-size: 15px; color: var(--primary);">
+                                            El pedido llegará en un máximo de 2 horas ⏱️
+                                        </div>
+                                        <div class="text-muted" style="font-size: 12px;">
+                                            Estamos preparando tu orden en droguería. En cuanto el repartidor inicie el recorrido, verás aquí su ubicación GPS en vivo y el tiempo estimado exacto de llegada.
+                                        </div>
+                                    </div>
+                                </div>
+                                <span class="badge rounded-pill px-3 py-2 fw-semibold" style="background: rgba(124, 58, 237, 0.15); color: var(--primary); font-size: 12px;">
+                                    <i class="bi bi-hourglass-split me-1"></i> Máximo en 2 hrs
+                                </span>
+                            </div>
+                        }
+
+                        <!-- 2) SI ESTÁ EN CAMINO: Repartidor inició el recorrido, mostrar tiempo aproximado de llegada y mapa -->
                         @if (isEnCamino)
                         {
-                            <div class="p-3 border-bottom bg-warning-subtle text-warning-emphasis">
-                                <div class="d-flex align-items-center justify-content-between mb-2 flex-wrap gap-2">
-                                    <span class="fw-bold d-flex align-items-center gap-2">
-                                        <i class="bi bi-geo-alt-fill text-danger fs-5 animate-pulse"></i>
-                                        <span>Tu pedido está en camino. Ubicación del repartidor en tiempo real:</span>
-                                    </span>
-                                    <span class="badge bg-warning text-dark font-monospace" id="clientGpsStatus-@pedido.Id">Rastreando repartidor...</span>
+                            <div class="p-3 border-bottom" style="background: rgba(245, 158, 11, 0.08); border-color: rgba(245, 158, 11, 0.25) !important;">
+                                <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div style="background: rgba(245, 158, 11, 0.2); color: #d97706; width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;">
+                                            <i class="bi bi-truck animate-pulse"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-dark" style="font-size: 15px;">
+                                                ¡El repartidor ha iniciado el recorrido hacia tu destino! 🛵
+                                            </div>
+                                            @if (pedido.Repartidor != null)
+                                            {
+                                                <div class="fw-semibold text-primary" style="font-size: 13px;">
+                                                    <i class="bi bi-person-badge me-1"></i>Repartidor: @pedido.Repartidor.Nombre @pedido.Repartidor.Apellido
+                                                    @if (!string.IsNullOrEmpty(pedido.Repartidor.TipoVehiculo))
+                                                    {
+                                                        <span class="badge bg-light text-dark border ms-2">
+                                                            <i class="bi @(pedido.Repartidor.TipoVehiculo == "Bicicleta" ? "bi-bicycle" : pedido.Repartidor.TipoVehiculo == "Carro" ? "bi-car-front-fill" : pedido.Repartidor.TipoVehiculo == "A pie" ? "bi-person-walking" : "bi-truck") me-1"></i>
+                                                            @pedido.Repartidor.TipoVehiculo
+                                                            @if (!string.IsNullOrEmpty(pedido.Repartidor.Placa))
+                                                            {
+                                                                <span class="fw-bold text-primary ms-1 font-monospace">(@pedido.Repartidor.Placa)</span>
+                                                            }
+                                                        </span>
+                                                    }
+                                                </div>
+                                            }
+                                            <div class="text-muted" style="font-size: 12px;" id="clientEtaSub-@pedido.Id">
+                                                Calculando tiempo estimado de llegada...
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                                        <span class="badge bg-warning text-dark font-monospace px-3 py-2 shadow-sm" id="clientGpsStatus-@pedido.Id" style="font-size: 13px; font-weight: 700;">
+                                            <i class="bi bi-stopwatch me-1"></i> Calculando tiempo aproximado...
+                                        </span>
+                                    </div>
                                 </div>
-                                <div id="client-map-@pedido.Id" style="height: 260px; width: 100%; border-radius: 12px;" class="shadow-sm border"></div>
+                                <div id="client-map-@pedido.Id" style="height: 280px; width: 100%; border-radius: 14px;" class="shadow-sm border"></div>
                             </div>
                         }
 
@@ -186,7 +252,6 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // Inicializar SignalR para cliente
             const connection = new signalR.HubConnectionBuilder()
                 .withUrl("/hubs/ubicacion")
                 .withAutomaticReconnect()
@@ -194,8 +259,8 @@
 
             connection.start().then(() => {
                 console.log("Cliente conectado a SignalR Hub");
-                // Suscribirse a grupos de los pedidos en camino
-                @foreach (var p in Model.Where(p => p.Estado == "En camino"))
+                // Suscribirse a grupos de todos los pedidos activos para recibir actualizaciones
+                @foreach (var p in Model.Where(p => p.Estado != "Entregado" && p.Estado != "Cancelado"))
                 {
                     <text>
                     connection.invoke("JoinOrderGroup", "@p.Id").catch(err => console.error(err));
@@ -205,14 +270,25 @@
 
             const clientMarkers = {};
             const clientMaps = {};
+            const clientRoutes = {};
 
             @foreach (var p in Model.Where(p => p.Estado == "En camino"))
             {
+                var partesDirP = (p.DireccionEntrega ?? "").Split('|');
+                var geoQueryP = "";
+                var popupCalleP  = partesDirP.Length > 1 ? partesDirP[1].Trim() : (p.DireccionEntrega ?? "");
+                var geoSegP = partesDirP.FirstOrDefault(s => s.TrimStart().StartsWith("GEO:"));
+                if (geoSegP != null)
+                    geoQueryP = geoSegP.Replace("GEO:", "").Trim();
+                else
+                    geoQueryP = popupCalleP;
+
                 <text>
                 (function() {
                     const pedidoId = "@p.Id";
                     const initialLat = @(p.LatitudRepartidor.HasValue ? p.LatitudRepartidor.Value.ToString(System.Globalization.CultureInfo.InvariantCulture) : "4.60971");
                     const initialLng = @(p.LongitudRepartidor.HasValue ? p.LongitudRepartidor.Value.ToString(System.Globalization.CultureInfo.InvariantCulture) : "-74.08175");
+                    const geoQuery = "@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(geoQueryP))";
 
                     const map = L.map('client-map-' + pedidoId).setView([initialLat, initialLng], 15);
                     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -221,7 +297,7 @@
 
                     const deliveryIcon = L.divIcon({
                         className: 'custom-repartidor-marker',
-                        html: '<div style="background:#f59e0b; color:white; border-radius:50%; width:38px; height:38px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.3); border:2px solid white;"><i class="bi bi-truck fs-5"></i></div>',
+                        html: '<div style="background:#f59e0b; color:white; border-radius:50%; width:38px; height:38px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(245,158,11,0.4); border:2px solid white;"><i class="bi bi-truck fs-5"></i></div>',
                         iconSize: [38, 38],
                         iconAnchor: [19, 19]
                     });
@@ -232,9 +308,86 @@
 
                     clientMaps[pedidoId] = map;
                     clientMarkers[pedidoId] = marker;
+
+                    // Geocodificar destino del cliente y calcular tiempo inicial de llegada
+                    if (geoQuery && geoQuery.trim() !== '') {
+                        fetch('/Direccion/Geocodificar?' + new URLSearchParams({ direccion: geoQuery, ciudad: '' }), {
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                        })
+                        .then(r => r.json())
+                        .then(data => {
+                            if (data.success) {
+                                const homeIcon = L.divIcon({
+                                    className: '',
+                                    html: '<div style="background:#ef4444; color:white; border-radius:50%; width:34px; height:34px; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 10px rgba(239,68,68,0.4); border:2px solid white;"><i class="bi bi-house-fill" style="font-size:16px;"></i></div>',
+                                    iconSize: [34, 34],
+                                    iconAnchor: [17, 17]
+                                });
+
+                                L.marker([data.lat, data.lon], { icon: homeIcon })
+                                    .addTo(map)
+                                    .bindPopup("<b>Tu Dirección de Entrega</b>");
+
+                                // Calcular ruta y tiempo estimado de llegada inicial
+                                fetch(`/Direccion/CalcularRuta?origenLat=${initialLat}&origenLng=${initialLng}&destinoLat=${data.lat}&destinoLng=${data.lon}`, {
+                                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                                })
+                                .then(r => r.json())
+                                .then(routeData => {
+                                    if (routeData.success) {
+                                        if (clientRoutes[pedidoId]) map.removeLayer(clientRoutes[pedidoId]);
+                                        clientRoutes[pedidoId] = L.geoJSON(routeData.geometry, {
+                                            style: { color: '#2563eb', weight: 5, opacity: 0.85, lineJoin: 'round' }
+                                        }).addTo(map);
+
+                                        map.fitBounds(clientRoutes[pedidoId].getBounds(), { padding: [35, 35], maxZoom: 16 });
+
+                                        const statusElem = document.getElementById('clientGpsStatus-' + pedidoId);
+                                        const subElem = document.getElementById('clientEtaSub-' + pedidoId);
+                                        if (statusElem) {
+                                            statusElem.innerHTML = `<i class="bi bi-stopwatch-fill me-1"></i>Llegada aprox: <strong>${routeData.tiempoTexto}</strong> (${routeData.distanciaTexto})`;
+                                            statusElem.className = "badge bg-success text-white font-monospace px-3 py-2 shadow-sm";
+                                        }
+                                        if (subElem) {
+                                            subElem.textContent = `Tiempo estimado: ${routeData.tiempoTexto} • Distancia restante: ${routeData.distanciaTexto} • Hora aprox: ${routeData.horaEstimadaLlegada}`;
+                                        }
+                                    }
+                                })
+                                .catch(err => console.error("Error ruta cliente:", err));
+                            }
+                        })
+                        .catch(err => console.error("Error geocodificando destino cliente:", err));
+                    }
                 })();
                 </text>
             }
+
+            // Escuchar cuando el repartidor inicia el pedido ("En camino") en tiempo real
+            connection.on("EstadoCambiado", function (pedidoId, nuevoEstado) {
+                if (nuevoEstado === "En camino" || nuevoEstado === "Entregado") {
+                    location.reload();
+                }
+            });
+
+            // Escuchar actualizaciones con ruta y tiempo estimado del repartidor
+            connection.on("ReceiveLocationWithRoute", function (pedidoId, lat, lng, tiempoEstimado, distancia) {
+                const marker = clientMarkers[pedidoId];
+                const map = clientMaps[pedidoId];
+                const statusElem = document.getElementById('clientGpsStatus-' + pedidoId);
+                const subElem = document.getElementById('clientEtaSub-' + pedidoId);
+
+                if (marker && map) {
+                    marker.setLatLng([lat, lng]);
+                    map.panTo([lat, lng]);
+                }
+                if (statusElem) {
+                    statusElem.innerHTML = `<i class="bi bi-stopwatch-fill me-1"></i>Llegada aprox: <strong>${tiempoEstimado}</strong> (${distancia})`;
+                    statusElem.className = "badge bg-success text-white font-monospace px-3 py-2 shadow-sm";
+                }
+                if (subElem) {
+                    subElem.textContent = `Tiempo estimado: ${tiempoEstimado} • Distancia restante: ${distancia}`;
+                }
+            });
 
             // Escuchar actualizaciones de ubicación enviadas por el repartidor
             connection.on("ReceiveLocation", function (pedidoId, lat, lng) {
@@ -245,13 +398,12 @@
                 if (marker && map) {
                     marker.setLatLng([lat, lng]);
                     map.panTo([lat, lng]);
-                    if (statusElem) {
-                        statusElem.textContent = `En vivo: Repartidor en movimiento (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
-                        statusElem.className = "badge bg-success text-white font-monospace";
+                    if (statusElem && !statusElem.innerHTML.includes("Llegada aprox")) {
+                        statusElem.textContent = `Repartidor en movimiento (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+                        statusElem.className = "badge bg-success text-white font-monospace px-3 py-2 shadow-sm";
                     }
                 }
             });
         });
     </script>
 }
-

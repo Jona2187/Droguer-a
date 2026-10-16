@@ -89,6 +89,10 @@
                         <i class="bi bi-clock-history"></i>
                         <span>Historial</span>
                     </a>
+                    <a asp-controller="Account" asp-action="Perfil" class="cliente-nav-item @(activeNav == "perfil" ? "active" : "")">
+                        <i class="bi bi-person-circle"></i>
+                        <span>Mi Perfil</span>
+                    </a>
                 }
                 else
                 {
@@ -104,6 +108,10 @@
                     <a asp-controller="Tienda" asp-action="MisPedidos" class="cliente-nav-item @(activeNav == "pedidos" ? "active" : "")">
                         <i class="bi bi-bag-check-fill"></i>
                         <span>Mis Pedidos</span>
+                    </a>
+                    <a asp-controller="Account" asp-action="Perfil" class="cliente-nav-item @(activeNav == "perfil" ? "active" : "")">
+                        <i class="bi bi-person-circle"></i>
+                        <span>Mi Perfil</span>
                     </a>
                 }
             </div>
@@ -160,6 +168,11 @@
                                 </a>
                             </li>
                         }
+                        <li>
+                            <a class="dropdown-item rounded-3 py-2 d-flex align-items-center gap-2 @(activeNav == "perfil" ? "active text-primary fw-bold" : "")" asp-controller="Account" asp-action="Perfil">
+                                <i class="bi bi-person-circle text-primary"></i> Mi Perfil
+                            </a>
+                        </li>
                         <li><hr class="dropdown-divider my-1"></li>
                         <li>
                             <form method="post" asp-controller="Account" asp-action="Logout" class="m-0">
@@ -190,6 +203,9 @@
                     <a asp-controller="Repartidor" asp-action="Historial" class="cliente-mobile-item @(activeNav == "historial" ? "active" : "")">
                         <i class="bi bi-clock-history"></i> Historial
                     </a>
+                    <a asp-controller="Account" asp-action="Perfil" class="cliente-mobile-item @(activeNav == "perfil" ? "active" : "")">
+                        <i class="bi bi-person-circle"></i> Mi Perfil
+                    </a>
                 }
                 else
                 {
@@ -202,6 +218,9 @@
                     </a>
                     <a asp-controller="Tienda" asp-action="MisPedidos" class="cliente-mobile-item @(activeNav == "pedidos" ? "active" : "")">
                         <i class="bi bi-bag-check-fill"></i> Mis Pedidos
+                    </a>
+                    <a asp-controller="Account" asp-action="Perfil" class="cliente-mobile-item @(activeNav == "perfil" ? "active" : "")">
+                        <i class="bi bi-person-circle"></i> Mi Perfil
                     </a>
                 }
                 <hr class="my-2" />

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -201,6 +202,223 @@ namespace Drogueria.Controllers
                     return RedirectToAction("Catalogo", "Tienda");
             }
             return RedirectToAction("Index", "Home");
+        }
+
+        // GET: /Account/Perfil
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> Perfil()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.Uuid == userId);
+            if (usuario == null)
+            {
+                TempData["Error"] = "Usuario no encontrado.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            if (usuario.Rol == "Repartidor")
+            {
+                ViewBag.TotalEntregados = await _context.Pedidos.CountAsync(p => p.RepartidorId == userId && p.Estado == "Entregado");
+                ViewBag.TotalActivos = await _context.Pedidos.CountAsync(p => p.RepartidorId == userId && p.Estado != "Entregado");
+            }
+            else if (usuario.Rol == "Cliente")
+            {
+                ViewBag.TotalPedidos = await _context.Pedidos.CountAsync(p => p.UsuarioId == userId);
+                ViewBag.Direcciones = await _context.DireccionesUsuario
+                    .Where(d => d.UsuarioId == userId)
+                    .OrderByDescending(d => d.EsPredeterminada)
+                    .ToListAsync();
+            }
+
+            ViewData["Title"] = "Mi Perfil";
+            ViewData["ActiveNav"] = "perfil";
+            return View("~/Views/Account/Perfil.cshtml", usuario);
+        }
+
+        // POST: /Account/ActualizarPerfil
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ActualizarPerfil(string nombre, string apellido, string email, string? telefono, string? tipoVehiculo, string? placa)
+        {
+            var isAjax = Request.Headers["X-Requested-With"] == "XMLHttpRequest" ||
+                         Request.Headers["Accept"].ToString().Contains("application/json");
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.Uuid == userId);
+            if (usuario == null)
+            {
+                var msg = "Usuario no encontrado.";
+                if (isAjax) return Json(new { success = false, message = msg });
+                TempData["Error"] = msg;
+                return RedirectToAction(nameof(Perfil));
+            }
+
+            nombre = nombre?.Trim() ?? "";
+            apellido = apellido?.Trim() ?? "";
+            email = email?.Trim().ToLower() ?? "";
+
+            if (string.IsNullOrWhiteSpace(nombre) || string.IsNullOrWhiteSpace(apellido) || string.IsNullOrWhiteSpace(email))
+            {
+                var msg = "El nombre, apellido y correo electrónico son obligatorios.";
+                if (isAjax) return Json(new { success = false, message = msg });
+                TempData["Error"] = msg;
+                return RedirectToAction(nameof(Perfil));
+            }
+
+            // Validar correo
+            var emailRegex = new System.Text.RegularExpressions.Regex(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            if (!emailRegex.IsMatch(email))
+            {
+                var msg = "El correo electrónico ingresado no tiene un formato válido.";
+                if (isAjax) return Json(new { success = false, message = msg });
+                TempData["Error"] = msg;
+                return RedirectToAction(nameof(Perfil));
+            }
+
+            // Validar correo duplicado
+            if (await _context.Usuarios.AnyAsync(u => u.Email.ToLower() == email && u.Uuid != userId))
+            {
+                var msg = "El correo electrónico ya está en uso por otra cuenta.";
+                if (isAjax) return Json(new { success = false, message = msg });
+                TempData["Error"] = msg;
+                return RedirectToAction(nameof(Perfil));
+            }
+
+            // Validaciones específicas para Repartidor
+            if (usuario.Rol == "Repartidor")
+            {
+                var vehiculosValidos = new[] { "Moto", "Bicicleta", "Carro", "A pie" };
+                tipoVehiculo = tipoVehiculo?.Trim();
+
+                if (!string.IsNullOrEmpty(tipoVehiculo) && !vehiculosValidos.Contains(tipoVehiculo))
+                {
+                    var msg = "Selecciona un tipo de vehículo válido (Moto, Bicicleta, Carro o A pie).";
+                    if (isAjax) return Json(new { success = false, message = msg });
+                    TempData["Error"] = msg;
+                    return RedirectToAction(nameof(Perfil));
+                }
+
+                // Si usa Moto o Carro, la placa es obligatoria
+                if (tipoVehiculo == "Moto" || tipoVehiculo == "Carro")
+                {
+                    var placaLimpia = (placa ?? "").Trim().ToUpper();
+                    if (string.IsNullOrEmpty(placaLimpia))
+                    {
+                        var msg = $"Debes ingresar la placa para el vehículo de tipo '{tipoVehiculo}'.";
+                        if (isAjax) return Json(new { success = false, message = msg });
+                        TempData["Error"] = msg;
+                        return RedirectToAction(nameof(Perfil));
+                    }
+                    usuario.Placa = placaLimpia;
+                }
+                else
+                {
+                    // Para Bicicleta o A pie, la placa no se necesita
+                    usuario.Placa = null;
+                }
+
+                usuario.TipoVehiculo = tipoVehiculo;
+            }
+
+            usuario.Nombre = nombre;
+            usuario.Apellido = apellido;
+            usuario.Email = email;
+            usuario.Telefono = string.IsNullOrWhiteSpace(telefono) ? null : telefono.Trim();
+
+            _context.Usuarios.Update(usuario);
+            await _context.SaveChangesAsync();
+
+            // Actualizar claims en la cookie de sesión para reflejar cambios en la interfaz
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, usuario.Uuid),
+                new Claim(ClaimTypes.Name, $"{usuario.Nombre} {usuario.Apellido}".Trim()),
+                new Claim(ClaimTypes.Email, usuario.Email),
+                new Claim(ClaimTypes.Role, usuario.Rol)
+            };
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(identity),
+                new AuthenticationProperties { IsPersistent = true, ExpiresUtc = DateTimeOffset.UtcNow.AddHours(8) });
+
+            var exito = "Tu perfil ha sido actualizado exitosamente.";
+            if (isAjax) return Json(new { success = true, message = exito });
+            TempData["Success"] = exito;
+            return RedirectToAction(nameof(Perfil));
+        }
+
+        // POST: /Account/CambiarPassword
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CambiarPassword(string actualPassword, string nuevaPassword, string confirmarPassword)
+        {
+            var isAjax = Request.Headers["X-Requested-With"] == "XMLHttpRequest" ||
+                         Request.Headers["Accept"].ToString().Contains("application/json");
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.Uuid == userId);
+            if (usuario == null)
+            {
+                var msg = "Usuario no encontrado.";
+                if (isAjax) return Json(new { success = false, message = msg });
+                TempData["Error"] = msg;
+                return RedirectToAction(nameof(Perfil));
+            }
+
+            if (string.IsNullOrWhiteSpace(actualPassword) || string.IsNullOrWhiteSpace(nuevaPassword) || string.IsNullOrWhiteSpace(confirmarPassword))
+            {
+                var msg = "Todos los campos de contraseña son requeridos.";
+                if (isAjax) return Json(new { success = false, message = msg });
+                TempData["Error"] = msg;
+                return RedirectToAction(nameof(Perfil));
+            }
+
+            // Validar contraseña actual
+            bool passValida = false;
+            try { passValida = BCrypt.Net.BCrypt.Verify(actualPassword, usuario.Password); }
+            catch { passValida = (usuario.Password == actualPassword); }
+
+            if (!passValida)
+            {
+                var msg = "La contraseña actual ingresada es incorrecta.";
+                if (isAjax) return Json(new { success = false, message = msg });
+                TempData["Error"] = msg;
+                return RedirectToAction(nameof(Perfil));
+            }
+
+            if (nuevaPassword.Length < 6)
+            {
+                var msg = "La nueva contraseña debe tener al menos 6 caracteres.";
+                if (isAjax) return Json(new { success = false, message = msg });
+                TempData["Error"] = msg;
+                return RedirectToAction(nameof(Perfil));
+            }
+
+            if (nuevaPassword != confirmarPassword)
+            {
+                var msg = "La nueva contraseña y su confirmación no coinciden.";
+                if (isAjax) return Json(new { success = false, message = msg });
+                TempData["Error"] = msg;
+                return RedirectToAction(nameof(Perfil));
+            }
+
+            usuario.Password = BCrypt.Net.BCrypt.HashPassword(nuevaPassword);
+            _context.Usuarios.Update(usuario);
+            await _context.SaveChangesAsync();
+
+            var exito = "Tu contraseña ha sido cambiada correctamente.";
+            if (isAjax) return Json(new { success = true, message = exito });
+            TempData["Success"] = exito;
+            return RedirectToAction(nameof(Perfil));
         }
 
         private static string ObtenerModal(string? rolEsperado) => rolEsperado switch

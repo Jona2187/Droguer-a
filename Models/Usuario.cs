@@ -33,5 +33,20 @@ public class Usuario
 
     [Required(ErrorMessage = "El rol es obligatorio")]
     [StringLength(50)]
-    public string Rol { get; set; } = "Cliente"; // Administrador, Empleado, Cliente
+    public string Rol { get; set; } = "Cliente"; // Administrador, Empleado, Repartidor, Cliente
+
+    [StringLength(20, ErrorMessage = "El teléfono no puede superar 20 caracteres")]
+    public string? Telefono { get; set; }
+
+    /// <summary>
+    /// Tipo de vehículo usado por el repartidor (ej: Moto, Bicicleta, Carro, A pie).
+    /// </summary>
+    [StringLength(50)]
+    public string? TipoVehiculo { get; set; }
+
+    /// <summary>
+    /// Placa del vehículo si aplica (ej: Moto o Carro).
+    /// </summary>
+    [StringLength(20)]
+    public string? Placa { get; set; }
 }
