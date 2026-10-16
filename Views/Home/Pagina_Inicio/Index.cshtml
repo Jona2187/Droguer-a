@@ -335,7 +335,7 @@
             <h2>¿Necesitas ayuda?</h2>
             <p>Comunícate con nosotros y recibe atención personalizada.</p>
         </div>
-        <a href="#contacto" class="boton-contacto">Contáctanos →</a>
+        <a href="https://wa.me/573135958228?text=Hola%2C%20necesito%20ayuda" class="boton-contacto" target="_blank" rel="noopener">Contáctanos →</a>
     </section>
 </div>
 
@@ -409,14 +409,14 @@
                         <label for="emp-user" class="form-label">Usuario o Correo</label>
                         <div class="input-group-custom">
                             <i class="bi bi-person input-icon"></i>
-                            <input type="text" class="form-control" id="emp-user" name="email" placeholder="ej. empleado@drogueria.com" required autocomplete="username">
+                            <input type="text" class="form-control" id="emp-user" name="email" placeholder="ej. empleado@drogueria.com" required maxlength="60" autocomplete="username">
                         </div>
                     </div>
                     <div class="mb-3">
                         <label for="emp-pass" class="form-label">Contraseña</label>
                         <div class="input-group-custom">
                             <i class="bi bi-lock input-icon"></i>
-                            <input type="password" class="form-control" id="emp-pass" name="password" placeholder="••••••••" required autocomplete="current-password">
+                            <input type="password" class="form-control" id="emp-pass" name="password" placeholder="••••••••" required minlength="8" maxlength="25" autocomplete="current-password">
                             <button type="button" class="btn-toggle-password" onclick="togglePasswordVisibility('emp-pass', this)" title="Ver contraseña">
                                 <i class="bi bi-eye"></i>
                             </button>
@@ -471,14 +471,14 @@
                         <label for="admin-user" class="form-label">Usuario Administrador</label>
                         <div class="input-group-custom">
                             <i class="bi bi-shield-person input-icon"></i>
-                            <input type="text" class="form-control" id="admin-user" name="email" placeholder="admin@drogueria.com" required autocomplete="username">
+                            <input type="text" class="form-control" id="admin-user" name="email" placeholder="admin@drogueria.com" required maxlength="60" autocomplete="username">
                         </div>
                     </div>
                     <div class="mb-3">
                         <label for="admin-pass" class="form-label">Contraseña</label>
                         <div class="input-group-custom">
                             <i class="bi bi-key input-icon"></i>
-                            <input type="password" class="form-control" id="admin-pass" name="password" placeholder="••••••••" required autocomplete="current-password">
+                            <input type="password" class="form-control" id="admin-pass" name="password" placeholder="••••••••" required minlength="8" maxlength="25" autocomplete="current-password">
                             <button type="button" class="btn-toggle-password" onclick="togglePasswordVisibility('admin-pass', this)" title="Ver contraseña">
                                 <i class="bi bi-eye"></i>
                             </button>
@@ -540,7 +540,7 @@
                         <label for="client-pass" class="form-label">Contraseña</label>
                         <div class="input-group-custom">
                             <i class="bi bi-lock input-icon"></i>
-                            <input type="password" class="form-control" id="client-pass" name="password" placeholder="••••••••" required autocomplete="current-password">
+                            <input type="password" class="form-control" id="client-pass" name="password" placeholder="••••••••" required minlength="8" maxlength="25" autocomplete="current-password">
                             <button type="button" class="btn-toggle-password" onclick="togglePasswordVisibility('client-pass', this)" title="Ver contraseña">
                                 <i class="bi bi-eye"></i>
                             </button>
@@ -674,14 +674,14 @@
                         <label for="rep-user" class="form-label">Usuario o Correo</label>
                         <div class="input-group-custom">
                             <i class="bi bi-person input-icon"></i>
-                            <input type="text" class="form-control" id="rep-user" name="email" placeholder="ej. repartidor@drogueria.com" required autocomplete="username">
+                            <input type="text" class="form-control" id="rep-user" name="email" placeholder="ej. repartidor@drogueria.com" required maxlength="60" autocomplete="username">
                         </div>
                     </div>
                     <div class="mb-3">
                         <label for="rep-pass" class="form-label">Contraseña</label>
                         <div class="input-group-custom">
                             <i class="bi bi-lock input-icon"></i>
-                            <input type="password" class="form-control" id="rep-pass" name="password" placeholder="••••••••" required autocomplete="current-password">
+                            <input type="password" class="form-control" id="rep-pass" name="password" placeholder="••••••••" required minlength="8" maxlength="25" autocomplete="current-password">
                             <button type="button" class="btn-toggle-password" onclick="togglePasswordVisibility('rep-pass', this)" title="Ver contraseña">
                                 <i class="bi bi-eye"></i>
                             </button>

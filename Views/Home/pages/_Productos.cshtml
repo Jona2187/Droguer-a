@@ -64,7 +64,7 @@
                     <circle cx="11" cy="11" r="8" />
                     <path d="m21 21-4.3-4.3" />
                 </svg>
-                <input type="text" id="filtroProductos" placeholder="Buscar por nombre o categoría..." autocomplete="off" />
+                <input type="text" id="filtroProductos" placeholder="Buscar por nombre o categoría..." autocomplete="off" maxlength="100" />
             </div>
         </div>
     </div>
@@ -291,7 +291,7 @@
                         <div class="col-12">
                             <label class="form-label" for="crearDescripcion">Descripción</label>
                             <textarea class="form-control" id="crearDescripcion" name="Descripcion"
-                                      placeholder="Descripción breve del producto..." rows="2" maxlength="500"></textarea>
+                                      placeholder="Descripción breve del producto..." rows="2" maxlength="255"></textarea>
                         </div>
 
                         <!-- Stock Actual -->
@@ -418,7 +418,7 @@
                         <div class="col-12">
                             <label class="form-label" for="editarDescripcion">Descripción</label>
                             <textarea class="form-control" id="editarDescripcion" name="Descripcion"
-                                      placeholder="Descripción breve del producto..." rows="2" maxlength="500"></textarea>
+                                      placeholder="Descripción breve del producto..." rows="2" maxlength="255"></textarea>
                         </div>
 
                         <!-- Stock Actual -->

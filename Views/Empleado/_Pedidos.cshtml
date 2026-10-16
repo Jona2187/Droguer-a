@@ -59,7 +59,7 @@
 <div class="ped-search-bar">
     <div class="ped-search-wrap">
         <i class="bi bi-search"></i>
-        <input type="text" class="ped-search-input" id="pedBuscar" placeholder="Buscar por cliente o ID..." oninput="filtrarPedidos()">
+        <input type="text" class="ped-search-input" id="pedBuscar" placeholder="Buscar por cliente o ID..." oninput="filtrarPedidos()" maxlength="100">
     </div>
     <select class="ped-filter-select" id="pedEstadoFilter" onchange="filtrarPedidos()">
         <option value="">Todos los estados</option>

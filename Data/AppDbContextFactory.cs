@@ -25,14 +25,7 @@ public class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContex>
 
         var optionsBuilder = new DbContextOptionsBuilder<AppDbContex>();
 
-        try
-        {
-            optionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
-        }
-        catch
-        {
-            optionsBuilder.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 30)));
-        }
+        optionsBuilder.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 30)));
 
         return new AppDbContex(optionsBuilder.Options);
     }

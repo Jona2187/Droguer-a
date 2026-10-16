@@ -71,13 +71,16 @@ namespace Drogueria.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            if (!string.IsNullOrWhiteSpace(rolEsperado) &&
-                !string.Equals(usuario.Rol?.Trim(), rolEsperado.Trim(), StringComparison.OrdinalIgnoreCase))
+            var rolUsuario = usuario.Rol?.Trim() ?? "";
+            var rolEsperadoNorm = rolEsperado?.Trim() ?? "";
+
+            if (string.IsNullOrEmpty(rolEsperadoNorm) ||
+                !string.Equals(rolUsuario, rolEsperadoNorm, StringComparison.OrdinalIgnoreCase))
             {
-                var msg = "Esta cuenta debe ingresar por el acceso correspondiente a su rol.";
+                var msg = $"Acceso denegado: Tu cuenta tiene el rol '{rolUsuario}' y únicamente puedes iniciar sesión desde la sección de {rolUsuario}.";
                 if (isAjax) return Json(new { success = false, message = msg });
                 TempData["Error"] = msg;
-                TempData["AbrirModal"] = ObtenerModal(rolEsperado);
+                TempData["AbrirModal"] = ObtenerModal(rolEsperadoNorm);
                 return RedirectToAction("Index", "Home");
             }
 
@@ -125,7 +128,10 @@ namespace Drogueria.Controllers
             var isAjax = Request.Headers["X-Requested-With"] == "XMLHttpRequest" ||
                          Request.Headers["Accept"].ToString().Contains("application/json");
 
+            nombre = nombre?.Trim() ?? "";
+            apellido = apellido?.Trim() ?? "";
             email = email?.Trim().ToLower() ?? "";
+            password = password ?? "";
 
             if (string.IsNullOrWhiteSpace(nombre) || string.IsNullOrWhiteSpace(apellido) ||
                 string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
@@ -141,6 +147,38 @@ namespace Drogueria.Controllers
             if (!emailRegex.IsMatch(email))
             {
                 var msg = "El correo electrónico debe tener un formato válido con '@', un dominio y su terminación (ejemplo: usuario@dominio.com o .co).";
+                if (isAjax) return Json(new { success = false, message = msg });
+                TempData["Error"] = msg; TempData["AbrirModal"] = "_RegistroCliente";
+                return RedirectToAction("Index", "Home");
+            }
+
+            if (nombre.Length > 25)
+            {
+                var msg = "El nombre no puede superar los 25 caracteres.";
+                if (isAjax) return Json(new { success = false, message = msg });
+                TempData["Error"] = msg; TempData["AbrirModal"] = "_RegistroCliente";
+                return RedirectToAction("Index", "Home");
+            }
+
+            if (apellido.Length > 25)
+            {
+                var msg = "El apellido no puede superar los 25 caracteres.";
+                if (isAjax) return Json(new { success = false, message = msg });
+                TempData["Error"] = msg; TempData["AbrirModal"] = "_RegistroCliente";
+                return RedirectToAction("Index", "Home");
+            }
+
+            if (email.Length > 60)
+            {
+                var msg = "El correo electrónico no puede superar los 60 caracteres.";
+                if (isAjax) return Json(new { success = false, message = msg });
+                TempData["Error"] = msg; TempData["AbrirModal"] = "_RegistroCliente";
+                return RedirectToAction("Index", "Home");
+            }
+
+            if (password.Length < 8 || password.Length > 25)
+            {
+                var msg = "La contraseña debe tener entre 8 y 25 caracteres.";
                 if (isAjax) return Json(new { success = false, message = msg });
                 TempData["Error"] = msg; TempData["AbrirModal"] = "_RegistroCliente";
                 return RedirectToAction("Index", "Home");

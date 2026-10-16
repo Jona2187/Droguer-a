@@ -40,9 +40,10 @@ public class Pedido
     [StringLength(20)]
     public string? CodigoConfirmacion { get; set; }
 
+
     public double? LatitudRepartidor { get; set; }
     public double? LongitudRepartidor { get; set; }
     public DateTime? UltimaUbicacionFecha { get; set; }
 
-    public List<DetallePedido> Detalles { get; set; } = new();
+    public ICollection<DetallePedido> Detalles { get; set; } = new List<DetallePedido>();
 }

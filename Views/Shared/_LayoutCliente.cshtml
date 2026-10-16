@@ -167,6 +167,11 @@
                                     <i class="bi bi-bag-check text-primary"></i> Mis Pedidos
                                 </a>
                             </li>
+                            <li>
+                                <a class="dropdown-item rounded-3 py-2 d-flex align-items-center gap-2 @(activeNav == "trabaja" ? "active text-primary fw-semibold" : "")" asp-controller="Home" asp-action="Trabaja">
+                                    <i class="bi bi-people text-primary"></i> Crezcamos juntos
+                                </a>
+                            </li>
                         }
                         <li>
                             <a class="dropdown-item rounded-3 py-2 d-flex align-items-center gap-2 @(activeNav == "perfil" ? "active text-primary fw-bold" : "")" asp-controller="Account" asp-action="Perfil">
@@ -219,8 +224,12 @@
                     <a asp-controller="Tienda" asp-action="MisPedidos" class="cliente-mobile-item @(activeNav == "pedidos" ? "active" : "")">
                         <i class="bi bi-bag-check-fill"></i> Mis Pedidos
                     </a>
+                    <a asp-controller="Home" asp-action="Trabaja" class="cliente-mobile-item @(activeNav == "trabaja" ? "active" : "")">
+                        <i class="bi bi-people-fill"></i> Crezcamos juntos
+                    </a>
                     <a asp-controller="Account" asp-action="Perfil" class="cliente-mobile-item @(activeNav == "perfil" ? "active" : "")">
                         <i class="bi bi-person-circle"></i> Mi Perfil
+
                     </a>
                 }
                 <hr class="my-2" />

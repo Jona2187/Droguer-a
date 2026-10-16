@@ -26,7 +26,7 @@ public class Usuario
 
     [Required(ErrorMessage = "La contraseña es obligatoria")]
     [DataType(DataType.Password)]
-    [StringLength(255)]
+    [StringLength(25, MinimumLength = 8, ErrorMessage = "La contraseña debe tener entre 8 y 25 caracteres")]
     public string Password { get; set; } = "";
 
     public bool Estado { get; set; } = true;
@@ -49,4 +49,8 @@ public class Usuario
     /// </summary>
     [StringLength(20)]
     public string? Placa { get; set; }
+
+    public ICollection<Pedido> Pedidos { get; set; } = new List<Pedido>();
+    public ICollection<Pedido> PedidosAsignados { get; set; } = new List<Pedido>();
+    public ICollection<DireccionUsuario> Direcciones { get; set; } = new List<DireccionUsuario>();
 }

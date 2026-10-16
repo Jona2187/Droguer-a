@@ -16,23 +16,24 @@ public class DireccionUsuario
     public Usuario? Usuario { get; set; }
 
     [Required(ErrorMessage = "El nombre de contacto es obligatorio")]
-    [StringLength(100)]
+    [StringLength(50, ErrorMessage = "El nombre de contacto no puede superar 50 caracteres")]
     public string NombreContacto { get; set; } = "";
 
     [Required(ErrorMessage = "El teléfono es obligatorio")]
-    [StringLength(20)]
+    [StringLength(10, ErrorMessage = "El teléfono debe tener máximo 10 dígitos")]
+    [RegularExpression(@"^\d{1,10}$", ErrorMessage = "El teléfono debe contener solo dígitos y máximo 10 caracteres")]
     public string Telefono { get; set; } = "";
 
     [Required(ErrorMessage = "La dirección es obligatoria")]
-    [StringLength(300)]
+    [StringLength(150, ErrorMessage = "La dirección no puede superar 150 caracteres")]
     public string Direccion { get; set; } = "";
 
     [Required(ErrorMessage = "La ciudad es obligatoria")]
-    [StringLength(100)]
+    [StringLength(50, ErrorMessage = "La ciudad no puede superar 50 caracteres")]
     public string Ciudad { get; set; } = "";
 
     [Required(ErrorMessage = "El departamento es obligatorio")]
-    [StringLength(100)]
+    [StringLength(50, ErrorMessage = "El departamento no puede superar 50 caracteres")]
     public string Departamento { get; set; } = "";
 
     public bool EsPredeterminada { get; set; } = false;

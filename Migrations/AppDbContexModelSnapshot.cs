@@ -3,7 +3,6 @@ using System;
 using Drogueria.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -17,7 +16,7 @@ namespace Drogueria.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.0")
+                .HasAnnotation("ProductVersion", "9.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
@@ -76,10 +75,62 @@ namespace Drogueria.Migrations
                     b.ToTable("DetallesPedido");
                 });
 
+            modelBuilder.Entity("Drogueria.Models.DireccionUsuario", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Ciudad")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("Departamento")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("Direccion")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)");
+
+                    b.Property<bool>("EsPredeterminada")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("NombreContacto")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("Telefono")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<string>("UsuarioId")
+                        .IsRequired()
+                        .HasMaxLength(36)
+                        .HasColumnType("varchar(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UsuarioId");
+
+                    b.ToTable("DireccionesUsuario");
+                });
+
             modelBuilder.Entity("Drogueria.Models.Pedido", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("char(36)");
+
+                    b.Property<string>("DireccionEntrega")
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)");
 
                     b.Property<string>("Estado")
                         .IsRequired()
@@ -97,7 +148,7 @@ namespace Drogueria.Migrations
 
                     b.Property<string>("RepartidorId")
                         .HasMaxLength(36)
-                        .HasColumnType("char(36)");
+                        .HasColumnType("varchar(36)");
 
                     b.Property<decimal>("Total")
                         .HasColumnType("decimal(10,2)");
@@ -118,7 +169,6 @@ namespace Drogueria.Migrations
 
                     b.ToTable("Pedidos");
                 });
-
 
             modelBuilder.Entity("Drogueria.Models.Producto", b =>
                 {
@@ -218,15 +268,26 @@ namespace Drogueria.Migrations
                     b.Navigation("Producto");
                 });
 
+            modelBuilder.Entity("Drogueria.Models.DireccionUsuario", b =>
+                {
+                    b.HasOne("Drogueria.Models.Usuario", "Usuario")
+                        .WithMany("Direcciones")
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Usuario");
+                });
+
             modelBuilder.Entity("Drogueria.Models.Pedido", b =>
                 {
                     b.HasOne("Drogueria.Models.Usuario", "Repartidor")
-                        .WithMany()
+                        .WithMany("PedidosAsignados")
                         .HasForeignKey("RepartidorId")
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("Drogueria.Models.Usuario", "Usuario")
-                        .WithMany()
+                        .WithMany("Pedidos")
                         .HasForeignKey("UsuarioId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -235,7 +296,6 @@ namespace Drogueria.Migrations
 
                     b.Navigation("Usuario");
                 });
-
 
             modelBuilder.Entity("Drogueria.Models.Producto", b =>
                 {
@@ -247,7 +307,21 @@ namespace Drogueria.Migrations
 
                     b.Navigation("Categoria");
                 });
-            #pragma warning restore 612, 618
+
+            modelBuilder.Entity("Drogueria.Models.Pedido", b =>
+                {
+                    b.Navigation("Detalles");
+                });
+
+            modelBuilder.Entity("Drogueria.Models.Usuario", b =>
+                {
+                    b.Navigation("Direcciones");
+
+                    b.Navigation("Pedidos");
+
+                    b.Navigation("PedidosAsignados");
+                });
+#pragma warning restore 612, 618
         }
     }
 }
