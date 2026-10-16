@@ -5,9 +5,17 @@
     Layout = "~/Views/Shared/_LayoutCliente.cshtml";
     var lista = Model ?? Enumerable.Empty<Drogueria.Models.Pedido>();
     var totalEntregas = lista.Count();
-    var totalIngresos = lista.Sum(p => p.Total);
-    var hoy = lista.Count(p => p.Fecha.Date == DateTime.Today);
-    var esteMes = lista.Count(p => p.Fecha.Month == DateTime.Now.Month && p.Fecha.Year == DateTime.Now.Year);
+
+    // Cálculos de ganancias reales del repartidor
+    var listaCalculos = lista.Select(p => new {
+        Pedido = p,
+        Calculo = Drogueria.Controllers.RepartidorGananciasHelper.Calcular(p)
+    }).ToList();
+
+    var totalGanancias = listaCalculos.Sum(x => x.Calculo.GananciaTotal);
+    var hoyGanancias = listaCalculos.Where(x => x.Pedido.Fecha.Date == DateTime.Today).Sum(x => x.Calculo.GananciaTotal);
+    var esteMesGanancias = listaCalculos.Where(x => x.Pedido.Fecha.Month == DateTime.Now.Month && x.Pedido.Fecha.Year == DateTime.Now.Year).Sum(x => x.Calculo.GananciaTotal);
+    var estaEnLinea = ViewBag.EstaEnLinea != null ? (bool)ViewBag.EstaEnLinea : true;
 }
 
 <style>
@@ -69,34 +77,41 @@
     </div>
 }
 
-<div class="mb-4">
-    <h1 class="fw-bold mb-1" style="font-size: clamp(1.4rem, 4vw, 2rem);">Historial de Entregas</h1>
-    <p class="text-muted mb-0" style="font-size:14px;">Todos los pedidos que has entregado exitosamente.</p>
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+    <div>
+        <h1 class="fw-bold mb-1" style="font-size: clamp(1.4rem, 4vw, 2rem);">Historial de Entregas</h1>
+        <p class="text-muted mb-0" style="font-size:14px;">Consulta tus entregas realizadas y el detalle exacto de tus ganancias.</p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <a asp-controller="Repartidor" asp-action="MisDomicilios" class="btn btn-outline-primary rounded-pill px-3 fw-semibold">
+            <i class="bi bi-truck me-1"></i> Ir a Domicilios Activos
+        </a>
+    </div>
 </div>
 
 <div class="row g-3 mb-4">
     <div class="col-6 col-md-3">
-        <div class="dash-kpi-card blue p-3">
-            <span class="dash-kpi-label">Total Entregas</span>
-            <div class="dash-kpi-val">@totalEntregas</div>
+        <div class="dash-kpi-card teal p-3">
+            <span class="dash-kpi-label">Mis Ganancias Totales</span>
+            <div class="dash-kpi-val" style="font-size:1.3rem; color: #10b981;">$@totalGanancias.ToString("N2")</div>
         </div>
     </div>
     <div class="col-6 col-md-3">
-        <div class="dash-kpi-card teal p-3">
-            <span class="dash-kpi-label">Hoy</span>
-            <div class="dash-kpi-val">@hoy</div>
+        <div class="dash-kpi-card blue p-3">
+            <span class="dash-kpi-label">Ganancias Hoy</span>
+            <div class="dash-kpi-val" style="font-size:1.3rem;">$@hoyGanancias.ToString("N2")</div>
         </div>
     </div>
     <div class="col-6 col-md-3">
         <div class="dash-kpi-card purple p-3">
-            <span class="dash-kpi-label">Este Mes</span>
-            <div class="dash-kpi-val">@esteMes</div>
+            <span class="dash-kpi-label">Ganancias Este Mes</span>
+            <div class="dash-kpi-val" style="font-size:1.3rem;">$@esteMesGanancias.ToString("N2")</div>
         </div>
     </div>
     <div class="col-6 col-md-3">
         <div class="dash-kpi-card orange p-3">
-            <span class="dash-kpi-label">Total Facturado</span>
-            <div class="dash-kpi-val" style="font-size:1.2rem;">$@totalIngresos.ToString("N2")</div>
+            <span class="dash-kpi-label">Total Entregas</span>
+            <div class="dash-kpi-val">@totalEntregas</div>
         </div>
     </div>
 </div>
@@ -106,7 +121,7 @@
     <div class="historial-empty">
         <i class="bi bi-clock-history" style="font-size:3rem; opacity:.25; display:block; margin-bottom:16px;"></i>
         <h5 class="fw-bold mb-2">Aún no tienes entregas completadas</h5>
-        <p class="text-muted small mb-4">Las entregas que marques como entregadas aparecerán aquí.</p>
+        <p class="text-muted small mb-4">Las entregas que marques como entregadas aparecerán aquí con su detalle de ganancias.</p>
         <a asp-controller="Repartidor" asp-action="MisDomicilios"
            class="btn btn-warning rounded-pill px-5 fw-semibold d-inline-flex align-items-center gap-2">
             <i class="bi bi-truck"></i> Ver Domicilios Activos
@@ -127,12 +142,17 @@ else
         var dirTel2    = dirPartes2.Length > 2 ? dirPartes2[2].Trim() : "";
         if (dirTel2.Contains("| GEO:")) dirTel2 = dirTel2.Split("| GEO:")[0].Trim();
 
+        var calc = Drogueria.Controllers.RepartidorGananciasHelper.Calcular(p);
+
         <div class="hist-card">
             <div class="hist-card-header">
                 <div class="d-flex align-items-center gap-2 flex-wrap">
                     <code class="fw-bold fs-6 text-success">#@shortId</code>
                     <span class="badge-entregado">
                         <i class="bi bi-check-all"></i> Entregado
+                    </span>
+                    <span class="badge rounded-pill bg-success-subtle text-success-emphasis border border-success-subtle fw-semibold px-2 py-1" style="font-size:11px;">
+                        <i class="bi bi-cash-coin me-1"></i>Ganancia: $@calc.GananciaTotal.ToString("N2")
                     </span>
                 </div>
                 <span class="text-muted" style="font-size:12px;">
@@ -187,9 +207,40 @@ else
                                 </ul>
                             </div>
                         </div>
-                        <div class="d-flex align-items-center justify-content-between pt-3 mt-2" style="border-top:1px solid var(--border);">
-                            <span class="text-muted fw-semibold" style="font-size:13px;">Total del Pedido</span>
-                            <span class="fs-5 fw-bold text-success">$@p.Total.ToString("N2")</span>
+
+                        <!-- Panel detallado de ganancias del repartidor -->
+                        <div class="p-3 rounded-3 mt-3 mb-2" style="background: rgba(16,185,129,.07); border: 1px solid rgba(16,185,129,.25);">
+                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                                <span class="fw-bold text-success d-inline-flex align-items-center gap-2" style="font-size:14px;">
+                                    <i class="bi bi-wallet2 fs-5"></i> Tu Ganancia por esta Entrega:
+                                </span>
+                                <span class="fs-4 fw-bold text-success">$@calc.GananciaTotal.ToString("N2")</span>
+                            </div>
+                            <div class="d-flex flex-wrap gap-2 pt-2 border-top" style="border-color: rgba(16,185,129,.2) !important; font-size:11.5px;">
+                                <span class="badge bg-light text-dark border">
+                                    <i class="bi bi-truck text-primary me-1"></i> Tarifa de envío: <strong>$@calc.TarifaEnvio.ToString("N2")</strong>
+                                </span>
+                                <span class="badge bg-light text-dark border">
+                                    <i class="bi bi-heart-fill text-danger me-1"></i> Propina: <strong>$@calc.Propina.ToString("N2")</strong>
+                                </span>
+                                @if (calc.SuperaLimite)
+                                {
+                                    <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle fw-bold" title="12% de comisión sobre la compra de $@calc.SubtotalProductos.ToString("N2") por superar el límite de $45.000">
+                                        <i class="bi bi-award-fill text-warning me-1"></i> Bono 12% (> $45.000): <strong>+$@calc.Comision12.ToString("N2")</strong>
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-light text-muted border" title="Aplica 12% cuando la compra de productos es mayor a $45.000">
+                                        <i class="bi bi-dash-circle me-1"></i> Bono 12%: $0 (&lt; $45.000)
+                                    </span>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center justify-content-between pt-2 text-muted" style="font-size:12px;">
+                            <span>Total Facturado al Cliente:</span>
+                            <span class="fw-semibold text-secondary">$@p.Total.ToString("N2")</span>
                         </div>
                     </div>
                     @if (hasCoords)

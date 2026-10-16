@@ -122,8 +122,10 @@ else
                                     <option value="">-- Sin asignar --</option>
                                     @foreach (var rep in repartidores)
                                     {
+                                        var estadoIcon = rep.EstaEnLinea ? "🟢 " : "⚪ ";
+                                        var estadoTexto = rep.EstaEnLinea ? "" : " (En descanso)";
                                         <option value="@rep.Uuid" selected="@(p.RepartidorId == rep.Uuid)">
-                                            @rep.Nombre @rep.Apellido
+                                            @estadoIcon@rep.Nombre @rep.Apellido@estadoTexto
                                         </option>
                                     }
                                 </select>

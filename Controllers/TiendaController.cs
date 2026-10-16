@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Text.Json;
 using Drogueria.Data;
 using Drogueria.Models;
+using Drogueria.Services;
 
 namespace Drogueria.Controllers
 {
@@ -12,12 +13,14 @@ namespace Drogueria.Controllers
     public class TiendaController : Controller
     {
         private readonly AppDbContex _context;
+        private readonly AsignacionRepartidorService _asignacionService;
         private const string CarritoSessionKey = "Carrito";
         private const string CarritoCookieKey  = "Drogueria_Carrito_Persistente";
 
-        public TiendaController(AppDbContex context)
+        public TiendaController(AppDbContex context, AsignacionRepartidorService asignacionService)
         {
             _context = context;
+            _asignacionService = asignacionService;
         }
 
         // GET: /Tienda/Catalogo
@@ -642,18 +645,8 @@ namespace Drogueria.Controllers
                 });
             }
 
-            // Asignar automáticamente al repartidor disponible con menos pedidos activos
-            var repartidorAsignado = await _context.Usuarios
-                .Where(u => u.Rol == "Repartidor" && u.Estado)
-                .GroupJoin(
-                    _context.Pedidos.Where(p => p.Estado == "En camino" || p.Estado == "Confirmado"),
-                    u => u.Uuid,
-                    p => p.RepartidorId,
-                    (u, pedidos) => new { Usuario = u, PedidosActivos = pedidos.Count() }
-                )
-                .OrderBy(x => x.PedidosActivos)
-                .Select(x => x.Usuario)
-                .FirstOrDefaultAsync();
+            // Asignación inteligente por Proximidad/GPS, carga balanceada y equidad
+            var repartidorAsignado = await _asignacionService.SeleccionarRepartidorOptimoAsync(pedido.DireccionEntrega);
 
             if (repartidorAsignado != null)
             {

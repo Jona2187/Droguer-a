@@ -12,7 +12,7 @@ public class Producto
     [StringLength(100, ErrorMessage = "El nombre no puede superar 100 caracteres")]
     public string Nombre { get; set; } = "";
 
-    [StringLength(255, ErrorMessage = "La descripción no puede superar 255 caracteres")]
+    [StringLength(2000, ErrorMessage = "La descripción no puede superar 2000 caracteres")]
     public string? Descripcion { get; set; }
 
     [Required(ErrorMessage = "La dosis o concentración es obligatoria")]

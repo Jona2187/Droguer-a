@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Drogueria.Data;
 using Drogueria.Models;
+using Drogueria.Services;
 
 namespace Drogueria.Controllers
 {
@@ -11,10 +12,12 @@ namespace Drogueria.Controllers
     public class EmpleadoController : Controller
     {
         private readonly AppDbContex _context;
+        private readonly AsignacionRepartidorService _asignacionService;
 
-        public EmpleadoController(AppDbContex context)
+        public EmpleadoController(AppDbContex context, AsignacionRepartidorService asignacionService)
         {
             _context = context;
+            _asignacionService = asignacionService;
         }
 
         // ── PRODUCTOS (vista de consulta) ─────────────────────
@@ -204,6 +207,59 @@ namespace Drogueria.Controllers
                     id = pedido.Id,
                     repartidorId = pedido.RepartidorId,
                     repartidorNombre = repartidorNombre,
+                    estado = pedido.Estado
+                });
+            }
+
+            TempData["Exito"] = successMsg;
+            return RedirectToAction(nameof(Pedidos));
+        }
+
+        // POST: /Empleado/AutoAsignarRepartidor
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AutoAsignarRepartidor(Guid id)
+        {
+            var isAjax = Request.Headers["X-Requested-With"] == "XMLHttpRequest" || Request.Headers.Accept.ToString().Contains("application/json");
+
+            var pedido = await _context.Pedidos.FindAsync(id);
+            if (pedido == null)
+            {
+                var errorMsg = "Pedido no encontrado.";
+                if (isAjax) return Json(new { success = false, message = errorMsg });
+                TempData["Error"] = errorMsg;
+                return RedirectToAction(nameof(Pedidos));
+            }
+
+            var repartidor = await _asignacionService.SeleccionarRepartidorOptimoAsync(pedido.DireccionEntrega);
+            if (repartidor == null)
+            {
+                var errorMsg = "No hay repartidores en línea disponibles en este momento. El pedido permanecerá como 'Pendiente'.";
+                if (isAjax) return Json(new { success = false, message = errorMsg });
+                TempData["Error"] = errorMsg;
+                return RedirectToAction(nameof(Pedidos));
+            }
+
+            pedido.RepartidorId = repartidor.Uuid;
+            if (pedido.Estado == "Pendiente")
+            {
+                pedido.Estado = "Confirmado";
+            }
+
+            _context.Pedidos.Update(pedido);
+            await _context.SaveChangesAsync();
+
+            var nombreCompleto = $"{repartidor.Nombre} {repartidor.Apellido}".Trim();
+            var successMsg = $"Asignado a {nombreCompleto} por cercanía GPS y disponibilidad.";
+
+            if (isAjax)
+            {
+                return Json(new {
+                    success = true,
+                    message = successMsg,
+                    id = pedido.Id,
+                    repartidorId = pedido.RepartidorId,
+                    repartidorNombre = nombreCompleto,
                     estado = pedido.Estado
                 });
             }

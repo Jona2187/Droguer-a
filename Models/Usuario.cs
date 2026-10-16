@@ -50,6 +50,11 @@ public class Usuario
     [StringLength(20)]
     public string? Placa { get; set; }
 
+    /// <summary>
+    /// Indica si el repartidor está en línea/activo para recibir pedidos (true) o descansando/inactivo (false).
+    /// </summary>
+    public bool EstaEnLinea { get; set; } = true;
+
     public ICollection<Pedido> Pedidos { get; set; } = new List<Pedido>();
     public ICollection<Pedido> PedidosAsignados { get; set; } = new List<Pedido>();
     public ICollection<DireccionUsuario> Direcciones { get; set; } = new List<DireccionUsuario>();

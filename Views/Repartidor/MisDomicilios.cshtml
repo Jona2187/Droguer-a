@@ -7,6 +7,8 @@
     var totalActivos = lista.Count();
     var enCamino = lista.Count(p => p.Estado == "En camino");
     var pendientes = lista.Count(p => p.Estado == "Pendiente" || p.Estado == "Confirmado");
+    var estaEnLinea = ViewBag.EstaEnLinea != null ? (bool)ViewBag.EstaEnLinea : true;
+    var nombreRepartidor = ViewBag.RepartidorNombre as string ?? "Repartidor";
 }
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -14,6 +16,68 @@
 <style>
 .domicilios-wrap { padding: 28px 24px; max-width: 1200px; margin: 0 auto; }
 @@media (max-width: 576px) { .domicilios-wrap { padding: 16px 12px; } }
+
+/* Tarjeta de estado de trabajo (En Línea / En Descanso) */
+.disponibilidad-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 20px 24px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.05);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    transition: all .3s ease;
+}
+.disponibilidad-card.en-linea {
+    border-left: 5px solid #10b981;
+    background: linear-gradient(to right, rgba(16,185,129,.06), var(--bg-card) 40%);
+}
+.disponibilidad-card.en-descanso {
+    border-left: 5px solid #f59e0b;
+    background: linear-gradient(to right, rgba(245,158,11,.06), var(--bg-card) 40%);
+}
+[data-bs-theme="dark"] .disponibilidad-card { box-shadow: 0 4px 24px rgba(0,0,0,.4); }
+
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 99px;
+    font-size: 13px;
+    font-weight: 700;
+}
+.status-pill.online {
+    background: rgba(16,185,129,.15);
+    color: #10b981;
+    border: 1px solid rgba(16,185,129,.35);
+}
+.status-pill.resting {
+    background: rgba(245,158,11,.15);
+    color: #d97706;
+    border: 1px solid rgba(245,158,11,.35);
+}
+[data-bs-theme="dark"] .status-pill.online { color: #34d399; }
+[data-bs-theme="dark"] .status-pill.resting { color: #fbbf24; }
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+}
+.status-dot.online {
+    background-color: #10b981;
+    box-shadow: 0 0 10px #10b981;
+    animation: pulse 1.8s infinite;
+}
+.status-dot.resting {
+    background-color: #f59e0b;
+}
 
 .domicilio-card { background: var(--bg-card); border-radius: 18px; border: 1px solid var(--border); box-shadow: 0 2px 12px rgba(0,0,0,.06); overflow: hidden; margin-bottom: 24px; }
 .domicilio-card.en-camino { border: 2px solid #f59e0b; box-shadow: 0 2px 20px rgba(245,158,11,.18); }
@@ -91,9 +155,59 @@
     </div>
 }
 
+<!-- Toast flotante dinámico para notificaciones inmediatas -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 1090;">
+    <div id="disponibilidadToast" class="toast align-items-center text-white border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true" style="border-radius: 14px;">
+        <div class="d-flex">
+            <div class="toast-body d-flex align-items-center gap-2 fw-semibold" id="disponibilidadToastBody">
+                <i class="bi bi-info-circle-fill fs-5"></i>
+                <span id="disponibilidadToastMsg">Estado actualizado</span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
 <div class="mb-4">
     <h1 class="fw-bold mb-1" style="font-size: clamp(1.4rem, 4vw, 2rem);">Mis Domicilios</h1>
-    <p class="text-muted mb-0" style="font-size:14px;">Pedidos activos asignados. Visualiza la ruta óptima al cliente y el tiempo aproximado de llegada.</p>
+    <p class="text-muted mb-0" style="font-size:14px;">Pedidos activos asignados. Visualiza la ruta óptima al cliente y gestiona tus entregas.</p>
+</div>
+
+<!-- PANEL DE CONTROL DE DISPONIBILIDAD (EN LÍNEA / DESCANSO) -->
+<div class="disponibilidad-card @(estaEnLinea ? "en-linea" : "en-descanso")" id="cardDisponibilidad">
+    <div class="d-flex align-items-center gap-3">
+        <div class="status-indicator-icon p-3 rounded-circle d-flex align-items-center justify-content-center shadow-sm"
+             id="statusIconBox"
+             style="width: 54px; height: 54px; background: @(estaEnLinea ? "rgba(16,185,129,.15)" : "rgba(245,158,11,.15)"); color: @(estaEnLinea ? "#10b981" : "#f59e0b");">
+            <i class="bi @(estaEnLinea ? "bi-broadcast" : "bi-cup-hot-fill") fs-4"></i>
+        </div>
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                <span class="status-pill @(estaEnLinea ? "online" : "resting")" id="statusBadge">
+                    <span class="status-dot @(estaEnLinea ? "online" : "resting")" id="statusDot"></span>
+                    <span id="statusText">@(estaEnLinea ? "EN LÍNEA · Activo" : "EN DESCANSO · Inactivo")</span>
+                </span>
+                <span class="badge bg-light text-muted border px-2 py-1" style="font-size: 11px;">Disponibilidad</span>
+            </div>
+            <p class="text-muted mb-0" id="statusDesc" style="font-size: 13px; max-width: 650px;">
+                @(estaEnLinea 
+                    ? "Estás activo y disponible. El sistema te asignará nuevos pedidos automáticamente por cercanía." 
+                    : $"Estás en modo descanso. No se te asignarán nuevos pedidos. Puedes continuar y entregar tus {totalActivos} pedidos asignados normalmente.")
+            </p>
+        </div>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <form id="formDisponibilidad" asp-controller="Repartidor" asp-action="ToggleDisponibilidad" method="post" class="d-inline">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="enLinea" id="inputEnLinea" value="@((!estaEnLinea).ToString().ToLowerInvariant())" />
+            <button type="button" class="btn @(estaEnLinea ? "btn-outline-warning" : "btn-success") rounded-pill px-4 py-2 fw-bold d-inline-flex align-items-center gap-2 shadow-sm"
+                    id="btnToggleDisponibilidad"
+                    onclick="cambiarEstadoDisponibilidad()">
+                <i class="bi @(estaEnLinea ? "bi-pause-circle-fill" : "bi-play-circle-fill")"></i>
+                <span id="btnToggleText">@(estaEnLinea ? "Pausar y Descansar" : "Conectarme (En Línea)")</span>
+            </button>
+        </form>
+    </div>
 </div>
 
 <div class="row g-3 mb-4">
@@ -245,9 +359,41 @@ else
                             </div>
                         </div>
 
-                        <div class="d-flex align-items-center justify-content-between mt-3 pt-3 border-top">
-                            <span class="text-muted fw-semibold" style="font-size:13px;">Total del Pedido</span>
-                            <span class="fs-5 fw-bold text-primary">$@p.Total.ToString("N2")</span>
+                        @{
+                            var calc = Drogueria.Controllers.RepartidorGananciasHelper.Calcular(p);
+                        }
+                        <div class="p-3 rounded-3 mt-3 mb-2" style="background: rgba(16,185,129,.07); border: 1px solid rgba(16,185,129,.25);">
+                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                                <span class="fw-bold text-success d-inline-flex align-items-center gap-2" style="font-size:13.5px;">
+                                    <i class="bi bi-wallet2 fs-5"></i> Tu Ganancia estimada:
+                                </span>
+                                <span class="fs-4 fw-bold text-success">$@calc.GananciaTotal.ToString("N2")</span>
+                            </div>
+                            <div class="d-flex flex-wrap gap-2 pt-2 border-top" style="border-color: rgba(16,185,129,.2) !important; font-size:11.5px;">
+                                <span class="badge bg-light text-dark border">
+                                    <i class="bi bi-truck text-primary me-1"></i> Tarifa de envío: <strong>$@calc.TarifaEnvio.ToString("N2")</strong>
+                                </span>
+                                <span class="badge bg-light text-dark border">
+                                    <i class="bi bi-heart-fill text-danger me-1"></i> Propina: <strong>$@calc.Propina.ToString("N2")</strong>
+                                </span>
+                                @if (calc.SuperaLimite)
+                                {
+                                    <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle fw-bold" title="12% de comisión sobre la compra de $@calc.SubtotalProductos.ToString("N2") por superar el límite de $45.000">
+                                        <i class="bi bi-award-fill text-warning me-1"></i> Bono 12% (> $45.000): <strong>+$@calc.Comision12.ToString("N2")</strong>
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-light text-muted border">
+                                        <i class="bi bi-dash-circle me-1"></i> Bono 12%: $0 (&lt; $45.000)
+                                    </span>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center justify-content-between pt-2 text-muted" style="font-size:12px;">
+                            <span>Total a cobrar/facturado al cliente:</span>
+                            <span class="fw-semibold text-secondary">$@p.Total.ToString("N2")</span>
                         </div>
                     </div>
 
@@ -833,5 +979,97 @@ connection.on('RecibirMensajeChat', function (pid, remitente, mensaje, hora) {
         if (window.showAppToast) window.showAppToast(`Mensaje del cliente: "${mensaje.substring(0,40)}"`, 'info');
     }
 });
+
+// Control interactivo de disponibilidad En Línea / Descanso
+function cambiarEstadoDisponibilidad() {
+    const btn = document.getElementById('btnToggleDisponibilidad');
+    const input = document.getElementById('inputEnLinea');
+    const form = document.getElementById('formDisponibilidad');
+    const token = form ? (form.querySelector('input[name="__RequestVerificationToken"]')?.value || '') : '';
+
+    if (!btn || !input) return;
+    const nuevoEstado = input.value === 'true';
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Actualizando...';
+
+    const formData = new FormData();
+    formData.append('enLinea', nuevoEstado);
+    if (token) formData.append('__RequestVerificationToken', token);
+
+    fetch('/Repartidor/ToggleDisponibilidad', {
+        method: 'POST',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        body: formData
+    })
+    .then(r => r.json())
+    .then(data => {
+        btn.disabled = false;
+        if (data.success) {
+            const estaEnLinea = data.estaEnLinea;
+            input.value = (!estaEnLinea).toString();
+
+            const card = document.getElementById('cardDisponibilidad');
+            const iconBox = document.getElementById('statusIconBox');
+            const badge = document.getElementById('statusBadge');
+            const dot = document.getElementById('statusDot');
+            const text = document.getElementById('statusText');
+            const desc = document.getElementById('statusDesc');
+
+            if (estaEnLinea) {
+                if (card) card.className = 'disponibilidad-card en-linea';
+                if (iconBox) {
+                    iconBox.style.background = 'rgba(16,185,129,.15)';
+                    iconBox.style.color = '#10b981';
+                    iconBox.innerHTML = '<i class="bi bi-broadcast fs-4"></i>';
+                }
+                if (badge) badge.className = 'status-pill online';
+                if (dot) dot.className = 'status-dot online';
+                if (text) text.textContent = 'EN LÍNEA · Activo';
+                if (desc) desc.textContent = 'Estás activo y disponible. El sistema te asignará nuevos pedidos automáticamente por cercanía.';
+                btn.className = 'btn btn-outline-warning rounded-pill px-4 py-2 fw-bold d-inline-flex align-items-center gap-2 shadow-sm';
+                btn.innerHTML = '<i class="bi bi-pause-circle-fill"></i> <span id="btnToggleText">Pausar y Descansar</span>';
+            } else {
+                if (card) card.className = 'disponibilidad-card en-descanso';
+                if (iconBox) {
+                    iconBox.style.background = 'rgba(245,158,11,.15)';
+                    iconBox.style.color = '#f59e0b';
+                    iconBox.innerHTML = '<i class="bi bi-cup-hot-fill fs-4"></i>';
+                }
+                if (badge) badge.className = 'status-pill resting';
+                if (dot) dot.className = 'status-dot resting';
+                if (text) text.textContent = 'EN DESCANSO · Inactivo';
+                if (desc) desc.textContent = 'Estás en modo descanso. No se te asignarán nuevos pedidos. Puedes continuar y entregar tus pedidos asignados normalmente.';
+                btn.className = 'btn btn-success rounded-pill px-4 py-2 fw-bold d-inline-flex align-items-center gap-2 shadow-sm';
+                btn.innerHTML = '<i class="bi bi-play-circle-fill"></i> <span id="btnToggleText">Conectarme (En Línea)</span>';
+            }
+
+            mostrarToastDisponibilidad(data.message, estaEnLinea ? 'success' : 'warning');
+        } else {
+            alert(data.message || 'Error al actualizar disponibilidad.');
+            btn.innerHTML = '<i class="bi bi-exclamation-triangle"></i> Reintentar';
+        }
+    })
+    .catch(err => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-exclamation-triangle"></i> Error';
+        console.error(err);
+    });
+}
+
+function mostrarToastDisponibilidad(msg, tipo) {
+    const el = document.getElementById('disponibilidadToast');
+    const msgEl = document.getElementById('disponibilidadToastMsg');
+    if (!el || !msgEl) return;
+    
+    el.className = `toast align-items-center text-white border-0 shadow-lg ${tipo === 'success' ? 'bg-success' : 'bg-warning text-dark'}`;
+    msgEl.textContent = msg;
+    if (typeof bootstrap !== 'undefined' && bootstrap.Toast) {
+        const toast = new bootstrap.Toast(el, { delay: 4500 });
+        toast.show();
+    } else {
+        el.style.display = 'block';
+        setTimeout(() => { el.style.display = 'none'; }, 4500);
+    }
+}
 </script>
 }

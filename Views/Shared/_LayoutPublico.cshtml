@@ -93,7 +93,7 @@
 
 <!-- Google Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 <!-- Bootstrap 5 CSS -->
@@ -333,7 +333,7 @@
                     <a href="#" class="pub-social-btn" aria-label="Instagram" id="socialInstagram">
                         <i class="bi bi-instagram"></i>
                     </a>
-                    <a href="#" class="pub-social-btn" aria-label="WhatsApp" id="socialWhatsapp">
+                    <a href="https://wa.me/573135248994" class="pub-social-btn" aria-label="WhatsApp" id="socialWhatsapp" target="_blank" rel="noopener">
                         <i class="bi bi-whatsapp"></i>
                     </a>
                     <a href="#" class="pub-social-btn" aria-label="Twitter" id="socialTwitter">
@@ -389,10 +389,12 @@
                     <!-- Columna 2 -->
                     <div>
                         <div class="pub-footer-contact-item">
-                            <div class="pub-footer-contact-icon">
-                                <i class="bi bi-whatsapp"></i>
-                            </div>
-                            <span>WhatsApp: +57 300 123 4567</span>
+                            <a href="https://wa.me/573135248994" target="_blank" rel="noopener" class="d-flex align-items-center gap-2 text-decoration-none text-reset">
+                                <div class="pub-footer-contact-icon">
+                                    <i class="bi bi-whatsapp"></i>
+                                </div>
+                                <span>WhatsApp: +57 313 524 8994</span>
+                            </a>
                         </div>
 
                         <div class="pub-footer-contact-item">
@@ -520,6 +522,8 @@
         }
     })();
 </script>
+
+<partial name="_ModalesAutenticacion" />
 
 @await RenderSectionAsync("Scripts", required: false)
 

@@ -25,6 +25,7 @@ namespace Drogueria.Controllers
         public async Task<IActionResult> MisDomicilios()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.Uuid == userId);
 
             var pedidos = await _context.Pedidos
                 .Include(p => p.Usuario)
@@ -36,6 +37,8 @@ namespace Drogueria.Controllers
 
             ViewData["Title"] = "Mis Domicilios";
             ViewData["ActiveNav"] = "misdomicilios";
+            ViewBag.EstaEnLinea = usuario?.EstaEnLinea ?? true;
+            ViewBag.RepartidorNombre = usuario != null ? $"{usuario.Nombre} {usuario.Apellido}".Trim() : "Repartidor";
 
             return View("~/Views/Repartidor/MisDomicilios.cshtml", pedidos);
         }
@@ -44,6 +47,7 @@ namespace Drogueria.Controllers
         public async Task<IActionResult> Historial()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.Uuid == userId);
 
             var pedidos = await _context.Pedidos
                 .Include(p => p.Usuario)
@@ -55,8 +59,48 @@ namespace Drogueria.Controllers
 
             ViewData["Title"] = "Historial de Entregas";
             ViewData["ActiveNav"] = "historial";
+            ViewBag.EstaEnLinea = usuario?.EstaEnLinea ?? true;
+            ViewBag.RepartidorNombre = usuario != null ? $"{usuario.Nombre} {usuario.Apellido}".Trim() : "Repartidor";
 
             return View("~/Views/Repartidor/Historial.cshtml", pedidos);
+        }
+
+        // POST: /Repartidor/ToggleDisponibilidad
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ToggleDisponibilidad([FromForm] bool? enLinea)
+        {
+            var isAjax = Request.Headers["X-Requested-With"] == "XMLHttpRequest" ||
+                         Request.Headers.Accept.ToString().Contains("application/json");
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.Uuid == userId);
+
+            if (usuario == null)
+            {
+                if (isAjax) return Json(new { success = false, message = "Usuario repartidor no encontrado." });
+                TempData["Error"] = "Usuario repartidor no encontrado.";
+                return RedirectToAction(nameof(MisDomicilios));
+            }
+
+            usuario.EstaEnLinea = enLinea.HasValue ? enLinea.Value : !usuario.EstaEnLinea;
+            _context.Usuarios.Update(usuario);
+            await _context.SaveChangesAsync();
+
+            var mensaje = usuario.EstaEnLinea
+                ? "¡Estás En Línea! Ahora estás disponible para recibir nuevos pedidos."
+                : "Has pasado a modo Descanso. No recibirás nuevos pedidos mientras estés descansando, pero puedes finalizar los que tienes asignados.";
+
+            if (isAjax)
+            {
+                return Json(new {
+                    success = true,
+                    estaEnLinea = usuario.EstaEnLinea,
+                    message = mensaje
+                });
+            }
+
+            TempData["Success"] = mensaje;
+            return RedirectToAction(nameof(MisDomicilios));
         }
 
         // POST: /Repartidor/CambiarEstado
@@ -159,6 +203,53 @@ namespace Drogueria.Controllers
             await _context.SaveChangesAsync();
 
             return Json(new { success = true });
+        }
+    }
+
+    /// <summary>
+    /// Reglas de ganancias del repartidor:
+    /// - Tarifa de envío: $8.000 fijos por cada entrega.
+    /// - Propina voluntaria dejada por el cliente.
+    /// - Comisión del 12% sobre la compra total cuando el pedido supera el límite de $45.000.
+    /// </summary>
+    public static class RepartidorGananciasHelper
+    {
+        public const decimal LimitePedido = 45000m;
+        public const decimal TarifaEnvioBase = 8000m;
+        public const decimal PorcentajeComision = 0.12m;
+
+        public class CalculoGanancia
+        {
+            public decimal SubtotalProductos { get; set; }
+            public decimal TarifaEnvio { get; set; } = TarifaEnvioBase;
+            public decimal Propina { get; set; }
+            public decimal Comision12 { get; set; }
+            public bool SuperaLimite { get; set; }
+            public decimal GananciaTotal => TarifaEnvio + Propina + Comision12;
+        }
+
+        public static CalculoGanancia Calcular(Pedido p)
+        {
+            var subtotal = (p.Detalles != null && p.Detalles.Count > 0)
+                ? p.Detalles.Sum(d => d.Subtotal)
+                : p.Total;
+
+            // En la tienda: pedidos < 45.000 cobran 8.000 de envío al cliente, >= 45.000 tienen envío gratis
+            var envioCobradoCliente = subtotal >= LimitePedido ? 0m : TarifaEnvioBase;
+            var diff = p.Total - subtotal - envioCobradoCliente;
+            var propina = diff > 0m ? diff : 0m;
+
+            bool supera = subtotal >= LimitePedido;
+            decimal comision12 = supera ? Math.Round(subtotal * PorcentajeComision, 2) : 0m;
+
+            return new CalculoGanancia
+            {
+                SubtotalProductos = subtotal,
+                TarifaEnvio = TarifaEnvioBase,
+                Propina = propina,
+                Comision12 = comision12,
+                SuperaLimite = supera
+            };
         }
     }
 }

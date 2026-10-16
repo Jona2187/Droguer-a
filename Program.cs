@@ -3,10 +3,12 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Globalization;
 using Drogueria.Data;
 using Drogueria.Hubs;
+using Drogueria.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<AsignacionRepartidorService>();
 
 builder.Services.AddHttpClient("Nominatim", client =>
 {
@@ -79,20 +81,74 @@ app.MapControllerRoute(
 
 app.MapHub<UbicacionHub>("/hubs/ubicacion");
 
-// Asegurar columnas de perfil y vehículo en la tabla Usuarios
+// Asegurar columnas de perfil y vehículo en la tabla Usuarios sin generar errores en consola
 using (var scope = app.Services.CreateScope())
 {
     try
     {
         var db = scope.ServiceProvider.GetRequiredService<AppDbContex>();
-        try { db.Database.ExecuteSqlRaw("ALTER TABLE Usuarios ADD COLUMN Telefono VARCHAR(20) NULL;"); } catch { }
-        try { db.Database.ExecuteSqlRaw("ALTER TABLE Usuarios ADD COLUMN TipoVehiculo VARCHAR(50) NULL;"); } catch { }
-        try { db.Database.ExecuteSqlRaw("ALTER TABLE Usuarios ADD COLUMN Placa VARCHAR(20) NULL;"); } catch { }
+        var conn = db.Database.GetDbConnection();
+        if (conn.State != System.Data.ConnectionState.Open)
+        {
+            conn.Open();
+        }
 
-        // Asegurar tabla persistente de Mensajes de Chat
+        void AsegurarColumna(string tabla, string columna, string tipoDef)
+        {
+            using var cmdCheck = conn.CreateCommand();
+            cmdCheck.CommandText = @"
+                SELECT COUNT(*) 
+                FROM INFORMATION_SCHEMA.COLUMNS 
+                WHERE TABLE_SCHEMA = DATABASE() 
+                  AND TABLE_NAME = @tabla 
+                  AND COLUMN_NAME = @columna;";
+
+            var pTabla = cmdCheck.CreateParameter();
+            pTabla.ParameterName = "@tabla";
+            pTabla.Value = tabla;
+            cmdCheck.Parameters.Add(pTabla);
+
+            var pCol = cmdCheck.CreateParameter();
+            pCol.ParameterName = "@columna";
+            pCol.Value = columna;
+            cmdCheck.Parameters.Add(pCol);
+
+            var count = Convert.ToInt32(cmdCheck.ExecuteScalar());
+            if (count == 0)
+            {
+                using var cmdAlter = conn.CreateCommand();
+                cmdAlter.CommandText = $"ALTER TABLE `{tabla}` ADD COLUMN `{columna}` {tipoDef};";
+                cmdAlter.ExecuteNonQuery();
+            }
+        }
+
+        // Asegurar columnas en Usuarios
+        AsegurarColumna("Usuarios", "Telefono", "VARCHAR(20) NULL");
+        AsegurarColumna("Usuarios", "TipoVehiculo", "VARCHAR(50) NULL");
+        AsegurarColumna("Usuarios", "Placa", "VARCHAR(20) NULL");
+        AsegurarColumna("Usuarios", "EstaEnLinea", "TINYINT(1) NOT NULL DEFAULT 1");
+
+        // Asegurar columnas en Pedidos (evita 'Unknown column p.CodigoConfirmacion')
+        AsegurarColumna("Pedidos", "CodigoConfirmacion", "VARCHAR(20) NULL");
+        AsegurarColumna("Pedidos", "MetodoPago", "VARCHAR(50) NULL");
+        AsegurarColumna("Pedidos", "DireccionEntrega", "VARCHAR(300) NULL");
+        AsegurarColumna("Pedidos", "LatitudRepartidor", "DOUBLE NULL");
+        AsegurarColumna("Pedidos", "LongitudRepartidor", "DOUBLE NULL");
+        AsegurarColumna("Pedidos", "UltimaUbicacionFecha", "DATETIME(6) NULL");
+
+        // Ampliar campo de descripción de productos a 2000 caracteres
         try
         {
-            db.Database.ExecuteSqlRaw(@"
+            using var cmdDesc = conn.CreateCommand();
+            cmdDesc.CommandText = "ALTER TABLE Productos MODIFY COLUMN Descripcion VARCHAR(2000) NULL;";
+            cmdDesc.ExecuteNonQuery();
+        }
+        catch { }
+
+        // Asegurar tabla persistente de Mensajes de Chat
+        using (var cmd = conn.CreateCommand())
+        {
+            cmd.CommandText = @"
                 CREATE TABLE IF NOT EXISTS MensajesChat (
                     Id CHAR(36) NOT NULL PRIMARY KEY,
                     PedidoId CHAR(36) NOT NULL,
@@ -100,10 +156,9 @@ using (var scope = app.Services.CreateScope())
                     Mensaje TEXT NOT NULL,
                     Fecha DATETIME NOT NULL,
                     INDEX idx_chat_pedido (PedidoId)
-                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-            ");
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+            cmd.ExecuteNonQuery();
         }
-        catch { }
     }
     catch { }
 }
